@@ -1,17 +1,46 @@
-#include <iostream>
 
 /*
  * Don't be that fucking guy that does: ( i % 2 == 0) ? bgBlack: bgWhite
  * modulos are expensive as they rely on division, and processors can't divide.
  * a bit wise and (or or) on bit 0 will be faster.
+ *
+ * compile: g++ fast_odd_even.cpp -o mod -std=c++17
  */
+
+#include <iostream>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+unsigned long slow(){
+  // Starting time for the clock
+  auto start = high_resolution_clock::now();
+
+  for (int i=0; i<=10000000; ++i)
+    if (i % 2 == 0) { }
+
+  auto stop = high_resolution_clock::now();
+  return duration_cast<microseconds>(stop - start).count();
+}
+
+unsigned long fast(){
+  // Starting time for the clock
+  auto start = high_resolution_clock::now();
+
+  for (int i=0; i<=100000000; ++i)
+    if ( !(i & 1) ) { }
+
+  auto stop = high_resolution_clock::now();
+  return duration_cast<microseconds>(stop - start).count();
+}
+
 int main()
 {
-  for (int i=0; i<=1000000; ++i){
-    if ( (i & 1) )
-      std::cout << i << " odd" << std::endl;
-    else
-      std::cout << i << " even" << std::endl;
-  }
+  auto a = slow();
+  auto b = fast();
+
+  cout << "modulo took " << a << " uSec " << endl;
+  cout << "and took " << b << " uSec " << endl;
   return 0;
 }
