@@ -44,6 +44,12 @@ filetype plugin indent on    " required
 Plugin 'Valloric/YouCompleteMe'
 syntax on
 
+set number
+set relativenumber
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+
 Plugin 'morhetz/gruvbox'
 colorscheme gruvbox
 set background=dark    " Setting dark mode
@@ -62,7 +68,4 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 set splitbelow splitright
 :term ++rows=10
 
-set nu
-set rnu
-set shiftwidth=2
 
