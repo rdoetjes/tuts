@@ -20,7 +20,9 @@ void three(int v){
 
 int main(){
 
-  void (*p[4]) (int x);
+  //declare an array of 3 function pointers that take int as argument
+  void (*p[3]) (int x);
+  //fill the array (you'd do that in your own function normally or based on configuration file for example)
   p[0] = &one;
   p[1] = &two;
   p[2] = &three;
@@ -30,7 +32,9 @@ int main(){
   for(int i=0; i<sizeof(ins)/sizeof(ins[0]); i++)
     (*p[ ins[i] ])(i);
 
+  //declare a map (hash) of 3 function pointers that take int as argument
   std::map<std::string, void (*)(int)> t;
+  //fill the map (you'd do that in your own function normally or based on configuration file for example)
   t["one"] = &one;
   t["two"] = &two;
   t["three"] = &three;
@@ -46,7 +50,8 @@ int main(){
       std::cout << "Not a valid command" << std::endl;
       continue;
     }
-
+    
+    //execute the method in the map with an arg value of 12 (couldn't be bothered to make arg value random :D)
     t[inp](12);
   }
 }
