@@ -32,7 +32,7 @@ int main(){
   for(int i=0; i<sizeof(ins)/sizeof(ins[0]); i++)
     (*p[ ins[i] ])(i);
 
-  //declare a map (hash) of 3 function pointers that take int as argument
+  //declare a map (hash) of 3 function pointers that take int as argument. C++ as std::function which would be a cleaner more c++ approach
   std::map<std::string, void (*)(int)> t;
   //fill the map (you'd do that in your own function normally or based on configuration file for example)
   t["one"] = &one;
