@@ -13,11 +13,13 @@
 using namespace std;
 using namespace std::chrono;
 
+const int ITS = 10000000;
+
 unsigned long slow(){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
 
-  for (int i=0; i<=10000000; ++i)
+  for (int i=0; i<=ITS; ++i)
     if (i % 2 == 0) { }
 
   auto stop = high_resolution_clock::now();
@@ -28,7 +30,7 @@ unsigned long fast(){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
 
-  for (int i=0; i<=100000000; ++i)
+  for (int i=0; i<=ITS; ++i)
     if ( !(i & 1) ) { }
 
   auto stop = high_resolution_clock::now();
