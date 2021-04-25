@@ -13,6 +13,11 @@ void three(int v){
   std::cout << "I am three " << v << std::endl;
 }
 
+/*
+* example of using function pointers in arrays and maps (hashes) to clean up code and avoid
+* large switch or if blocks.
+*/
+
 int main(){
 
   void (*p[4]) (int x);
