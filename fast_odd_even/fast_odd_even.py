@@ -11,7 +11,7 @@ def slow():
 
 def fast():
     for i in range (0, ITS):
-        if i & 2:
+        if not i & 2:
             pass
 
     

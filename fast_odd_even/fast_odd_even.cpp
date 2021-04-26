@@ -9,6 +9,9 @@
 
 #include <iostream>
 #include <chrono>
+#include <vector>
+#include <numeric>
+#include <algorithm>
 
 using namespace std;
 using namespace std::chrono;
@@ -30,6 +33,17 @@ unsigned long fast(int ITS){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
 
+	//00000001
+	//00000001 &
+	//00000001
+	//
+	//00000010
+	//00000001
+	//00000000
+	//
+	//00000011
+	//00000001
+	//00000001
   for (int i=0; i<=ITS; ++i)
     if ( !(i & 1) ) { }
 
@@ -41,10 +55,25 @@ int main()
 {
 	const int ITS = 10000000;
 
-  auto a = slow(ITS);
-  auto b = fast(ITS);
+	vector<long> aC;
+	vector<long> bC;
 
-  cout << "modulo took " << a << " uSec " << endl;
-  cout << "and took " << b << " uSec " << endl;
+	for(int i=0; i<100; i++){
+		auto a = slow(ITS);
+		aC.push_back(a);
+
+		auto b = fast(ITS);
+		bC.push_back(b);
+	}
+
+	float aCA = accumulate( aC.begin(), aC.end(), 0.0) / aC.size();
+	float maxA = *max_element(aC.begin(), aC.end());
+
+	float bCA = accumulate( bC.begin(), bC.end(), 0.0) / bC.size();
+	float maxB = *max_element(bC.begin(), bC.end());
+ 
+  cout << "modulo took on average: " << aCA << " uSec with max: " << maxA << " uSec" << endl;
+  cout << "and took on average: " << bCA << " uSec with max: " << maxB << " uSec" << endl;
+
   return 0;
 }
