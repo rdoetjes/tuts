@@ -17,35 +17,27 @@ using namespace std;
 using namespace std::chrono;
 
 
-unsigned long slow(int ITS){
+unsigned long moduloMethod(int ITS){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
+  unsigned int temp = 0;
 
   for (int i=0; i<=ITS; ++i)
-    if (i % 2 == 0) { }
-
+    if (i % 2 == 0) { temp+=i; }
+	std::cout << temp << endl;
   auto stop = high_resolution_clock::now();
 
   return duration_cast<microseconds>(stop - start).count();
 }
 
-unsigned long fast(int ITS){
+unsigned long andMethod(int ITS){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
+  unsigned int temp = 0;
 
-	//00000001
-	//00000001 &
-	//00000001
-	//
-	//00000010
-	//00000001
-	//00000000
-	//
-	//00000011
-	//00000001
-	//00000001
   for (int i=0; i<=ITS; ++i)
-    if ( !(i & 1) ) { }
+    if ( !(i & 1) ) { temp+=i; }
+	std::cout << temp << endl;
 
   auto stop = high_resolution_clock::now();
   return duration_cast<microseconds>(stop - start).count();
@@ -59,21 +51,23 @@ int main()
 	vector<long> bC;
 
 	for(int i=0; i<100; i++){
-		auto a = slow(ITS);
+		auto a = andMethod(ITS);
 		aC.push_back(a);
 
-		auto b = fast(ITS);
+		auto b = moduloMethod(ITS);
 		bC.push_back(b);
 	}
 
 	float aCA = accumulate( aC.begin(), aC.end(), 0.0) / aC.size();
 	float maxA = *max_element(aC.begin(), aC.end());
+	float minA = *min_element(aC.begin(), aC.end());
 
 	float bCA = accumulate( bC.begin(), bC.end(), 0.0) / bC.size();
 	float maxB = *max_element(bC.begin(), bC.end());
+	float minB = *min_element(bC.begin(), bC.end());
  
-  cout << "modulo took on average: " << aCA << " uSec with max: " << maxA << " uSec" << endl;
-  cout << "and took on average: " << bCA << " uSec with max: " << maxB << " uSec" << endl;
+  cout << "and took on average: " << aCA << " uSec max: " << maxA << " uSec min: " << minA << " uSec" << endl;
+  cout << "modulo took on average: " << bCA << " uSec max: " << maxB << " uSec min: " << minB << " uSec" << endl;
 
   return 0;
 }

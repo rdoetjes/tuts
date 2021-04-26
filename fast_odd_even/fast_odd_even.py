@@ -4,23 +4,41 @@ import time
 
 ITS = 10000000
 
-def slow():
+def moduloMethod():
     for i in range (0, ITS):
         if i % 2 == 0:
             pass
 
-def fast():
+def andMethod():
     for i in range (0, ITS):
         if not i & 2:
             pass
 
-    
-start = time.time_ns()
-slow()
-stop  = time.time_ns()
-print("modulo took: %d " % ( (stop - start) / 1000 ) )
+def Average(lst):
+    return sum(lst) / len(lst)
 
-start = time.time_ns()
-slow()
-stop  = time.time_ns()
-print("and took: %d " % ( (stop - start) /1000 ) )
+aC = []
+bC = []
+
+for i in range(0, 100):   
+    start = time.time_ns()
+    andMethod()
+    stop  = time.time_ns()
+    aC.append(stop-start)
+
+    start = time.time_ns()
+    moduloMethod()
+    stop  = time.time_ns()
+    bC.append(stop-start)
+
+aAvg = Average(aC)
+aMax = max(aC)
+aMin = min(aC)
+
+bAvg = Average(bC)
+bMax = max(bC)
+bMin = min(bC)
+
+print("and method average %d max %d min %d" % (aAvg, aMax, aMin))
+print("modulo method average %d max %d min %d" % (bAvg, bMax, bMin))
+
