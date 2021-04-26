@@ -1,5 +1,5 @@
 set nocompatible              " be iMproved, required
-filetype off                  " required
+filetype on                   " required
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -84,6 +84,9 @@ augroup AutoChdir
   autocmd BufEnter * if &buftype !=# 'terminal' | lchdir %:p:h | endif
 augroup END
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+Plugin 'tpope/vim-commentary'
+"use <n>gcc to comment n lines example 10gcc and to uncomment do 10gcc again
 
 set splitbelow splitright
 :term ++rows=10
