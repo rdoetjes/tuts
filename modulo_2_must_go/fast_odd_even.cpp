@@ -7,61 +7,63 @@
  * compile: g++ fast_odd_even.cpp -o mod -std=c++17
  */
 
-#include <iostream>
-#include <chrono>
-#include <vector>
-#include <numeric>
 #include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <numeric>
+#include <vector>
 
 using namespace std;
 using namespace std::chrono;
 
-
-unsigned long long moduloMethod(int ITS){
+unsigned long long moduloMethod(int ITS) {
   // Starting time for the clock
   auto startTime = high_resolution_clock::now();
   unsigned int temp = 0;
 
-  for (int i=0; i<=ITS; ++i)
-    if (i % 2 == 0) { temp+=i; }
-	std::cout << temp << endl;
-	auto endTime = high_resolution_clock::now();
+  for (int i = 0; i <= ITS; ++i)
+    if (i % 2 == 0) {
+      temp += i;
+    }
+  std::cout << temp << endl;
+  auto endTime = high_resolution_clock::now();
 
-	return duration_cast<microseconds>(endTime - startTime).count();
+  return duration_cast<microseconds>(endTime - startTime).count();
 }
 
-unsigned long long andMethod(int ITS){
+unsigned long long andMethod(int ITS) {
   // Starting time for the clock
   auto startTime = high_resolution_clock::now();
   unsigned int temp = 0;
 
-  for (int i=0; i<=ITS; ++i)
-    if ( !( i & 1 ) ) { temp+=i; }
-	std::cout << temp << endl;
+  for (int i = 0; i <= ITS; ++i)
+    if (!(i & 1)) {
+      temp += i;
+    }
+  std::cout << temp << endl;
 
-	auto endTime = high_resolution_clock::now();
-	return duration_cast<microseconds>(endTime - startTime).count();
+  auto endTime = high_resolution_clock::now();
+  return duration_cast<microseconds>(endTime - startTime).count();
 }
 
-int main()
-{
-	const int ITS = 10000000;
+int main() {
+  const int ITS = 10000000;
 
-	vector<long> aC;
-	vector<long> bC;
+  vector<long> aC;
+  vector<long> bC;
 
-	for(int i=0; i<100; i++){
-		auto a = andMethod(ITS);
-		aC.push_back(a);
+  for (int i = 0; i < 100; i++) {
+    auto a = andMethod(ITS);
+    aC.push_back(a);
 
-		auto b = moduloMethod(ITS);
-		bC.push_back(b);
-	}
+    auto b = moduloMethod(ITS);
+    bC.push_back(b);
+  }
 
-	float aCA = accumulate( aC.begin(), aC.end(), 0.0) / aC.size();
+  float aCA = accumulate(aC.begin(), aC.end(), 0.0) / aC.size();
 
-	float bCA = accumulate( bC.begin(), bC.end(), 0.0) / bC.size();
- 
+  float bCA = accumulate(bC.begin(), bC.end(), 0.0) / bC.size();
+
   cout << "and    took on average: " << aCA << endl;
   cout << "modulo took on average: " << bCA << endl;
 
