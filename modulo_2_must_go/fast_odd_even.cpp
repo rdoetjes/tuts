@@ -16,34 +16,27 @@
 using namespace std;
 using namespace std::chrono;
 
-unsigned long long moduloMethod(int ITS) {
+void moduloMethod(const int ITS) {
   // Starting time for the clock
-  auto startTime = high_resolution_clock::now();
-  unsigned int temp = 0;
+  int temp = 0;
 
-  for (int i = 0; i <= ITS; ++i)
+  for (int i = 0; i < ITS; ++i) {
     if (i % 2 == 0) {
-      temp += i;
+      temp++;
     }
+  }
   std::cout << temp << endl;
-  auto endTime = high_resolution_clock::now();
-
-  return duration_cast<microseconds>(endTime - startTime).count();
 }
 
-unsigned long long andMethod(int ITS) {
-  // Starting time for the clock
-  auto startTime = high_resolution_clock::now();
-  unsigned int temp = 0;
+void andMethod(const int ITS) {
+  int temp = 0;
 
-  for (int i = 0; i <= ITS; ++i)
-    if (!(i & 1)) {
-      temp += i;
+  for (int i = 0; i < ITS; ++i) {
+    if ((i & 1) == 0) {
+      temp++;
     }
+  }
   std::cout << temp << endl;
-
-  auto endTime = high_resolution_clock::now();
-  return duration_cast<microseconds>(endTime - startTime).count();
 }
 
 int main() {
@@ -52,12 +45,19 @@ int main() {
   vector<long> aC;
   vector<long> bC;
 
-  for (int i = 0; i < 100; i++) {
-    auto a = andMethod(ITS);
-    aC.push_back(a);
+  std::chrono::time_point<std::chrono::system_clock> startTime;
+  std::chrono::time_point<std::chrono::system_clock> endTime;
 
-    auto b = moduloMethod(ITS);
-    bC.push_back(b);
+  for (int i = 0; i < 100; i++) {
+    startTime = high_resolution_clock::now();
+    andMethod(ITS);
+    endTime = high_resolution_clock::now();
+    aC.push_back(duration_cast<microseconds>(endTime - startTime).count());
+
+    startTime = high_resolution_clock::now();
+    moduloMethod(ITS);
+    endTime = high_resolution_clock::now();
+    bC.push_back(duration_cast<microseconds>(endTime - startTime).count());
   }
 
   float aCA = accumulate(aC.begin(), aC.end(), 0.0) / aC.size();

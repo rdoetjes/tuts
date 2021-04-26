@@ -2,19 +2,21 @@
 
 import time
 
-ITS = 10000000
 
-
-def moduloMethod():
+def moduloMethod(ITS):
+    temp = 0
     for i in range(0, ITS):
         if i % 2 == 0:
-            pass
+            temp += 1
+    print(temp)
 
 
-def andMethod():
+def andMethod(ITS):
+    temp = 0
     for i in range(0, ITS):
         if not i & 2:
-            pass
+            temp += 1
+    print(temp)
 
 
 def Average(lst):
@@ -24,14 +26,16 @@ def Average(lst):
 aC = []
 bC = []
 
-for i in range(0, 10):
+ITS = 10000000
+
+for i in range(0, 100):
     start = time.time_ns()
-    moduloMethod()
+    andMethod(ITS)
     stop = time.time_ns()
     aC.append(stop - start)
 
     start = time.time_ns()
-    andMethod()
+    moduloMethod(ITS)
     stop = time.time_ns()
     bC.append(stop - start)
 
@@ -39,5 +43,5 @@ aAvg = Average(aC) / 1000
 
 bAvg = Average(bC) / 1000
 
-print("and    method average %d uSec" % (bAvg))
-print("modulo method average %d uSec" % (aAvg))
+print("and    method average %d uSec" % (aAvg))
+print("modulo method average %d uSec" % (bAvg))
