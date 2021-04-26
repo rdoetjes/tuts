@@ -89,5 +89,12 @@ Plugin 'tpope/vim-commentary'
 "use <n>gcc to comment n lines example 10gcc and to uncomment do 10gcc again
 "use gcap to comment out a paragraph
 
+"Auto Command to remove trailing spaces on save
+autocmd BufWritePre * %s/\s+$//e
+
+"Short keybinding for replace %s/<current word>/<type new>/g the leader is set
+"to , above so ,s would write this for you on the command line
+:nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
+
 set splitbelow splitright
 :term ++rows=10
