@@ -19,28 +19,28 @@ using namespace std::chrono;
 
 unsigned long long moduloMethod(int ITS){
   // Starting time for the clock
-  auto start = high_resolution_clock::now();
+  auto startTime = high_resolution_clock::now();
   unsigned int temp = 0;
 
   for (int i=0; i<=ITS; ++i)
     if (i % 2 == 0) { temp+=i; }
 	std::cout << temp << endl;
-  auto stop = high_resolution_clock::now();
+	auto endTime = high_resolution_clock::now();
 
-  return duration_cast<microseconds>(stop - start).count();
+	return duration_cast<microseconds>(endTime - startTime).count();
 }
 
 unsigned long long andMethod(int ITS){
   // Starting time for the clock
-  auto start = high_resolution_clock::now();
+  auto startTime = high_resolution_clock::now();
   unsigned int temp = 0;
 
   for (int i=0; i<=ITS; ++i)
     if ( !( i & 1 ) ) { temp+=i; }
 	std::cout << temp << endl;
 
-  auto stop = high_resolution_clock::now();
-  return duration_cast<microseconds>(stop - start).count();
+	auto endTime = high_resolution_clock::now();
+	return duration_cast<microseconds>(endTime - startTime).count();
 }
 
 int main()
