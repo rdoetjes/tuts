@@ -17,7 +17,7 @@ using namespace std;
 using namespace std::chrono;
 
 
-unsigned long moduloMethod(int ITS){
+unsigned long long moduloMethod(int ITS){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
   unsigned int temp = 0;
@@ -30,7 +30,7 @@ unsigned long moduloMethod(int ITS){
   return duration_cast<microseconds>(stop - start).count();
 }
 
-unsigned long andMethod(int ITS){
+unsigned long long andMethod(int ITS){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
   unsigned int temp = 0;
