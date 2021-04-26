@@ -66,7 +66,7 @@ int main()
 	float maxB = *max_element(bC.begin(), bC.end());
 	float minB = *min_element(bC.begin(), bC.end());
  
-  cout << "and took on average: " << aCA << " uSec max: " << maxA << " uSec min: " << minA << " uSec" << endl;
+  cout << "and    took on average: " << aCA << " uSec max: " << maxA << " uSec min: " << minA << " uSec" << endl;
   cout << "modulo took on average: " << bCA << " uSec max: " << maxB << " uSec min: " << minB << " uSec" << endl;
 
   return 0;

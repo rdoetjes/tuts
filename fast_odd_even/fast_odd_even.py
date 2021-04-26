@@ -20,7 +20,7 @@ def Average(lst):
 aC = []
 bC = []
 
-for i in range(0, 100):   
+for i in range(0, 10):   
     start = time.time_ns()
     andMethod()
     stop  = time.time_ns()
@@ -31,14 +31,14 @@ for i in range(0, 100):
     stop  = time.time_ns()
     bC.append(stop-start)
 
-aAvg = Average(aC)
-aMax = max(aC)
-aMin = min(aC)
+aAvg = Average(aC) / 1000
+aMax = max(aC) / 1000 
+aMin = min(aC) / 1000
 
-bAvg = Average(bC)
-bMax = max(bC)
-bMin = min(bC)
+bAvg = Average(bC) / 1000
+bMax = max(bC) / 1000
+bMin = min(bC) / 1000
 
-print("and method average %d max %d min %d" % (aAvg, aMax, aMin))
-print("modulo method average %d max %d min %d" % (bAvg, bMax, bMin))
+print("and    method average %d uSec max %d uSec min %d uSec"  % (aAvg, aMax, aMin))
+print("modulo method average %d uSec max %d uSec min %d uSec " % (bAvg, bMax, bMin))
 
