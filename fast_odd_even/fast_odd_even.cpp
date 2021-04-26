@@ -13,9 +13,8 @@
 using namespace std;
 using namespace std::chrono;
 
-const int ITS = 10000000;
 
-unsigned long slow(){
+unsigned long slow(int ITS){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
 
@@ -23,10 +22,11 @@ unsigned long slow(){
     if (i % 2 == 0) { }
 
   auto stop = high_resolution_clock::now();
+
   return duration_cast<microseconds>(stop - start).count();
 }
 
-unsigned long fast(){
+unsigned long fast(int ITS){
   // Starting time for the clock
   auto start = high_resolution_clock::now();
 
@@ -39,8 +39,10 @@ unsigned long fast(){
 
 int main()
 {
-  auto a = slow();
-  auto b = fast();
+	const int ITS = 10000000;
+
+  auto a = slow(ITS);
+  auto b = fast(ITS);
 
   cout << "modulo took " << a << " uSec " << endl;
   cout << "and took " << b << " uSec " << endl;

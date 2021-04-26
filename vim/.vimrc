@@ -18,8 +18,6 @@ Plugin 'tpope/vim-fugitive'
 " Plugin 'L9'
 " Git plugin not hosted on GitHub
 Plugin 'git://git.wincent.com/command-t.git'
-" git repos on your local machine (i.e. when working on your own plugin)
-Plugin 'file:///home/gmarik/path/to/plugin'
 " The sparkup vim script is in a subdirectory of this repo called vim.
 " Pass the path to set the runtimepath properly.
 Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
@@ -43,6 +41,22 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 Plugin 'Valloric/YouCompleteMe'
 syntax on
+set completeopt-=preview
+let g:ycm_autoclose_preview_window_after_insertion = 1
+set conceallevel=2
+set concealcursor=vin
+let g:clang_snippets=1
+let g:clang_conceal_snippets=1
+let g:clang_snippets_engine='clang_complete'
+
+" Complete options (disable preview scratch window, longest removed to aways show menu)
+set completeopt=menu,menuone
+
+" Limit popup menu height
+set pumheight=20
+
+" SuperTab completion fall-back 
+let g:SuperTabDefaultCompletionType='<c-x><c-u><c-p>'
 
 set number
 set relativenumber
@@ -67,5 +81,3 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
 set splitbelow splitright
 :term ++rows=10
-
-
