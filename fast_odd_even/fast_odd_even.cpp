@@ -36,7 +36,7 @@ unsigned long long andMethod(int ITS){
   unsigned int temp = 0;
 
   for (int i=0; i<=ITS; ++i)
-    if ( !(i & 1) ) { temp+=i; }
+    if ( !( i & 1 ) ) { temp+=i; }
 	std::cout << temp << endl;
 
   auto stop = high_resolution_clock::now();
@@ -59,15 +59,11 @@ int main()
 	}
 
 	float aCA = accumulate( aC.begin(), aC.end(), 0.0) / aC.size();
-	float maxA = *max_element(aC.begin(), aC.end());
-	float minA = *min_element(aC.begin(), aC.end());
 
 	float bCA = accumulate( bC.begin(), bC.end(), 0.0) / bC.size();
-	float maxB = *max_element(bC.begin(), bC.end());
-	float minB = *min_element(bC.begin(), bC.end());
  
-  cout << "and    took on average: " << aCA << " uSec max: " << maxA << " uSec min: " << minA << " uSec" << endl;
-  cout << "modulo took on average: " << bCA << " uSec max: " << maxB << " uSec min: " << minB << " uSec" << endl;
+  cout << "and    took on average: " << aCA << endl;
+  cout << "modulo took on average: " << bCA << endl;
 
   return 0;
 }

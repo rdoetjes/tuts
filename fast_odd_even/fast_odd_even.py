@@ -22,23 +22,19 @@ bC = []
 
 for i in range(0, 10):   
     start = time.time_ns()
-    andMethod()
+    moduloMethod()
     stop  = time.time_ns()
     aC.append(stop-start)
 
     start = time.time_ns()
-    moduloMethod()
+    andMethod()
     stop  = time.time_ns()
     bC.append(stop-start)
 
 aAvg = Average(aC) / 1000
-aMax = max(aC) / 1000 
-aMin = min(aC) / 1000
 
 bAvg = Average(bC) / 1000
-bMax = max(bC) / 1000
-bMin = min(bC) / 1000
 
-print("and    method average %d uSec max %d uSec min %d uSec"  % (aAvg, aMax, aMin))
-print("modulo method average %d uSec max %d uSec min %d uSec " % (bAvg, bMax, bMin))
+print("and    method average %d uSec" % (bAvg))
+print("modulo method average %d uSec"  % (aAvg))
 
