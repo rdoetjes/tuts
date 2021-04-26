@@ -87,6 +87,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
 Plugin 'tpope/vim-commentary'
 "use <n>gcc to comment n lines example 10gcc and to uncomment do 10gcc again
+"use gcap to comment out a paragraph
 
 set splitbelow splitright
 :term ++rows=10
