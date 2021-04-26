@@ -6,7 +6,7 @@ import time
 def moduloMethod(ITS):
     temp = 0
     for i in range(0, ITS):
-        if i % 2 == 0:
+        if int(i) % 2 == 0:
             temp += 1
     print(temp)
 
@@ -14,7 +14,7 @@ def moduloMethod(ITS):
 def andMethod(ITS):
     temp = 0
     for i in range(0, ITS):
-        if not i & 2:
+        if (i & 2) == 0:
             temp += 1
     print(temp)
 
@@ -28,7 +28,7 @@ bC = []
 
 ITS = 10000000
 
-for i in range(0, 100):
+for i in range(0, 3):
     start = time.time_ns()
     andMethod(ITS)
     stop = time.time_ns()
