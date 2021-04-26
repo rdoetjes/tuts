@@ -52,6 +52,7 @@ let g:clang_snippets_engine='clang_complete'
 let mapleader=","
 nnoremap <leader>gd :YcmCompleter GoToDeclaration <CR>
 nnoremap <leader>gr :YcmCompleter RefactorRename 
+nnoremap <leader>gf :YcmCompleter FixIt <CR> 
 
 " Complete options (disable preview scratch window, longest removed to aways show menu)
 set completeopt=menu,menuone
