@@ -26,14 +26,14 @@ class File:
             raise e
 
     @staticmethod
-    def createFileOrAppendWithText(fileName, text):
+    def createOrAppendWithText(fileName, text):
         try:
             File.writeText(fileName,text, "a+")
         except IOError as e:
             raise e
 
     @staticmethod
-    def createFileWithText(fileName, text):
+    def createWithText(fileName, text):
         try:
             File.writeText(fileName,text, "w+")
         except IOError as e:
@@ -44,7 +44,7 @@ textToSave = "Hi write me to the file please\n"
 okayFile = "okay.txt"
 
 try:
-    File.createFileOrAppendWithText(okayFile, textToSave)
+    File.createOrAppendWithText(okayFile, textToSave)
 except Exception as e:
     print("Uncaught exception %s" % (e))
     exit(1)
