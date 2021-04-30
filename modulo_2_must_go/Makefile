@@ -7,7 +7,7 @@
 CC = g++                        # compiler to use
 
 LINKERFLAG = 
-CXXFLAGS = -g -O3 -std=c++17
+CXXFLAGS = -O3 -g -std=c++17
 
 SRCS := $(wildcard *.cpp)
 BINS := $(SRCS:%.cpp=%)

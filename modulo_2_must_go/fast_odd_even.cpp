@@ -25,6 +25,7 @@ void moduloMethod(const int ITS) {
       temp++;
     }
   }
+
   std::cout << temp << endl;
 }
 
@@ -45,19 +46,19 @@ int main() {
   vector<long> aC;
   vector<long> bC;
 
-  std::chrono::time_point<std::chrono::system_clock> startTime;
-  std::chrono::time_point<std::chrono::system_clock> endTime;
+  std::chrono::time_point<std::chrono::system_clock> sTime;
+  std::chrono::time_point<std::chrono::system_clock> eTime;
 
   for (int i = 0; i < 100; i++) {
-    startTime = high_resolution_clock::now();
+    sTime = high_resolution_clock::now();
     andMethod(ITS);
-    endTime = high_resolution_clock::now();
-    aC.push_back(duration_cast<microseconds>(endTime - startTime).count());
+    eTime = high_resolution_clock::now();
+    aC.push_back(duration_cast<microseconds>(eTime - sTime).count());
 
-    startTime = high_resolution_clock::now();
+    sTime = high_resolution_clock::now();
     moduloMethod(ITS);
-    endTime = high_resolution_clock::now();
-    bC.push_back(duration_cast<microseconds>(endTime - startTime).count());
+    eTime = high_resolution_clock::now();
+    bC.push_back(duration_cast<microseconds>(eTime - sTime).count());
   }
 
   float aCA = accumulate(aC.begin(), aC.end(), 0.0) / aC.size();
