@@ -1,5 +1,5 @@
-.global _start                      //_start is the starting address for MacOS
-.align 4                            //align on even boundaries, to satisfy drawin
+.global _start                          //_start is the starting address for MacOS
+.align 4                                //align on even boundaries, to satisfy ARM64
 
 _start:
     mov W3, #0xFFFFF
