@@ -65,7 +65,7 @@ exit:
 	
 .data
 string:	
-	.ascii "Hello World, ARM cpu's rule\n"	//this is our string
+	.ascii "Hello World, ARM cpus rule!\n"	//this is our string
 len = . - string				//the length of the string, calculated at assemble time (. is current address)
 .align 2					//align nicely (this is optional)
 uppercase:
