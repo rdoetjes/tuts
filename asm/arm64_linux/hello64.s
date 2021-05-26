@@ -1,32 +1,27 @@
 .text
-.align 4
+.align 8
 .global _start
 
 _start:
-	mov X3, #0xFF
-loop:
-	ldr X1, =string
+	adr X1, string
 	ldr X2, =len
 	bl print
-	subs X3, X3, #1
-	bne loop
+
+	mov X0, #0
 	bl exit
 
 print:
-	push { lr }
 	mov X0, #1
-	mov X7, #4
+	mov X8, #64
 	svc #0
-	pop { pc }
+	ret
 
 exit:
-	push { lr }
-	mov X0, #0
-	mov X7, #1
+	mov X8, #93
 	svc #0
-	pop { lr }
+	ret
 	
 .data
 string:	
-	.ascii "Hello World!\r\n"
+	.ascii "Hello, World! ARM CPUs rule!\r\n"
 len = . - string
