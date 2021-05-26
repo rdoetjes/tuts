@@ -16,12 +16,15 @@ loop:
 
 	subs R3, R3, #1				//decrement R3 by one
 	bne loop				//if R0 not zero than continue to loop and print the uppercase message
+
+	mov R0, #0				//set exit code to 0 (normal exit)
 	bl exit					//exit the program
 
 //toUpper function changes string in R0 to uppercase
 //parameters: 	R0 is input string
 //		R1 is the output string (must have same length!)
 //		R2 is the length of the input string (and output string)
+//Clobbers: R3
 toupper:					
 	push { lr }				//save the link register to jump back to
 _toupper:
@@ -41,6 +44,9 @@ _store:
 	bne _toupper				//is string length (R2) not 0 then continue to change case 
 	pop { pc }				//return 
 
+//print function prints what is in R1 to the STDOUT
+//parameters:	R1 is the string you want to write to STDOUT
+//Clobbers: R7 and R0
 print:
 	push { lr }				//save the ling register to jump back to
 	mov R0, #1				//set write() file descriptor to 1 (STDOUT)
@@ -48,9 +54,11 @@ print:
 	svc #0					//call software interrupt 0, which executes syscall
 	pop { pc }				//return
 
+//exit function, exits to OS and retruns what is in R0
+//parameters:	R0 is the exit code returned to OS
+//Clobbers: nothing, but who cares at this point ;)
 exit:
 	push { lr }				//store link register to jump back to
-	mov R0, #0				//set exit code to 0 (normal exit)
 	mov R7, #1				//set syscall to 1, which is exit() syscall
 	svc #0					//call software interrupt 0, which executes syscall
 	pop { pc }				//return
