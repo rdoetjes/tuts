@@ -3,7 +3,7 @@
 .global _start
 
 _start:
-	adr X1, string
+	ldr X1, =string
 	ldr X2, =len
 	bl print
 
