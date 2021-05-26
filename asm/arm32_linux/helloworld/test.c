@@ -1,3 +1,5 @@
+//This is what we will be coding in assembler
+
 #include <stdio.h>
 #include <unistd.h>
 
