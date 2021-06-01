@@ -32,7 +32,7 @@ toupper:
 
 _toupper:
 	cmp W3, #'z'			//if byte read from source is >z then we just copy it otherwise we turn it into a captitol
-	bge _store			//the byte read was greater than the value z, so we copy
+	bgt _store			//the byte read was greater than the value z, so we copy
 	subs W3, W3, #32		//byte was in the range of [a-z] so we can take away 32 to make it a capitol
 _store:
 	strb W3, [X1], #1		//store the byte in W3 to the X1 and increment the X1 pointer
