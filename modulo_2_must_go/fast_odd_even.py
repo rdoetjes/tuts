@@ -28,7 +28,7 @@ bC = []
 
 ITS = 10000000
 
-for i in range(0, 3):
+for i in range(0, 100):
     start = time.time_ns()
     andMethod(ITS)
     stop = time.time_ns()

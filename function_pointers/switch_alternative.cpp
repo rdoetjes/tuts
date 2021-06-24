@@ -29,8 +29,7 @@ int main(){
 
   std::cout << "an example of using fuction pointers in an array, as order of execution" << std::endl;
   int ins[] = {1, 1, 2, 0, 1};
-  for(int i=0; i<sizeof(ins)/sizeof(ins[0]); i++)
-    (*p[ ins[i] ])(i);
+  for(int i=0; i<sizeof(ins)/sizeof(ins[0]); i++) (*p[ ins[i] ])(i);
 
   //declare a map (hash) of 3 function pointers that take int as argument. C++ as std::function which would be a cleaner more c++ approach for prototyping def.
   std::map<std::string, void (*)(int)> t;
