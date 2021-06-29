@@ -8,14 +8,14 @@ _start:
 	bl print			//print the string to the screen
 
 	ldr x0, =value			//set the number that we want to count the number of set bits from
-	bl printNr			//print that number in decimal
+	bl printUInt			//print that number in decimal
 
 	ldr x1, =s_bitcount1		//set x1 to string pointed to by s_bitcount2
 	ldr x2, =len_s_bitcount1        //set x3 to the length of the s_bitcount1 strong
 	bl print			//print the s_bitcount1 string to the screen
 
 	bl bitCount			//count the number of set bits in X0, result will be in X0
-	bl printNr			//prints the number of set bits
+	bl printUInt			//prints the number of set bits
 	
 	mov X0, #0			//set the exit code to 0
 	bl exit				//call exit
@@ -44,7 +44,7 @@ bitCount_Exit:
 	ret				//return
 
 //Print value in X0 as an unisgned int to screen
-printNr:
+printUInt:
 	stp x29, x30, [sp, #-16]!	//store frame pointer and  stack pointer on the stack
 	stp x5, x7, [sp, #-16]!		//push x5 and x7 to stack (so they won't be globbered)
 	stp x2, x3, [sp, #-16]!		//push x2 and x3 to stack (so they won't be globbered)
@@ -55,24 +55,24 @@ printNr:
 	sub sp, sp, #128		//move stack pointer down 128 bytes, so we have space to store the to print digits
 	
 	cmp x0, #0			//if x0=0 then the division algorith will not work
-	beq printNr_Zero		//we set the value on the stack to 0
+	beq printUInt_Zero		//we set the value on the stack to 0
 
-printNr_Count:
+printUInt_Count:
 	udiv x2, x0, x7			//divide the value x0 by 10
 	msub x3, x2, x7, x0		//obtain the remainder (x3) and the Quotient (x2)
 	add x5, x5, #1			//increment the digit counter (x5)
 	strb w3, [sp, x5]		//store the digit on the stack as single byte
 	mov x0, x2			//copy the Quotient (x2) into x0 which is the new value to divide by 10
 	cmp x0, #0			//if the Quotient (x0) is 00 then we found all individual digits
-	bne printNr_Count		//if x0 is not yet zero than there's more digits to extract
-	b printNr_print			//we set all the digits on the stack now we can pop them off and print them
+	bne printUInt_Count		//if x0 is not yet zero than there's more digits to extract
+	b printUInt_print			//we set all the digits on the stack now we can pop them off and print them
 
-printNr_Zero:				//this is the exceptional case when x0 is 0 then we need to push this ourselves to the stack
+printUInt_Zero:				//this is the exceptional case when x0 is 0 then we need to push this ourselves to the stack
 	add x5, x5, #1 			//x5 is not used so still 0, there for we need to offset it by 1 for the sp offset
 	strb w0, [sp, x5]		//set the value 0 to the stack, so that it can be printed to the screen
 
 	//using the stacl guarantees that the digits are printed in the right order (from large to smallest_
-printNr_print:
+printUInt_print:
 	ldrb w3, [sp, x5]		//pop the last digit from the stack (the biggest value)
 	ldr X1,=char			//set X1 to the char variable address, so we can store the char there later on
 	add w3, w3, 48			//add 48 to the number, turning it into an ASCII char 0-9
@@ -80,9 +80,9 @@ printNr_print:
 	mov x2,#1 			//set the length to write() to 1
 	bl print			//call the writer() system call wrapper 
 	subs x5, x5, #1			//reduce x5 by 1, pointing to the next digit on the stack 
-	bne printNr_print		//if x5 is not 0 then there are still digits on the stack, that should be printed
+	bne printUInt_print		//if x5 is not 0 then there are still digits on the stack, that should be printed
 
-printNr_exit:
+printUInt_exit:
 	add sp, sp, #128		//reclaim the 128 bytes local storage on the stack 
 	ldp x0, x1, [sp], #16		//pop x0 and x1 from stack (so they won't be globbered)
 	ldp x2, x3, [sp], #16		//pop x2 and x3 from stack (so they won't be globbered)
