@@ -3,11 +3,43 @@
 .global _start
 
 _start:
-	mov x0,#1024
+	ldr x1, =s_bitcount
+	ldr x2, =len_s_bitcount
+	bl print
+
+	ldr x0, =value
+	bl printNr
+
+	ldr x1, =s_bitcount1
+	ldr x2, =len_s_bitcount1
+	bl print
+
+	bl bitCount
 	bl printNr
 
 	mov X0, #0			//set the exit code to 0
 	bl exit				//call exit
+
+//Will count the number of set bits in the number in register X0
+//Result X0 will contain the number of set bits after calling this routine
+bitCount:
+	stp x29, x30, [sp, #-16]!
+	stp x1, x2, [sp, #-16]!
+	
+	mov x2, #0
+bitCount_Counter:
+	cmp x0, #0
+	beq bitCount_Exit
+	add x2, x2, #1
+	sub x1, x0, #1
+	and x0, x0, x1
+	bne bitCount_Counter
+
+bitCount_Exit:
+	mov x0, x2
+	ldp x1, x2, [sp], #16
+	ldp x29, x30, [sp], #16
+	ret
 
 //Print value in X0 as an unisgned int to screen
 printNr:
@@ -74,5 +106,12 @@ exit:
 	ret
 
 .data
-char:
-	.fill 1, 1, 0
+s_bitcount:	.ascii "We are counting the number of set bits in #"
+len_s_bitcount = . - s_bitcount
+
+s_bitcount1: 	.ascii " which there are #"
+len_s_bitcount1 = . - s_bitcount1
+
+value = 65535
+
+char: 		.byte 0
