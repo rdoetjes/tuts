@@ -164,6 +164,7 @@ exit:
 	svc #0				//call system call (93 => exit)
 	ret				//this won't be called because exit will terminate program before we get here
 
+.align 8
 .data
 s_bitcount:	.ascii "We are counting the number of set bits in 0x"
 len_s_bitcount = . - s_bitcount
@@ -171,7 +172,7 @@ len_s_bitcount = . - s_bitcount
 s_bitcount1: 	.ascii " which there are #"
 len_s_bitcount1 = . - s_bitcount1
 
-value = 0
+value = 65534
 
 char: 		.byte 0
 
