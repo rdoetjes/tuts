@@ -28,27 +28,28 @@ PrintHex:
 	stp x2, x3, [sp, #-16]!         //store x0 and x1 on the stack, so they won't get globbered
 	stp x0, x1, [sp, #-16]!         //store x0 and x1 on the stack, so they won't get globbered
 
-	mov x3, #0xf000000000000000	//
+	mov x3, #0xf000000000000000	//this is the mask for the top nibble, we will shift x0 to the left and mask it, with this top nibble
 PrintHex_mask:
-	and x5, x0, x3
-	mov x5, x5, ror #60
-	mov x0, x0, lsl #4
+	and x5, x0, x3			//mask the top nibble from x0 (x3 is the mask) store resuklt in x5 for shifting down
+	mov x5, x5, lsr #60		//we need the low nibble as an offset index, so we shift the result down 60 bits
+	mov x0, x0, lsl #4		//we shift x0 up 4 bits, so we can process the next nibble 
+					//(we are automatically printing from high nibble to low nibble this way)
 	
 	ldr x1, =hexArray		//load the approptiate hex value from the array, x1 is the offset in the hex char array
-	ldrb w5, [x1, x5] 
+	ldrb w5, [x1, x5] 		//pick the correct hex character to print from the hexArray, x5 has the right offset, because it's shifted down to the 1st nibble
 
 	ldr x1, =char			//store the hex char into char variable, so it can be printed
-	strb w5, [x1]
-	mov x2, #1			//print the hex byte to screen
+	strb w5, [x1]			//store the hex character to print in the char variable
+	mov x2, #1			//print 1 byte 
+	bl print			//print the current hex character to screen
 
-	bl print
-	cmp x0, #0
+	cmp x0, #0			//has x0 been shifted all the way up, in effect being 0, no? Then continue
 	bne PrintHex_mask
 
-	ldp x0, x1, [sp], #16
-	ldp x2, x3, [sp], #16
-	ldp x4, x5, [sp], #16
-	ldp x29, x30, [sp], #16
+	ldp x0, x1, [sp], #16		//restore x0 and x1 so they won't be globbered
+	ldp x2, x3, [sp], #16		//restore x2 and x3 so they won't be globbered
+	ldp x4, x5, [sp], #16		//restore x4 and x5 so they won't be globbered
+	ldp x29, x30, [sp], #16		//restore fp and sp so they won't be globbered
 	ret
 
 
