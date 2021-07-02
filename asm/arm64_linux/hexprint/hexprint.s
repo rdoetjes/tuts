@@ -37,16 +37,17 @@ PrintHex_mask:
 	mov x0, x0, lsl #4		//we shift x0 up 4 bits, so we can process the next nibble 
 					//(we are automatically printing from high nibble to low nibble this way)
 
-	add x6, x6, #1
+	add x6, x6, #1			//increment the nibble counter (we stop this procedure when this is 16)
 	cmp x4, #1			//if (x4==1) then print
-	beq PrintHex_print
+	beq PrintHex_print		//else continue without printing
 
-	cmp w5, #0			//if (w5>0) then x4=1
-	bgt PrintHex_setFlag
+	cmp w5, #0			//if (w5>0) 
+	bgt PrintHex_setFlag		//then set x4 (no more leading zeros flag) to 1
 	
-	cmp x6, #16                      //has x0 been shifted all the way up, in effect being 0, no? Then continue
+	cmp x6, #16                     //has x0 been shifted all the way up, in effect being 0, no? Then continue
         bne PrintHex_mask
-        //if x0=0 then we fall through here and we print the one and only 0
+
+        //if x0 argument was set to 0, then we fall through here and we print the one and only 0
 
 PrintHex_setFlag:
 	mov x4, #1			//the first digit is no longer 0 so we can print and continue to print digits
@@ -60,8 +61,8 @@ PrintHex_print:
 	mov x2, #1			//print 1 byte 
 	bl print			//print the current hex character to screen
 
-	cmp x6, #16			//has x0 been shifted all the way up, in effect being 0, no? Then continue
-	bne PrintHex_mask
+	cmp x6, #16			//has the lowest nibble, been shifted all the way up (in effect being 0) 
+	bne PrintHex_mask		//No? then continue printing nibble
 
 PrintHex_Exit:
 	ldp x0, x1, [sp], #16		//restore x0 and x1 so they won't be globbered
@@ -167,13 +168,13 @@ exit:
 	ret				//this won't be called because exit will terminate program before we get here
 
 .data
-s_bitcount:	.ascii "We are counting the number of set bits in #"
+s_bitcount:	.ascii "We are counting the number of set bits in 0x"
 len_s_bitcount = . - s_bitcount
 
 s_bitcount1: 	.ascii " which there are #"
 len_s_bitcount1 = . - s_bitcount1
 
-value = 0
+value = 65534
 
 char: 		.byte 0
 
