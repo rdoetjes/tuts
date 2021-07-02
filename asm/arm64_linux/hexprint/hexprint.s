@@ -9,6 +9,7 @@ _start:
 
 	ldr x0, =value			//set the number that we want to count the number of set bits from
 	bl printUInt			//print that number in decimal
+	bl PrintHex
 
 	ldr x1, =s_bitcount1		//set x1 to string pointed to by s_bitcount2
 	ldr x2, =len_s_bitcount1        //set x3 to the length of the s_bitcount1 strong
@@ -19,6 +20,37 @@ _start:
 	
 	mov X0, #0			//set the exit code to 0
 	bl exit				//call exit
+
+//We will print the contents of X0 to the screen in hex
+PrintHex:
+	stp x29, x30, [sp, #-16]!	//store frame pointer and  stack pointer on the stack
+	stp x4, x5, [sp, #-16]!
+	stp x2, x3, [sp, #-16]!         //store x0 and x1 on the stack, so they won't get globbered
+	stp x0, x1, [sp, #-16]!         //store x0 and x1 on the stack, so they won't get globbered
+
+	mov x3, #0xf000000000000000	//
+PrintHex_mask:
+	and x5, x0, x3
+	mov x5, x5, ror #60
+	mov x0, x0, lsl #4
+	
+	ldr x1, =hexArray		//load the approptiate hex value from the array, x1 is the offset in the hex char array
+	ldrb w5, [x1, x5] 
+
+	ldr x1, =char			//store the hex char into char variable, so it can be printed
+	strb w5, [x1]
+	mov x2, #1			//print the hex byte to screen
+
+	bl print
+	cmp x0, #0
+	bne PrintHex_mask
+
+	ldp x0, x1, [sp], #16
+	ldp x2, x3, [sp], #16
+	ldp x4, x5, [sp], #16
+	ldp x29, x30, [sp], #16
+	ret
+
 
 //Will count the number of set bits in the number in register X0
 //Result X0 will contain the number of set bits after calling this routine
@@ -98,8 +130,8 @@ print:
 	stp x2, x8, [sp, #-16]!		//store x2 and x8 on the stack (so they won't be globbered)
 	stp x0, x1, [sp, #-16]!		//store x0 and x1 on the stack (so they won't be globbered)
 
-	mov X0, #1			//set X0 to point to standard out
-	mov X8, #64			//write syscall 
+	mov x0, #1			//set X0 to point to standard out
+	mov x8, #64			//write syscall 
 	svc #0				//call system call (64 => write)
 
 	ldp x0, x1, [sp], #16		//pop x0 and x1 from stack (so they won't be globbered)
@@ -124,3 +156,5 @@ len_s_bitcount1 = . - s_bitcount1
 value = 65535
 
 char: 		.byte 0
+
+hexArray:	.ascii "0123456789ABCDEF"
