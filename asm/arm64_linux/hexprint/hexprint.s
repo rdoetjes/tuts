@@ -30,7 +30,7 @@ PrintHex:
 	mov x4, #0			//we use this for a leading zero flag (as long as this is 0, no digits will printed, as they'd be leading zeros)
 	mov x3, #0			//this is our nibble counter used to determine when we are done
 PrintHex_mask:
-	and x5, x0, #0xf000000000000000			//mask the top nibble from x0 (x3 is the mask) store resuklt in x5 for shifting down
+	and x5, x0, #0xf000000000000000	//mask the top nibble from x0 (x3 is the mask) store resuklt in x5 for shifting down
 	mov x5, x5, lsr #60		//we need the low nibble as an offset index, so we shift the result down 60 bits
 	mov x0, x0, lsl #4		//we shift x0 up 4 bits, so we can process the next nibble 
 					//(we are automatically printing from high nibble to low nibble this way)
@@ -172,7 +172,7 @@ len_s_bitcount = . - s_bitcount
 s_bitcount1: 	.ascii " which there are #"
 len_s_bitcount1 = . - s_bitcount1
 
-value = 65534
+value = 321
 
 char: 		.byte 0
 
