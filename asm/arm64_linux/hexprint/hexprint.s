@@ -34,8 +34,8 @@ PrintHex_mask:
 	mov x5, x5, lsr #60		//we need the low nibble as an offset index, so we shift the result down 60 bits
 	mov x0, x0, lsl #4		//we shift x0 up 4 bits, so we can process the next nibble 
 					//(we are automatically printing from high nibble to low nibble this way)
-
 	add x3, x3, #1			//increment the nibble counter (we stop this procedure when this is 16)
+
 	cmp x4, #1			//if (x4==1) then print
 	beq PrintHex_print		//else continue without printing
 
