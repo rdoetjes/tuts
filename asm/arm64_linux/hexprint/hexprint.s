@@ -31,8 +31,8 @@ PrintHex:
 	mov x3, #0			//this is our nibble counter used to determine when we are done
 PrintHex_mask:
 	and x5, x0, #0xf000000000000000	//mask the top nibble from x0 (x3 is the mask) store resuklt in x5 for shifting down
-	mov x5, x5, lsr #60		//we need the low nibble as an offset index, so we shift the result down 60 bits
-	mov x0, x0, lsl #4		//we shift x0 up 4 bits, so we can process the next nibble 
+	lsr x5, x5, #60			//we need the low nibble as an offset index, so we shift the result down 60 bits
+	lsl x0, x0, #4			//we shift x0 up 4 bits, so we can process the next nibble 
 					//(we are automatically printing from high nibble to low nibble this way)
 	add x3, x3, #1			//increment the nibble counter (we stop this procedure when this is 16)
 
