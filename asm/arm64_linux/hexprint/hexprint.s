@@ -27,28 +27,28 @@ PrintHex:
 	stp x2, x3, [sp, #-16]!         //store x2 and x4 on the stack, so they won't get globbered
 	stp x0, x1, [sp, #-16]!         //store x0 and x1 on the stack, so they won't get globbered
 
-	mov x4, #0			//we use this for a leading zero flag (as long as this is 0, no digits will printed, as they'd be leading zeros)
-	mov x3, #0			//this is our nibble counter used to determine when we are done
+	mov w4, #0			//we use this for a leading zero flag (as long as this is 0, no digits will printed, as they'd be leading zeros)
+	mov w3, #0			//this is our nibble counter used to determine when we are done
 PrintHex_mask:
 	and x5, x0, #0xf000000000000000	//mask the top nibble from x0 (x3 is the mask) store resuklt in x5 for shifting down
 	lsr x5, x5, #60			//we need the low nibble as an offset index, so we shift the result down 60 bits
 	lsl x0, x0, #4			//we shift x0 up 4 bits, so we can process the next nibble 
 					//(we are automatically printing from high nibble to low nibble this way)
-	add x3, x3, #1			//increment the nibble counter (we stop this procedure when this is 16)
+	add w3, w3, #1			//increment the nibble counter (we stop this procedure when this is 16)
 
-	cmp x4, #1			//if (x4==1) then print
+	cmp w4, #1			//if (x4==1) then print
 	beq PrintHex_print		//else continue without printing
 
 	cmp w5, #0			//if (w5>0) 
 	bgt PrintHex_setFlag		//then set x4 (no more leading zeros flag) to 1
 	
-	cmp x3, #16                     //has x0 been shifted all the way up, in effect being 0, no? Then continue
+	cmp w3, #16                     //has x0 been shifted all the way up, in effect being 0, no? Then continue
         bne PrintHex_mask
 
         //if x0 argument was set to 0, then we fall through here and we print the one and only 0
 
 PrintHex_setFlag:
-	mov x4, #1			//the first digit is no longer 0 so we can print and continue to print digits
+	mov w4, #1			//the first digit is no longer 0 so we can print and continue to print digits
 	
 PrintHex_print:
 	ldr x1, =hexArray		//load the approptiate hex value from the array, x1 is the offset in the hex char array
@@ -59,7 +59,7 @@ PrintHex_print:
 	mov x2, #1			//print 1 byte 
 	bl print			//print the current hex character to screen
 
-	cmp x3, #16			//has the lowest nibble, been shifted all the way up (in effect being 0) 
+	cmp w3, #16			//has the lowest nibble, been shifted all the way up (in effect being 0) 
 	bne PrintHex_mask		//No? then continue printing nibble
 
 PrintHex_Exit:
@@ -172,7 +172,7 @@ len_s_bitcount = . - s_bitcount
 s_bitcount1: 	.ascii " which there are #"
 len_s_bitcount1 = . - s_bitcount1
 
-value = 321
+value = 65535
 
 char: 		.byte 0
 
