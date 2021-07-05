@@ -21,6 +21,7 @@ _start:
 	bl exit				//call exit
 
 //We will print the contents of X0 to the screen in hex
+//Argument X0 (is value to print)
 PrintHex:
 	stp x29, x30, [sp, #-16]!	//store frame pointer and  stack pointer on the stack
 	stp x4, x5, [sp, #-16]!		//store x4 and x5 on the stack, so they won't get globbered

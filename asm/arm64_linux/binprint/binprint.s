@@ -20,6 +20,8 @@ _start:
 	mov X0, #0			//set the exit code to 0
 	bl exit				//call exit
 
+//Prints the value in X0 into 64 bit binary format
+//Argument X0 contains value to print
 PrintBin:
 	stp x29, x30, [sp, #-16]!       //store frame pointer and  stack pointer on the stack
         stp x4, x5, [sp, #-16]!         //store x4 and x5 on the stack, so they won't get globbered
