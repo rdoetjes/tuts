@@ -8,7 +8,7 @@ _start:
 	bl print			//print the string to the screen
 
 	ldr x0, =value			//set the number that we want to count the number of set bits from
-	bl PrintHex
+	bl PrintBin
 
 	ldr x1, =s_bitcount1		//set x1 to string pointed to by s_bitcount2
 	ldr x2, =len_s_bitcount1        //set x3 to the length of the s_bitcount1 strong
@@ -19,6 +19,45 @@ _start:
 	
 	mov X0, #0			//set the exit code to 0
 	bl exit				//call exit
+
+PrintBin:
+	stp x29, x30, [sp, #-16]!       //store frame pointer and  stack pointer on the stack
+        stp x4, x5, [sp, #-16]!         //store x4 and x5 on the stack, so they won't get globbered
+        stp x2, x3, [sp, #-16]!         //store x2 and x4 on the stack, so they won't get globbered
+        stp x0, x1, [sp, #-16]!         //store x0 and x1 on the stack, so they won't get globbered
+
+	mov w3, #0			//bit counter
+	mov x4, #0x8000000000000000	//bit mask (in binary, it a 1 with 63 zeros)
+	mov x2, #1			//print length
+	ldr x1,=char			//load the char variable pointer (this pointer is reused for each print)
+PrintBin_mask:
+	tst x0, x4			//test if the bit in X4 is set in x0
+	beq PrintBin_zero		//the zero bit is set by the tst opcode (hence printing zero if equal; inverse login)
+
+PrintBin_one:
+	mov w5, #'1'			//set the char to print to 1
+	strb w5, [x1]			//store the char in x1
+	bl print			//print the 1 to the screen
+	b PrintBin_counter		//jump to continue the loop
+
+PrintBin_zero:
+	mov w5, #'0'			//store the char in x1
+	strb w5, [x1]			//store the 0 char in x1
+	bl print			//print the 0 to the screen
+
+PrintBin_counter:
+	lsr x4, x4, #1			//shift the mask over 1 bit to the left
+	add w3, w3, #1			//increment the counter
+	cmp w3, #64			//if counter hits 64 then we printed the 64 bits (we started at 0)
+	bne PrintBin_mask		//if counter not 64, then continue the loop
+	
+PrintBin_Exit:
+        ldp x0, x1, [sp], #16           //restore x0 and x1 so they won't be globbered
+        ldp x2, x3, [sp], #16           //restore x2 and x3 so they won't be globbered
+        ldp x4, x5, [sp], #16           //restore x4 and x5 so they won't be globbered
+        ldp x29, x30, [sp], #16         //restore fp and sp so they won't be globbered
+        ret
+
 
 //We will print the contents of X0 to the screen in hex
 PrintHex:
@@ -166,13 +205,13 @@ exit:
 
 .align 8
 .data
-s_bitcount:	.ascii "We are counting the number of set bits in 0x"
+s_bitcount:	.ascii "We are counting the number of set bits in b"
 len_s_bitcount = . - s_bitcount
 
 s_bitcount1: 	.ascii " which there are #"
 len_s_bitcount1 = . - s_bitcount1
 
-value = 1234
+value = 255
 
 char: 		.byte 0
 
