@@ -3,7 +3,7 @@ OBJECTS = binprint.o common.o
 all: binprint
 
 %.o: %.s
-	as -g $< -o $@
+	as $< -o $@
 
 binprint: $(OBJECTS)
 	ld -o binprint $(OBJECTS)

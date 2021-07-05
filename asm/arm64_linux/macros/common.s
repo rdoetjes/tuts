@@ -1,33 +1,4 @@
-.macro printChar chr
-	mov w2, \chr
-	ldr x1, =char
-	strb w2, [x1]
-	mov x2, #1
-	bl print
-.endm
-
-.macro printString string, length
-        ldr x1, =\string
-	mov x2, #\length
-        bl print
-.endm
-
-.macro pushPair r1, r2
-	stp \r1, \r2, [sp, #-16]!
-.endm
-
-.macro popPair r1, r2
-	ldp \r1, \r2, [sp], #16
-.endm
-
-//Exit to operating system, X0 will contain the exit code
-//X0 contains exit code
-.macro exit exitCode
-	mov x0, \exitCode
-        mov X8, #93                     //exit system call
-        svc #0                          //call system call (93 => exit)
-        ret                             //this won't be called because exit will terminate program before we get here
-.endm
+.include "macros.s"
 
 //Prints the value in X0 into 64 bit binary format
 //Argument X0 contains value to print
@@ -94,10 +65,10 @@ PrintHex_setFlag:
         mov w4, #1                      //the first digit is no longer 0 so we can print and continue to print digits
 
 PrintHex_print:
-        ldr x1, =hexArray               //load the approptiate hex value from the array, x1 is the offset in the hex char array
-        ldrb w5, [x1, x5]               //pick the correct hex character to print from the hexArray, x5 has the right offset, because it's shifted down to the 1st nibble
+        ldr x1, =common_HexArray               //load the approptiate hex value from the array, x1 is the offset in the hex char array
+        ldrb w5, [x1, x5]               //pick the correct hex character to print from the common_HexArray, x5 has the right offset, because it's shifted down to the 1st nibble
 
-        ldr x1, =char                   //store the hex char into char variable, so it can be printed
+        ldr x1, =common_char            //store the hex char into char variable, so it can be printed
         strb w5, [x1]                   //store the hex character to print in the char variable
         mov x2, #1                      //print 1 byte 
         bl print                        //print the current hex character to screen
@@ -178,6 +149,6 @@ printUInt_exit:
 
 .data
 .align 8
-hexArray:	.ascii "0123456789ABCDEF"
+common_HexArray:	.ascii "0123456789ABCDEF"
 
-char:		.byte 0
+common_char:		.byte 0
