@@ -1,15 +1,9 @@
-OBJECTS = binprint.o print.o
-
-ifdef DEBUG
-	DEBUGFLAGS = -g
-else
-	DEBUGFLAGS= 
-endif
+OBJECTS = binprint.o common.o
 
 all: binprint
 
 %.o: %.s
-	as $(DEBUGFLAGS) $< -o $@
+	as $< -o $@
 
 binprint: $(OBJECTS)
 	ld -o binprint $(OBJECTS)

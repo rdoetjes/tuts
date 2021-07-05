@@ -7,6 +7,13 @@
 	bl print
 .endm
 
+.macro printString string, length
+        ldr x1, =\string
+	mov x2, #\length
+        bl print
+.endm
+
+
 //Exit to operating system, X0 will contain the exit code
 //X0 contains exit code
 .macro exit exitCode

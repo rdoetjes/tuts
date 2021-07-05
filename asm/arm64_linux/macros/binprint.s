@@ -2,19 +2,15 @@
 .align 8
 .global _start
 
-.include "print.s"
+.include "common.s"
 
 _start:	
-	ldr x1, =s_bitcount		//set x1 to string pointed to by s_bitcount
-	ldr x2, =len_s_bitcount		//set x2 to the length of the s_bitcount string
-	bl print			//print the string to the screen
+	printString s_bitcount, len_s_bitcount
 
 	ldr x0, =value			//set the number that we want to count the number of set bits from
 	bl PrintBin
 
-	ldr x1, =s_bitcount1		//set x1 to string pointed to by s_bitcount2
-	ldr x2, =len_s_bitcount1        //set x3 to the length of the s_bitcount1 strong
-	bl print			//print the s_bitcount1 string to the screen
+	printString s_bitcount1, len_s_bitcount1
 
 	bl bitCount			//count the number of set bits in X0, result will be in X0
 	bl printUInt			//prints the number of set bits
