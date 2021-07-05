@@ -1,4 +1,4 @@
-OBJECTS = binprint.o common.o
+OBJECTS = binprint.o 
 
 all: binprint
 

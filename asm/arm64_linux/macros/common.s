@@ -1,4 +1,4 @@
-.include "macros.s"
+.include "macros.inc"
 
 //Prints the value in X0 into 64 bit binary format
 //Argument X0 contains value to print
