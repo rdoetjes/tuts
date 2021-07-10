@@ -10,7 +10,7 @@ _start:
 	printString s_bitcount, len_s_bitcount
 
 	ldr x0, =value			//set the number that we want to count the number of set bits from
-	bl PrintBin
+	bl PrintHex
 
 	printString s_bitcount1, len_s_bitcount1
 
