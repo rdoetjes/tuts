@@ -27,7 +27,7 @@ atoi:
         stp x1, x2, [sp, #-16]!         //push x0 and x1 to stack (so they won't be globbered)
 
 	mov x5, #1			//multiplier
-	mov x0, #0	
+	mov x0, #0			//The decimal result that will be returned, is set to 0 to allow base10 operations
 	mov x3, #0			//intermediate value to calulator decimnal part
 	mov x6, #10			//the decimal multiplier
 atoi_readchar:
