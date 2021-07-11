@@ -5,6 +5,10 @@
 _start:	
 	ldr x1, =input_cleaned		//set x1 to string to convert to decimal
 	ldr x2, =4			//set x2 to the length of that string
+	bl read				//read the keyboard
+	
+	ldr x1, =input_cleaned
+	mov x2, x0			//x0 holds the actual number of bytes read
 	bl atoi				//print the string to the screen
 	bl printUInt			//print that number in decimal
 
@@ -12,6 +16,8 @@ _start:
 	bl exit				//call exit
 
 	//x0 will hold result
+	//x1 points to the string
+	//x2 holds the number of butes 
 atoi:
 	stp x29, x30, [sp, #-16]!       //store frame pointer and  stack pointer on the stack
         stp x5, x6, [sp, #-16]!         //push x5 and x7 to stack (so they won't be globbered)
@@ -101,6 +107,28 @@ print:
 	ldp x2, x8, [sp], #16		//pop x2 and x8 from stack (so they won't be globbered)
 	ldp x29, x30, [sp], #16		//pop fp and sp from stacl
 	ret				//return to caller
+//Read from STDIN
+//FD is 0 (stdin)
+//x1 is the pointer for the buffer
+//x2 is number of bytes
+read:
+	stp x29, x30, [sp, #-16]!       //store fp and sp on the stack
+	stp x2, x8, [sp, #-16]!		//store x2 and x8 on the stack (so they won't be globbered)
+
+        mov X0, #0                      //set X0 to point to standard out
+        mov X8, #63                     //write syscall 
+        svc #0                          //call system call (64 => write)
+
+	subs x0, x0, #1			//length starts at 1 and we need to check last read char, so we subtract 1
+	ldrb w8, [x1, x0]		//did we read the maximum amount of chars then we don't need to subtract \n
+	cmp w8, #'\n'			//is last read char a \n then sub 1 from total length
+	beq read_exit		//subtrack the \n 
+	add x0, x0, #1
+
+read_exit:
+        ldp x2, x8, [sp], #16         //pop fp and sp from stacl
+        ldp x29, x30, [sp], #16         //pop fp and sp from stacl
+        ret                
 
 //Exit to operating system, X0 will contain the exit code
 //X0 contains exit code
@@ -120,4 +148,4 @@ value = 65535
 
 char: 		.byte 0
 
-input_cleaned:	.ascii "6986"
+input_cleaned:	.fill 20,1,0
