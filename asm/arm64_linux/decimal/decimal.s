@@ -4,7 +4,7 @@
 
 _start:	
 	ldr x1, =input_cleaned		//set x1 to string to convert to decimal
-	ldr x2, =4			//set x2 to the length of that string
+	ldr x2, =10			//set x2 to the length of that string
 	bl read				//read the keyboard
 	
 	ldr x1, =input_cleaned
@@ -107,10 +107,12 @@ print:
 	ldp x2, x8, [sp], #16		//pop x2 and x8 from stack (so they won't be globbered)
 	ldp x29, x30, [sp], #16		//pop fp and sp from stacl
 	ret				//return to caller
+
 //Read from STDIN
 //FD is 0 (stdin)
 //x1 is the pointer for the buffer
 //x2 is number of bytes
+//Return: x0 contains number of bytes read
 read:
 	stp x29, x30, [sp, #-16]!       //store fp and sp on the stack
 	stp x2, x8, [sp, #-16]!		//store x2 and x8 on the stack (so they won't be globbered)
