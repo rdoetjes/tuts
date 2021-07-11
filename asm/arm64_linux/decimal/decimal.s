@@ -121,9 +121,9 @@ read:
 
 	subs x0, x0, #1			//length starts at 1 and we need to check last read char, so we subtract 1
 	ldrb w8, [x1, x0]		//did we read the maximum amount of chars then we don't need to subtract \n
-	cmp w8, #'\n'			//is last read char a \n then sub 1 from total length
-	beq read_exit		//subtrack the \n 
-	add x0, x0, #1
+	cmp w8, #'\n'			//is the last character not a \n than we need to add 1 back to the total length
+	beq read_exit			//we already subtracted 1 from the length read so we are good
+	add x0, x0, #1			//we now have more chars than actually defined so we need to add 1 back to the length
 
 read_exit:
         ldp x2, x8, [sp], #16         //pop fp and sp from stacl
