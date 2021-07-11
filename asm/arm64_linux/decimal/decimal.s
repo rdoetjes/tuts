@@ -19,7 +19,7 @@ _start:
 
 //x0 will hold result
 //x1 points to the string
-//x2 holds the number of butes 
+//x2 holds the number of bytes 
 atoi:
 	stp x29, x30, [sp, #-16]!       //store frame pointer and  stack pointer on the stack
         stp x5, x6, [sp, #-16]!         //push x5 and x7 to stack (so they won't be globbered)
@@ -68,7 +68,7 @@ printUInt_Count:
 	mov x0, x2			//copy the Quotient (x2) into x0 which is the new value to divide by 10
 	cmp x0, #0			//if the Quotient (x0) is 00 then we found all individual digits
 	bne printUInt_Count		//if x0 is not yet zero than there's more digits to extract
-	b printUInt_print			//we set all the digits on the stack now we can pop them off and print them
+	b printUInt_print		//we set all the digits on the stack now we can pop them off and print them
 
 printUInt_Zero:				//this is the exceptional case when x0 is 0 then we need to push this ourselves to the stack
 	add x5, x5, #1 			//x5 is not used so still 0, there for we need to offset it by 1 for the sp offset
