@@ -2,6 +2,8 @@
 .align 8
 .global _start
 
+//READ A STRING FROM TERMINAL (stdin) AND TURN IT INTO A DECIMAL NUMBER
+//AND PRINT THAT DECIMAL NUMBER TO THE SCREEN
 _start:	
 	ldr x1, =input_cleaned		//set x1 to string to convert to decimal
 	ldr x2, =10			//set x2 to the length of that string
