@@ -17,9 +17,9 @@ _start:
 	mov X0, #0			//set the exit code to 0
 	bl exit				//call exit
 
-	//x0 will hold result
-	//x1 points to the string
-	//x2 holds the number of butes 
+//x0 will hold result
+//x1 points to the string
+//x2 holds the number of butes 
 atoi:
 	stp x29, x30, [sp, #-16]!       //store frame pointer and  stack pointer on the stack
         stp x5, x6, [sp, #-16]!         //push x5 and x7 to stack (so they won't be globbered)
