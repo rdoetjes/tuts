@@ -5,9 +5,9 @@
 //READ A STRING FROM TERMINAL (stdin) AND TURN IT INTO A DECIMAL NUMBER
 //AND PRINT THAT DECIMAL NUMBER TO THE SCREEN
 _start:	
-	ldr x1, =input_cleaned		//set x1 to string to convert to decimal
-	ldr x2, =10			//set x2 to the length of that string
-	bl read				//read the keyboard
+	ldr x1, =input_cleaned		//set x1 to a pointer that can hold the input 
+	ldr x2, =10			//set x2 to the maximum length for input
+	bl readSTDIN			//read the keyboard
 	
 	ldr x1, =input_cleaned
 	mov x2, x0			//x0 holds the actual number of bytes read
@@ -115,7 +115,7 @@ print:
 //x1 is the pointer for the buffer
 //x2 is number of bytes
 //Return: x0 contains number of bytes read
-read:
+readSTDIN:
 	stp x29, x30, [sp, #-16]!       //store fp and sp on the stack
 	stp x2, x8, [sp, #-16]!		//store x2 and x8 on the stack (so they won't be globbered)
 
@@ -126,10 +126,10 @@ read:
 	subs x0, x0, #1			//length starts at 1 and we need to check last read char, so we subtract 1
 	ldrb w8, [x1, x0]		//did we read the maximum amount of chars then we don't need to subtract \n
 	cmp w8, #'\n'			//is the last character not a \n than we need to add 1 back to the total length
-	beq read_exit			//we already subtracted 1 from the length read so we are good
+	beq readSTDIN_exit		//we already subtracted 1 from the length read so we are good
 	add x0, x0, #1			//we now have more chars than actually defined so we need to add 1 back to the length
 
-read_exit:
+readSTDIN_exit:
         ldp x2, x8, [sp], #16         //pop fp and sp from stacl
         ldp x29, x30, [sp], #16         //pop fp and sp from stacl
         ret                
