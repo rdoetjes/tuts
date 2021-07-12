@@ -1,4 +1,4 @@
-OBJECTS = decimal.o 
+OBJECTS = decimal.o common.o input.o conversion.o
 
 all: decimal
 
