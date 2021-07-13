@@ -20,7 +20,7 @@ more_data:
 	cmp  x0, #0
 	beq close_file
 	m_print file, x0
-	bne close_file
+	b more_data
 
 open_file_error:
 	m_print error, error_len
@@ -30,7 +30,6 @@ close_file:
 
 	mov x0, #0
 	bl exit
-
 .align 8
 .data
 prompt:		.ascii "enter file name: "
