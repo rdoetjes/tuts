@@ -13,9 +13,13 @@ _start:
 	m_openFile file_name, O_RDONLY
 	mov x11, x0		//keep copy of file desc
 
+more_data:
 	m_readFile x11, file, file_len
-
+	cmp  x0, #0
+	beq no_more_data
 	m_print file, x0
+	bne more_data
+no_more_data:
 
 	m_closeFile x0
 
@@ -30,5 +34,5 @@ prompt_len = . - prompt
 file_name:	.fill 255,1,0
 file_name_len = . - file_name
 
-file:	.fill 1024,1,0
+file:	.fill 255,1,0
 file_len = . - file
