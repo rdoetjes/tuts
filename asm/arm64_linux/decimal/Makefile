@@ -1,9 +1,9 @@
-OBJECTS = decimal.o common.o input.o conversion.o
+OBJECTS = decimal.o 
 
 all: decimal
 
 %.o: %.s
-	as -g $< -o $@
+	as $< -o $@
 
 decimal: $(OBJECTS)
 	ld -o decimal $(OBJECTS)
