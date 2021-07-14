@@ -2,10 +2,20 @@
 //allowing to have an abstraction between the (sys)call and the
 //user
 
-.macro m_print string, len
+.macro m_print string len
 	ldr x1, =\string
 	mov x2, \len
 	bl print
+.endm
+
+.macro m_printString string
+	ldr x1, =\string
+	bl printString
+.endm
+
+.macro m_printNr number
+	mov x0, \number
+	bl printUInt
 .endm
 
 .macro m_exit exitcode

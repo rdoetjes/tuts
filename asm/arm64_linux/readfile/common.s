@@ -3,6 +3,7 @@
 .text
 .align 8
 
+//x0 contains the number to print
 //Print value in X0 as an unisgned int to screen
 printUInt:
 	stp x29, x30, [sp, #-16]!	//store frame pointer and  stack pointer on the stack
@@ -34,7 +35,7 @@ printUInt_Zero:				//this is the exceptional case when x0 is 0 then we need to p
 	//using the stacl guarantees that the digits are printed in the right order (from large to smallest_
 printUInt_print:
 	ldrb w3, [sp, x5]		//pop the last digit from the stack (the biggest value)
-	ldr X1,=char			//set X1 to the char variable address, so we can store the char there later on
+	ldr X1,=printUInt_char		//set X1 to the char variable address, so we can store the char there later on
 	add w3, w3, 48			//add 48 to the number, turning it into an ASCII char 0-9
 	strb w3, [x1]			//store the ASCII char in the char variable (pointed to by X1)
 	mov x2,#1 			//set the length to write() to 1
@@ -49,6 +50,30 @@ printUInt_exit:
 	ldp x5, x7, [sp], #16		//pop x5 and x7 from stack (so they won't be globbered)
 	ldp x29, x30, [sp], #16		//pop fp and sp from stack (so they won't be globbered)
 	ret 				//return
+//Print to STDOUT the message pointed by X1
+//X1 is string ptr 
+//X2 is string length of the string
+printString:
+	stp x29, x30, [sp, #-16]!	//store fp and sp on the stack
+	stp x2, x8, [sp, #-16]!		//store x2 and x8 on the stack (so they won't be globbered)
+	stp x0, x1, [sp, #-16]!		//store x0 and x1 on the stack (so they won't be globbered)
+
+	mov x2, #0
+printString_getLength:
+	ldrb w8, [x1, x2]
+	add x2, x2, #1
+	cmp w8, #0
+	bne printString_getLength
+
+	mov x0, #1			//set X0 to point to standard out
+	mov x8, #64			//write syscall 
+	svc #0				//call system call (64 => write)
+
+	ldp x0, x1, [sp], #16		//pop x0 and x1 from stack (so they won't be globbered)
+	ldp x2, x8, [sp], #16		//pop x2 and x8 from stack (so they won't be globbered)
+	ldp x29, x30, [sp], #16		//pop fp and sp from stacl
+	ret				//return to caller
+
 
 //Print to STDOUT the message pointed by X1
 //X1 is string ptr 
@@ -76,4 +101,4 @@ exit:
 
 .align 8
 .data
-char: 		.byte 0
+printUInt_char:	.byte 0
