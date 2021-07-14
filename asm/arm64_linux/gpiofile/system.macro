@@ -1,0 +1,15 @@
+//This macro is more or less an interface to the actual functions
+//allowing to have an abstraction between the (sys)call and the
+//user
+
+.macro m_nanosleep 
+	ldr x0, =timespecsec
+	ldr x1, =timespecsec
+	mov x8, #101
+	svc #0
+.endm
+
+.macro m_exit exitcode
+	mov x0, \exitcode
+	bl sys_exit
+.endm

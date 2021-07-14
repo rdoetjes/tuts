@@ -1,0 +1,16 @@
+
+.macro m_gpio_map
+	bl sys_gpioMap
+.endm
+
+.macro m_gpio_setDirectionOut pin
+	ldr x2, =\pin
+	ldr x3, =\pin
+	bl sys_gpioSetDirectionOut
+.endm
+
+.macro m_gpio_value pin value
+	ldr x1, =\pin
+	mov x0, \value
+	bl sys_gpioValue
+.endm
