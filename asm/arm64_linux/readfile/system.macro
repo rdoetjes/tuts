@@ -4,5 +4,5 @@
 
 .macro m_exit exitcode
 	mov x0, \exitcode
-	bl exit
+	bl sys_exit
 .endm
