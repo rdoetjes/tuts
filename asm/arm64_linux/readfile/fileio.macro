@@ -22,12 +22,6 @@
 	bl sys_read
 .endm
 
-.macro m_print string, len
-	ldr x1, =\string
-	mov x2, \len
-	bl print
-.endm
-
 .macro m_input buffer, len
 	ldr x1, =\buffer
 	ldr x2, =\len

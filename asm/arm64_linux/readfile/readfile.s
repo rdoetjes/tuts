@@ -28,8 +28,8 @@ open_file_error:
 close_file:
 	m_closeFile x0
 
-	mov x0, #0
-	bl exit
+	m_exit 0
+
 .align 8
 .data
 prompt:		.ascii "enter file name: "

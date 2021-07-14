@@ -1,3 +1,5 @@
+.include "common.macro"
+
 .text
 .align 8
 
