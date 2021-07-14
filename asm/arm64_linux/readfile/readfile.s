@@ -1,5 +1,6 @@
-.include "common.s"
+.include "system.s"
 .include "fileio.s"
+.include "print.s"
 
 .text
 .align 8

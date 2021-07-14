@@ -1,0 +1,8 @@
+//This macro is more or less an interface to the actual functions
+//allowing to have an abstraction between the (sys)call and the
+//user
+
+.macro m_exit exitcode
+	mov x0, \exitcode
+	bl exit
+.endm

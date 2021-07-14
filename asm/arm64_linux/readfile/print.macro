@@ -17,8 +17,3 @@
 	mov x0, \number
 	bl printUInt
 .endm
-
-.macro m_exit exitcode
-	mov x0, \exitcode
-	bl exit
-.endm
