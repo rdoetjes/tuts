@@ -1,5 +1,12 @@
-.include "fileio.inc"
+//The macro's serve as a sort of an interface that 
+//adds an abstracts for handling of the arguments for us.
+//This way we can use either the sys_* functions and setup the
+//arguments ourselves. Or we can use the convenient (legible)
+//method, by using macros
+.include "fileio.macro"
+
 .text
+
 .align 8
 
 //x0 filename
