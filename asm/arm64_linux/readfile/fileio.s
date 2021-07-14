@@ -22,6 +22,10 @@ sys_open:
 	ldp x29, x30, [sp], #16
 	ret
 
+//x0 contains the file descriptor to read from
+//x1 points to the buffer
+//x2 is the length off the buffer (and is the maximum bytes being read at one time)
+//RETURN x0 contains the number of bytes read
 sys_read:
 	stp x29, x30, [sp, #-16]!
 
@@ -32,7 +36,7 @@ sys_read:
         ret
 
 //x0 file descriptor
-//RETRUN x0 error code
+//RETURN: x0 will contain error code
 sys_close:
   	stp x29, x30, [sp, #-16]!
 
