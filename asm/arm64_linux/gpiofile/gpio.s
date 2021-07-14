@@ -133,6 +133,10 @@ sys_gpioMap_dev_mem:		.asciz "/dev/mem"
 
 sys_gpioMap_gpio_addr:		.dword 0xfe200000		//physical address of GPIO 
 
+p4:				.word 0
+				.word 12
+				.word 4
+
 p17:
 				.word 4
 				.word 21
