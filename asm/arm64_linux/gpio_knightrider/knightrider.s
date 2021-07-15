@@ -43,4 +43,4 @@ exit:
 .align 8
 .data
 timespecsec:	.dword 0
-timespecnano:	.dword 200000000
+timespecnano:	.dword 070000000
