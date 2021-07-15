@@ -15,21 +15,18 @@ _start:
 	m_gpio_setDirectionOut p17
 	m_gpio_setDirectionOut p22
 	m_gpio_setDirectionOut p27
-
-	mov x5, #0
+reset:
+	mov x0, #1
 loop:
-	
-	m_gpio_value p2 x5
-	m_gpio_value p3 x5
-	m_gpio_value p4 x5
-	m_gpio_value p5 x5
-	m_gpio_value p6 x5
-	m_gpio_value p17 x5
-	m_gpio_value p22 x5
-	m_gpio_value p27 x5
-	eor x5, x5, #1
-
+	bl sys_gpioByte
+loop1:
+	mov x5, x0
 	m_nanosleep
+	mov x0, x5
+
+	lsl x0, x0, #1
+	cmp x0, #256
+	beq reset
 	b loop
 
 exit:
@@ -38,4 +35,4 @@ exit:
 .align 8
 .data
 timespecsec:	.dword 0
-timespecnano:	.dword 100000000
+timespecnano:	.dword 600000000

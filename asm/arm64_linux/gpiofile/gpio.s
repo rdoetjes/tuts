@@ -122,7 +122,50 @@ sys_gpioValue:
         ldp x29, x30, [sp], #16
         ret
 
+//X0 containts byte value to set to pins 
+//X10 memory map pointer to gpio
+sys_gpioByte:
+	stp x29, x30, [sp, #-16]!
+        stp x4, x5, [sp, #-16]!
+        stp x2, x3, [sp, #-16]!
+        stp x0, x1, [sp, #-16]!
+
+	mov x5, x0						//copy of X0 so we can use X0 as a paramter for sys_gpioValue
+	mov x4, #0						//bit counter
+	ldr x2, =pins						//beginning of the pin table
+	mov x3, #1						//bit on that is shifted an tested
+	mov x1, #0						//pin pointer
+
+1:
+	mov x1, x2						//x1 is the offset of each pin in the pin table
+	tst x5, x3 						//test to see if bit in X5 (X0 artgument) is 1
+	beq 2f
 	
+	//calculate offset in table
+	mov x0, #1						//set bit on
+	bl sys_gpioValue					//call the set pin function to set bit on
+	b 3f
+
+2:
+        mov x0, #0						//set bit off
+        bl sys_gpioValue					//call the set pin function to set bit off
+	
+3:
+	lsl x3, x3, #1 
+	add x2, x2, #12						//offset to the next pin in pin table
+	add x4, x4, #1						//increment bit counter
+	cmp x4, #8 						//is bit counter 8 (we set 7 bits) than exit
+	bne 1b							//not yet set all the 8 bits than continue
+	
+debug1:	
+	ldp x0, x1, [sp], #16
+debug2:
+        ldp x2, x3, [sp], #16
+        ldp x4, x5, [sp], #16
+        ldp x29, x30, [sp], #16
+        ret
+	
+
 
 .data
 sys_gpioMap_error_openfile:	.asciz "ERROR: Could not open /dev/mem, please try to run with sudo\n"
@@ -133,6 +176,7 @@ sys_gpioMap_dev_mem:		.asciz "/dev/mem"
 
 sys_gpioMap_gpio_addr:		.dword 0xfe200000		//physical address of GPIO 
 
+pins:
 p2:				.word 0
 				.word 6
 				.word 2
@@ -152,7 +196,6 @@ p5:				.word 0
 p6:                             .word 0
                                 .word 18
                                 .word 6
-
 p17:
 				.word 4
 				.word 21
