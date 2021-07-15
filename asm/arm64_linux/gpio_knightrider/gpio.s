@@ -124,6 +124,7 @@ sys_gpioValue:
 
 //X0 containts byte value to set to pins 
 //X10 memory map pointer to gpio
+//RETURN: void
 sys_gpioByte:
 	stp x29, x30, [sp, #-16]!
         stp x4, x5, [sp, #-16]!
@@ -157,9 +158,7 @@ sys_gpioByte:
 	cmp x4, #8 						//is bit counter 8 (we set 7 bits) than exit
 	bne 1b							//not yet set all the 8 bits than continue
 	
-debug1:	
 	ldp x0, x1, [sp], #16
-debug2:
         ldp x2, x3, [sp], #16
         ldp x4, x5, [sp], #16
         ldp x29, x30, [sp], #16
