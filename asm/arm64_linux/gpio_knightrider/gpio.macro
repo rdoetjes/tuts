@@ -4,8 +4,7 @@
 .endm
 
 .macro m_gpio_setDirectionOut pin
-	ldr x2, =\pin
-	ldr x3, =\pin
+	ldr x0, =\pin
 	bl sys_gpioSetDirectionOut
 .endm
 

@@ -62,9 +62,8 @@ sys_gpioMap:
 	ldp x29, x30, [sp], #16
 	ret
 
-//the m_gpio_out macro will setup the X2 and X3
-//X2 needs to be set to point to the required pin in the pin table in the data segment
-//X3 needs to be set to point to the required pin in the pin table in the data segment
+//The m_gpio_out macro will setup the X2 and X3
+//X0 needs to be set to point to the required gpio in the gpio table in the data segment
 //X10 contains the virtual memory addess (obtained by sys_gpioMap
 //RETURNS: void
 sys_gpioSetDirectionOut:
@@ -72,7 +71,9 @@ sys_gpioSetDirectionOut:
         stp x5, x8, [sp, #-16]!
         stp x3, x4, [sp, #-16]!
         stp x1, x2, [sp, #-16]!
-
+	
+	mov x2, x0						//x2 will become the base of the offset of the gpio pin
+	mov x3, x0						//x3 will become the direction of the register bit
 	ldr w2, [x2]
 	ldr w1, [x10, x2]					//get the address of the register from the table
 
