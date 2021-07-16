@@ -71,7 +71,8 @@ sys_gpioSetDirectionOut:
         stp x5, x8, [sp, #-16]!
         stp x3, x4, [sp, #-16]!
         stp x1, x2, [sp, #-16]!
-	
+	str x0, [sp, #-16]!
+
 	mov x2, x0						//x2 will become the base of the offset of the gpio pin
 	mov x3, x0						//x3 will become the direction of the register bit
 	ldr w2, [x2]
@@ -88,6 +89,7 @@ sys_gpioSetDirectionOut:
 	orr x1, x1, x0						//set the gpio bit that indicates output
 	str w1, [x10, x2]					//save the regsiter and now the pin is in output
 	
+	ldr x0, [sp], #16
 	ldp x1, x2, [sp], #16
         ldp x3, x4, [sp], #16
         ldp x5, x8, [sp], #16
