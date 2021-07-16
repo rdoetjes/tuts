@@ -7,17 +7,17 @@
 _start:
 	m_gpio_map			//x10 will contain the memory map, x11 the /dev/mem fd
 
-	m_gpio_setDirectionOut p2	//set pin 2 as output
-	m_gpio_setDirectionOut p3	//set pin 3 as output
-	m_gpio_setDirectionOut p4	//set pin 4 as output
-	m_gpio_setDirectionOut p5	//set pin 5 as output
-	m_gpio_setDirectionOut p6	//set pin 6 as output
-	m_gpio_setDirectionOut p17	//set pin 17 as output
-	m_gpio_setDirectionOut p22	//set pin 22 as output
-	m_gpio_setDirectionOut p27	//set pin 27 as output
+	m_gpio_setDirectionOut gpio2	//set pin 2 as output
+	m_gpio_setDirectionOut gpio3	//set pin 3 as output
+	m_gpio_setDirectionOut gpio4	//set pin 4 as output
+	m_gpio_setDirectionOut gpio5	//set pin 5 as output
+	m_gpio_setDirectionOut gpio6	//set pin 6 as output
+	m_gpio_setDirectionOut gpio17	//set pin 17 as output
+	m_gpio_setDirectionOut gpio22	//set pin 22 as output
+	m_gpio_setDirectionOut gpio27	//set pin 27 as output
 reset:
 	mov x0, #1			//start with lsb set to 1
-	ldr x1, =pins			//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	ldr x1, =gpio_byte_1			//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
 					//those 8 consecutive pins in that table make up a GPIO byte
 loop_up:
 	bl sys_gpioByte			//set x0 onto the gpio "byte"

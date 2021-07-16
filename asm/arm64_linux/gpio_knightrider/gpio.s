@@ -175,35 +175,47 @@ sys_gpioMap_dev_mem:		.asciz "/dev/mem"
 
 sys_gpioMap_gpio_addr:		.dword 0xfe200000		//physical address of GPIO 
 
-pins:
-p2:				.word 0
+//byte_1 is made up out of gpio 2,3,4,5,6,17,22,27
+//which are Raspberry Pi pins 3, 5, 7, 29, 31, 11, 15, 13
+gpio_byte_1:
+gpio2:
+p3:				.word 0
 				.word 6
 				.word 2
 
-p3:				.word 0
+gpio3:
+p5:				.word 0
 				.word 9
 				.word 3
 
-p4:				.word 0
+gpio4:
+p7:				.word 0
 				.word 12
 				.word 4
 
-p5:				.word 0
+gpio5:
+p29:				.word 0
 				.word 15
 				.word 5
 
-p6:                             .word 0
+gpio6:
+p31:                            .word 0
                                 .word 18
                                 .word 6
-p17:
+gpio17:
+p11:
 				.word 4
 				.word 21
 				.word 17
-p22:
+
+gpio22:
+p15:
 				.word 8
 				.word 6
 				.word 22
-p27:
+
+gpio27:
+p13:
 				.word 8
 				.word 21
 				.word 27
