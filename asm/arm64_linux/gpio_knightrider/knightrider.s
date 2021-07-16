@@ -17,20 +17,20 @@ _start:
 	m_gpio_setDirectionOut p27	//set pin 27 as output
 reset:
 	mov x0, #1			//start with lsb set to 1
+	ldr x1, =pins			//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+					//those 8 consecutive pins in that table make up a GPIO byte
 loop_up:
 	bl sys_gpioByte			//set x0 onto the gpio "byte"
-	mov x5, x0			//nano changes x0, so we safe it
-	m_nanosleep			//sleep 70 ms
-	mov x0, x5			//restore x0 after nano call
+
+	m_nanosleep
 
 	lsl x0, x0, #1			//shift byte to the left, to light up next light
 	cmp x0, #128			//are we at 128? if not continue otherwise shift left
 	bne loop_up			//if less than 128 continue shifting left
 loop_down:
 	bl sys_gpioByte			//set x0 for to gpio
-        mov x5, x0                      //nano changes x0, so we safe it
-        m_nanosleep			//sleep 70ms
-        mov x0, x5                      //restore x0 after nano call
+
+	m_nanosleep
 
         lsr x0, x0, #1			//shoft x0 to the right to light up previous led
         cmp x0, #1			//are we at #1? if so shift up, otherwise continue shifting down

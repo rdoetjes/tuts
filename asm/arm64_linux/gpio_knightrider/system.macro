@@ -2,14 +2,23 @@
 //allowing to have an abstraction between the (sys)call and the
 //user
 
+.macro m_exit exitcode
+	mov x0, \exitcode
+	bl sys_exit
+.endm
+
+//We want to safegaurd x0 and x1 when calling as well
+//often when you do a sleep you will not want to disrupt the x0 and x1
+//because they hold variables for the call after nanosleep
+//and the timespec struct in C is a "static" variable you pass in
+//this allows us to treat it as sucj
 .macro m_nanosleep 
+	stp x29, x30, [sp, #-16]!          //save x0 and x1 the contain our value and 8 pin offset
+	stp x0, x1, [sp, #-16]!          //save x0 and x1 the contain our value and 8 pin offset
 	ldr x0, =timespecsec
 	ldr x1, =timespecsec
 	mov x8, #101
 	svc #0
-.endm
-
-.macro m_exit exitcode
-	mov x0, \exitcode
-	bl sys_exit
+	ldp x0, x1, [sp], #16
+	ldp x29, x30, [sp], #16
 .endm

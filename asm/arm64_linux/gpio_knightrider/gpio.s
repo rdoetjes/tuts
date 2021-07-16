@@ -123,6 +123,9 @@ sys_gpioValue:
         ret
 
 //X0 containts byte value to set to pins 
+//X1 contains the pointer to the table (below) for 8 consecutive pins, (in effect making up a GPIO byte)
+//   These 8 pins need to be consecutive in the table below, it doesn't matter which 8 pins they are
+//   as each GPIO can be combined to make a "byte"
 //X10 memory map pointer to gpio
 //RETURN: void
 sys_gpioByte:
@@ -131,14 +134,11 @@ sys_gpioByte:
         stp x2, x3, [sp, #-16]!
         stp x0, x1, [sp, #-16]!
 
-	mov x5, x0						//copy of X0 so we can use X0 as a paramter for sys_gpioValue
-	mov x4, #0						//bit counter
-	ldr x2, =pins						//beginning of the pin table
 	mov x3, #1						//bit on that is shifted an tested
-	mov x1, #0						//pin pointer
+	mov x4, #0						//bit counter
+	mov x5, x0						//copy of X0 so we can use X0 as a paramter for sys_gpioValue
 
 1:
-	mov x1, x2						//x1 is the offset of each pin in the pin table
 	tst x5, x3 						//test to see if bit in X5 (X0 artgument) is 1
 	beq 2f
 	
@@ -153,7 +153,7 @@ sys_gpioByte:
 	
 3:
 	lsl x3, x3, #1 
-	add x2, x2, #12						//offset to the next pin in pin table
+	add x1, x1, #12						//offset to the next pin in pin table
 	add x4, x4, #1						//increment bit counter
 	cmp x4, #8 						//is bit counter 8 (we set 7 bits) than exit
 	bne 1b							//not yet set all the 8 bits than continue
