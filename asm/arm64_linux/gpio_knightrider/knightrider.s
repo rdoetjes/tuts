@@ -75,18 +75,18 @@ SetGpio16bit:
 	mov x3, x0			//save x0 because it will be overridden in the m_gpio_value 
 
 	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-	m_gpio_value gpio23, #1
-	and x0, x3, #255
+	m_gpio_value gpio23, #1		//select lowest byte
+	and x0, x3, #255		//bask off the lowest byte and set it in x0 to be set by sys_gpioByte
 	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-	bl sys_gpioByte
+	bl sys_gpioByte			//set the byte currently in x0 to the 8 consecutive gpio pins, were gpio_byte_1 points to
 
 	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-	m_gpio_value gpio23, #0
-	mov x0, x3
+	m_gpio_value gpio23, #0		//select most significant byte on the display
+	mov x0, x3			//restore the saved copy of the x0 argument, to process top 8 bits
 	lsr x0, x0, #8			//move top 8 bits in lower byte
-	and x0, x0, #255
+	and x0, x0, #255		//(this and is not required but ther efo consistency with the latter code) mask them off
 	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-	bl sys_gpioByte
+	bl sys_gpioByte			//set the byte currently in x0 to the 8 consecutive gpio pins, were gpio_byte_1 points to
 
 	ldp x0, x1, [sp], #16
 	ldp x2, x3, [sp], #16
