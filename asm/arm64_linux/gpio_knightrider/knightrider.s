@@ -51,6 +51,9 @@ reset:
 	b 1b
 	m_exit 0
 
+//this procedure saves us the extra step of 
+//saving the arguments x0 and x1 which we use in the main also
+//and keeps the code cleaner
 Sleep:
 	stp x29, x30, [sp, #-16]!
         stp x0, x1, [sp, #-16]!
@@ -61,6 +64,9 @@ Sleep:
         ldp x29, x30, [sp], #16
 	ret
 
+//X0 contains the 16 bit value to set
+//X1 contains the pointer to the gpio byte (8 consecutive pins in the gpio.s gpio table) in our case gpio_byte_1
+//X10 contains the virtua memory pointer (obtained by m_gpio_map
 SetGpio16bit:
 	stp x29, x30, [sp, #-16]!
 	stp x2, x3, [sp, #-16]!
@@ -94,4 +100,4 @@ exit:
 .align 8
 .data
 timespecsec:	.dword 0
-timespecnano:	.dword 040000000
+timespecnano:	.dword 030000000
