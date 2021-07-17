@@ -180,6 +180,7 @@ sys_gpioMap_gpio_addr:		.dword 0xfe200000		//physical address of GPIO
 
 //byte_1 is made up out of gpio 2,3,4,5,6,17,22,27
 //which are Raspberry Pi pins 3, 5, 7, 29, 31, 11, 15, 13
+
 gpio_byte_1:
 gpio2:
 p3:				.word 0
@@ -222,3 +223,9 @@ p13:
 				.word 8
 				.word 21
 				.word 27
+
+gpio23:
+p16:
+				.word 8
+				.word 9
+				.word 23

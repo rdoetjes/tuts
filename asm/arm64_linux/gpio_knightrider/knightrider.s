@@ -7,40 +7,91 @@
 _start:
 	m_gpio_map			//x10 will contain the memory map, x11 the /dev/mem fd
 
-	m_gpio_setDirectionOut gpio2	//set pin 2 as output
-	m_gpio_setDirectionOut gpio3	//set pin 3 as output
-	m_gpio_setDirectionOut gpio4	//set pin 4 as output
-	m_gpio_setDirectionOut gpio5	//set pin 5 as output
-	m_gpio_setDirectionOut gpio6	//set pin 6 as output
-	m_gpio_setDirectionOut gpio17	//set pin 17 as output
-	m_gpio_setDirectionOut gpio22	//set pin 22 as output
-	m_gpio_setDirectionOut gpio27	//set pin 27 as output
+	m_gpio_setDirectionOut gpio2	//set gpio 2 as output
+	m_gpio_setDirectionOut gpio3	//set gpio 3 as output
+	m_gpio_setDirectionOut gpio4	//set gpio 4 as output
+	m_gpio_setDirectionOut gpio5	//set gpio 5 as output
+	m_gpio_setDirectionOut gpio6	//set gpio 6 as output
+	m_gpio_setDirectionOut gpio17	//set gpio 17 as output
+	m_gpio_setDirectionOut gpio22	//set gpio 22 as output
+	m_gpio_setDirectionOut gpio27	//set gpio 27 as output
+
+	m_gpio_setDirectionOut gpio23	//set gpio 23 as output (the slector lsb msb)
+
 reset:
-	mov x0, #1			//start with lsb set to 1
-	ldr x1, =gpio_byte_1			//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-					//those 8 consecutive pins in that table make up a GPIO byte
-loop_up:
-	bl sys_gpioByte			//set x0 onto the gpio "byte"
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	m_gpio_value gpio23, #0
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	mov x0, #0
+	bl sys_gpioByte
+	m_nanosleep
+
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	m_gpio_value gpio23, #1
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	mov x0, #0
+	bl sys_gpioByte
+	m_nanosleep
+	mov x3, #0
+
+	mov x0 ,#1
+1:
+	bl SetGpio16bit
+	bl Sleep
+	lsl x0, x0, #1
+	cmp x0, #0x10000
+	bne 1b
+
+2:
+	lsr x0, x0, #1
+	bl SetGpio16bit
+	bl Sleep
+	cmp x0, #1
+	bne 2b
+	b 1b
+	m_exit 0
+
+Sleep:
+	stp x29, x30, [sp, #-16]!
+        stp x0, x1, [sp, #-16]!
 
 	m_nanosleep
 
-	lsl x0, x0, #1			//shift byte to the left, to light up next light
-	cmp x0, #128			//are we at 128? if not continue otherwise shift left
-	bne loop_up			//if less than 128 continue shifting left
-loop_down:
-	bl sys_gpioByte			//set x0 for to gpio
+	ldp x0, x1, [sp], #16
+        ldp x29, x30, [sp], #16
+	ret
 
-	m_nanosleep
+SetGpio16bit:
+	stp x29, x30, [sp, #-16]!
+	stp x2, x3, [sp, #-16]!
+	stp x0, x1, [sp, #-16]!
 
-        lsr x0, x0, #1			//shoft x0 to the right to light up previous led
-        cmp x0, #1			//are we at #1? if so shift up, otherwise continue shifting down
-	bne loop_down			//not 1 continue to shift down
-	b loop_up			//x0 == 1 shift it back up
+	mov x3, x0			//save x0 because it will be overridden in the m_gpio_value 
+
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	m_gpio_value gpio23, #1
+	and x0, x3, #255
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	bl sys_gpioByte
+
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	m_gpio_value gpio23, #0
+	mov x0, x3
+	lsr x0, x0, #8			//move top 8 bits in lower byte
+	and x0, x0, #255
+	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
+	bl sys_gpioByte
+
+	ldp x0, x1, [sp], #16
+	ldp x2, x3, [sp], #16
+	ldp x29, x30, [sp], #16
+	ret
 
 exit:
 	m_exit 0
 
+
 .align 8
 .data
 timespecsec:	.dword 0
-timespecnano:	.dword 070000000
+timespecnano:	.dword 040000000
