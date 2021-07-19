@@ -102,3 +102,4 @@ exit:
 .data
 timespecsec:	.dword 0
 timespecnano:	.dword 130000000
+welcome:	.asciz "This is a GPIO demo\n"

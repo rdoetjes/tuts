@@ -72,15 +72,15 @@ sys_input:
 	subs x0, x0, #1
 	ldrb w8, [x1, x0]
 	cmp w8, #'\n'
-	beq sys_input_clean
+	beq 1f
 	add x0, x0, #1
-	b sys_input_exit
+	b 2f
 
-sys_input_clean:
+1:
 	mov w8, #0
 	strb w8, [x1, x0]
 
-sys_input_exit:
+2:
 	ldp x2, x8, [sp], #16
 	ldp x29, x30, [sp], #16
 	ret
