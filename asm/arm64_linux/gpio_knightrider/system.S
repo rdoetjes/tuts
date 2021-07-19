@@ -1,3 +1,6 @@
+#ifndef SYSTEM_S
+#define SYSTEM_S
+
 .include "system.macro"
 
 .text
@@ -22,4 +25,4 @@ sys_exit:
 	mov X8, #93			//exit system call
 	svc #0				//call system call (93 => exit)
 	ret				//this won't be called because exit will terminate program before we get here
-
+#endif

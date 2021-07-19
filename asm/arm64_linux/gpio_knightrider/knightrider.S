@@ -1,4 +1,5 @@
-.include "gpio.s"
+#include "gpio.S"
+#include "system.S"
 
 .text
 .align 8
@@ -100,4 +101,4 @@ exit:
 .align 8
 .data
 timespecsec:	.dword 0
-timespecnano:	.dword 030000000
+timespecnano:	.dword 130000000

@@ -1,6 +1,9 @@
-.include "system.s"
-.include "print.s"
-.include "fileio.s"
+#ifndef GPIO_S
+#define GPIO_S
+
+#include "system.S"
+#include "print.S"
+#include "fileio.S"
 
 //This is the macro which functions as an interface
 .include "gpio.macro"
@@ -229,3 +232,5 @@ p16:
 				.word 8
 				.word 9
 				.word 23
+
+#endif

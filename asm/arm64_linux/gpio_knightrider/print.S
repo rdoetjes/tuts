@@ -1,4 +1,6 @@
-.include "print.macro"
+#ifndef PRINT_S
+#define PRINT_S
+#include "print.macro"
 
 .text
 .align 8
@@ -95,3 +97,5 @@ print:
 .align 8
 .data
 printUInt_char:	.byte 0
+
+#endif

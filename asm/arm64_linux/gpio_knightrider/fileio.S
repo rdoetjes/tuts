@@ -1,3 +1,6 @@
+#ifndef FILEIO_S
+#define FILEIO_S
+
 //The macro's serve as a sort of an interface that 
 //adds an abstracts for handling of the arguments for us.
 //This way we can use either the sys_* functions and setup the
@@ -83,4 +86,4 @@ sys_input_exit:
 	ret
 	
 .data
-
+#endif
