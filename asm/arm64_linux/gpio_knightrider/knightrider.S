@@ -20,20 +20,9 @@ _start:
 	m_gpio_setDirectionOut gpio23	//set gpio 23 as output (the slector lsb msb)
 
 reset:
-	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-	m_gpio_value gpio23, #0
-	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
 	mov x0, #0
-	bl sys_gpioByte
+	bl gpio_Set16bit
 	m_nanosleep
-
-	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-	m_gpio_value gpio23, #1
-	ldr x1, =gpio_byte_1		//set x1 to the beginning of the 8 consecutive pins table (in gpio.s)
-	mov x0, #0
-	bl sys_gpioByte
-	m_nanosleep
-	mov x3, #0
 
 	mov x0 ,#1
 1:

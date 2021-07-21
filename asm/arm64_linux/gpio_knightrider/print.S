@@ -55,7 +55,6 @@ printUInt:
 
 //Print to STDOUT the message pointed by X1
 //X1 is string ptr 
-//X2 is string length of the string
 printString:
 	stp x29, x30, [sp, #-16]!	//store fp and sp on the stack
 	stp x2, x8, [sp, #-16]!		//store x2 and x8 on the stack (so they won't be globbered)

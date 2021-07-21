@@ -67,6 +67,7 @@ sys_gpioMap:
 
 //The m_gpio_out macro will setup the X2 and X3
 //X0 needs to be set to point to the required gpio in the gpio table in the data segment
+//X1 direction
 //X10 contains the virtual memory addess (obtained by sys_gpioMap
 //RETURNS: void
 sys_gpioSetDirectionOut:
