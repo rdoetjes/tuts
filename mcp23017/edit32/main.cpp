@@ -13,7 +13,7 @@ void checkHandles(int u1, int u2){
 	}
 }
 
-int parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned int>> *step){
+int parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned int>> *steps){
   std::ifstream file(fileName);
   std::string line;
   if (!file.is_open()) return -1;
@@ -35,7 +35,7 @@ int parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned
     ss << std::hex << data;
     ss >> hexValue;
 
-    step->push_back( std::make_pair(msDelay, hexValue) );
+    steps->push_back( std::make_pair(msDelay, hexValue) );
   }
   return 1;
 }
