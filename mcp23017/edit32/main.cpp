@@ -41,7 +41,7 @@ int parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned
 }
 
 int main(int argc, char **argv){
-  std::vector<std::pair<unsigned int, unsigned int>> *step = new std::vector<std::pair<unsigned int, unsigned int>>();;
+  std::vector<std::pair<unsigned int, unsigned int>> *steps= new std::vector<std::pair<unsigned int, unsigned int>>();;
 
 	gpioInitialise();
 	int u1 = i2cOpen(1, 0x20, 0);
@@ -61,9 +61,9 @@ int main(int argc, char **argv){
   }
 
 	while(1) {
-		for ( auto s : *step){
-			set32BitValue(u1, u2, s.second);
-			usleep(s.first * 1000);
+		for ( auto step : *steps){
+			set32BitValue(u1, u2, step.second);
+			usleep(step.first * 1000);
 		}
 	}
 
