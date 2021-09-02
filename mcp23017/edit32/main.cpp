@@ -37,6 +37,7 @@ int parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned
 
     steps->push_back( std::make_pair(msDelay, hexValue) );
   }
+	file.close();
   return 1;
 }
 
