@@ -16,7 +16,7 @@ void checkHandles(int u1, int u2){
 int parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned int>> *step){
   std::ifstream file(fileName);
   std::string line;
-  if !file.is_open() return -1;
+  if (!file.is_open()) return -1;
 
   while(std::getline(file, line)){
     std::istringstream linestream(line);
