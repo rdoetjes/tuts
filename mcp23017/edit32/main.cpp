@@ -13,9 +13,10 @@ void checkHandles(int u1, int u2){
 	}
 }
 
-void parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned int>> *step){
+int parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigned int>> *step){
   std::ifstream file(fileName);
   std::string line;
+  if !file.is_open() return -1;
 
   while(std::getline(file, line)){
     std::istringstream linestream(line);
@@ -36,6 +37,7 @@ void parseFile(const char *fileName, std::vector<std::pair<unsigned int, unsigne
 
     step->push_back( std::make_pair(msDelay, hexValue) );
   }
+  return 1;
 }
 
 int main(int argc, char **argv){
@@ -53,7 +55,10 @@ int main(int argc, char **argv){
 
 	setAllPortsToOutput(u1, u2);
 	
-	parseFile(argv[1], step);
+	if ( parseFile(argv[1], step) == -1){
+    std::cerr << "Could not open the configuration file!" << std::endl;
+    exit(1);
+  }
 
 	while(1) {
 		for ( auto s : *step){
