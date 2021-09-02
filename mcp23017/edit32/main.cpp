@@ -55,7 +55,7 @@ int main(int argc, char **argv){
 
 	setAllPortsToOutput(u1, u2);
 	
-	if ( parseFile(argv[1], steps == -1){
+	if ( parseFile(argv[1], steps) == -1){
     std::cerr << "Could not open the configuration file!" << std::endl;
     exit(1);
   }
