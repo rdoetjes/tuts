@@ -68,5 +68,6 @@ int main(int argc, char **argv){
 		}
 	}
 
+  delete steps;
 	return 0;
 }
