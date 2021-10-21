@@ -19,8 +19,6 @@ sound:
 resetDi:
 	mov di, 0
 	jmp sound
-
-	include stdfunc.asm
 main endp
 
 sine:
