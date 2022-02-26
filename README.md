@@ -5,7 +5,7 @@ This varias from radom Assembly tutorials, to little titbits of Python and C++
 
 ## DOS Assembly coding vidos
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/ZBjNh7ZQE/0.jpg)](https://www.youtube.com/watch?v=ZBjNh7ZQE)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/S-ZBjNh7ZQ/0.jpg)](https://www.youtube.com/watch?v=S-ZBjNh7ZQ)
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/dALVoCAGEMU/0.jpg)](https://www.youtube.com/watch?v=dALVoCAGEMU)
 
