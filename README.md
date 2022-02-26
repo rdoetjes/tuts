@@ -3,7 +3,7 @@
 This is a collection of code for my YouTube tutorials.
 This varias from radom Assembly tutorials, to little titbits of Python and C++
 
-Some videos whos code is in this repository:
+## DOS Assembly coding vidos
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/ZBjNh7ZQE/0.jpg)](https://www.youtube.com/watch?v=ZBjNh7ZQE)
 
@@ -11,6 +11,22 @@ Some videos whos code is in this repository:
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/DfNsAK710kQ/0.jpg)](https://www.youtube.com/watch?v=DfNsAK710kQ)
 
+## ARM64 Assembly coding videos
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/eq60hjbHsmk/0.jpg)](https://www.youtube.com/watch?v=eq60hjbHsmk)
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/qHDGg0i-j7k/0.jpg)](https://www.youtube.com/watch?v=qHDGg0i-j7k)
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/_4v0vV72tGs/0.jpg)](https://www.youtube.com/watch?v=_4v0vV72tGs)
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/uB02Mr9tS7Q/0.jpg)](https://www.youtube.com/watch?uB02Mr9tS7Q)
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/1wk8U1UbspY/0.jpg)](https://www.youtube.com/watch?1wk8U1UbspY)
+
+## ARM32 Assembly coding videos
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/xJCNoJ9pCEI/0.jpg)](https://www.youtube.com/watch?v=xJCNoJ9pCEI)
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/zaftimghQeA/0.jpg)](https://www.youtube.com/watch?v=zaftimghQeA)
 
 
 
