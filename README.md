@@ -11,6 +11,8 @@ This varias from radom Assembly tutorials, to little titbits of Python and C++
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/DfNsAK710kQ/0.jpg)](https://www.youtube.com/watch?v=DfNsAK710kQ)
 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/trGgIdVOuLY/0.jpg)](https://www.youtube.com/watch?v=trGgIdVOuLY)
+
 ## SPEED HACKS
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/M6sFpP6qxEI/0.jpg)](https://www.youtube.com/watch?v=M6sFpP6qxEI)
