@@ -5,11 +5,15 @@ This varias from radom Assembly tutorials, to little titbits of Python and C++
 
 ## DOS Assembly coding vidos
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/S-ZBjNh7ZQ/0.jpg)](https://www.youtube.com/watch?v=S-ZBjNh7ZQ)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/S-ZBjNh7ZQE/0.jpg)](https://www.youtube.com/watch?v=S-ZBjNh7ZQEQ)
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/dALVoCAGEMU/0.jpg)](https://www.youtube.com/watch?v=dALVoCAGEMU)
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/DfNsAK710kQ/0.jpg)](https://www.youtube.com/watch?v=DfNsAK710kQ)
+
+## SPEED HACKS
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/M6sFpP6qxEI/0.jpg)](https://www.youtube.com/watch?v=M6sFpP6qxEI)
 
 ## ARM64 Assembly coding videos
 
