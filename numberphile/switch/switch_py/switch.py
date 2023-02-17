@@ -20,4 +20,5 @@ def switch_logic(buttons):
 if __name__ == "__main__":
     n = 100
     buttons=[0] * n
+    
     switch_logic(buttons)
