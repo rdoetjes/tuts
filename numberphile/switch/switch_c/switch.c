@@ -26,7 +26,9 @@ int main(){
     u_int8_t n = 100; 
     char *buttons = malloc(n);
     memset(buttons, '\0', n);
+
     switch_logic(buttons, n);
+    
     free(buttons);
     return 0;
 }
