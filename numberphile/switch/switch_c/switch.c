@@ -14,8 +14,8 @@ void switch_logic(char *switches, size_t size){
     size_t n = size + 1;
     for(int person=1; person<n; person++){
         printf("person: %d\n", person);
-        for (int i=1; i<n; i++){
-            if (i % person == 0) switches[i-1] ^= 1;
+        for (int button=1; button<n; button++){
+            if (button % person == 0) switches[button-1] ^= 1;
         }
         print_grid(switches, size);
     }

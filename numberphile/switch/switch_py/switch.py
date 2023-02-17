@@ -12,9 +12,9 @@ def switch_logic(switches):
     n = len(switches) + 1
     for person in range(1,n):
         print("person: "+str(person))
-        for i in range(1,n):
-            if (i % person == 0):
-                switches[i-1] = switches[i-1] ^ 1
+        for button in range(1,n):
+            if (button % person == 0):
+                switches[button-1] = switches[button-1] ^ 1
         print_grid(switches)
 
 if __name__ == "__main__":

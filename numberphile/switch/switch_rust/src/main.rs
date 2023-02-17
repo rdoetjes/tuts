@@ -11,8 +11,8 @@ fn switch_logic(switches: &mut [u8]){
     let n = switches.len() + 1;
     for person in 1..n{
         println!("person: {}", person);
-        for i in 1..n{
-            if i % person == 0 { switches[i-1] ^= 1 }
+        for button in 1..n{
+            if button % person == 0 { switches[button-1] ^= 1 }
         }
         print_grid(switches);
     }
