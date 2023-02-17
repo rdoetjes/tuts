@@ -24,7 +24,6 @@ void switch_logic(char *buttons, size_t size){
 int main(){
     u_int8_t n = 100; 
     char *buttons = calloc(n, 1);
-
     switch_logic(buttons, n);
     
     free(buttons);
