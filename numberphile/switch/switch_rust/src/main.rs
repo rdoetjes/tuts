@@ -20,8 +20,6 @@ fn switch_logic(buttons: &mut [u8]){
 
 fn main() {
     const N: usize = 100;
-    let mut buttons: [u8;N] = [0;N];
-    buttons.iter_mut().for_each(|m| *m = 0);
-    
+    let mut buttons: [u8;N] = [0;N];    
     switch_logic(&mut buttons);
 }
