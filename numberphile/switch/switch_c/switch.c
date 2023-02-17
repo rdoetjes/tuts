@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void print_grid(char *buttons, size_t size){
     size_t n = size + 1;
@@ -24,6 +25,7 @@ void switch_logic(char *buttons, size_t size){
 int main(){
     u_int8_t n = 100; 
     char *buttons = malloc(n);
+    memset(buttons, '\0', n);
     switch_logic(buttons, n);
     free(buttons);
     return 0;
