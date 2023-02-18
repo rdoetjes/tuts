@@ -4,6 +4,9 @@
 
 static const size_t N = 8;
 
+/*
+Set the whole board to 0
+*/
 void clear_board(int board[N][N]) {
     for(int row=0; row < N; row++){
         for(int col=0; col < N; col++){
@@ -12,6 +15,11 @@ void clear_board(int board[N][N]) {
     }
 }
 
+/*
+print the board to the screen.
+A queen is denoted by a Q
+An empty field by a .
+*/
 void show_board(int board[N][N]) {
     for(int row=0; row < N; row++){
         for(int col=0; col < N; col++){
@@ -24,6 +32,11 @@ void show_board(int board[N][N]) {
     }
 }
 
+/*
+Keep switching queens with each other until none of the queens can take eachother
+When the value on a cell in the board is 2, then these may not be moved/swapped as
+they are a part of the puzzle
+*/
 void solve(int board[N][N]){
 
 }
