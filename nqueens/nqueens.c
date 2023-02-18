@@ -31,20 +31,20 @@ void show_board(int board[N][N]) {
         for(int col=0; col < N; col++){
             switch (board[row][col])
             {
-             case 0:
-                printf(" . ");
-                break;
+                case 0:
+                    printf(" . ");
+                    break;
 
-            case 1:
-                printf("\033[32m Q \033[0m");
-                break;
+                case 1:
+                    printf("\033[32m Q \033[0m");
+                    break;
 
-            case 2:
-                printf("\033[31m Q \033[0m");
-                break;
-            
-            default:
-                break;
+                case 2:
+                    printf("\033[31m Q \033[0m");
+                    break;
+                
+                default:
+                    break;
             }
         }
         printf("\n");    
