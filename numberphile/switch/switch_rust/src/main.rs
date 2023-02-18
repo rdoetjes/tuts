@@ -18,6 +18,7 @@ fn switch_logic(person: usize, buttons: &mut [usize]){
 fn main() {
     const N: usize = 100;
     let mut buttons: [usize;N] = [0;N];    
+    
     for person in 1..N + 1 {
         switch_logic(person, &mut buttons);
         print_grid(person, &buttons);
