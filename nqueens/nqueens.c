@@ -51,11 +51,7 @@ void show_board(int board[N][N]) {
     }
 }
 
-/*
-Keep switching queens with each other until none of the queens can take eachother
-When the value on a cell in the board is 2, then these may not be moved/swapped as
-they are a part of the puzzle
-*/
+
 void solve(int board[N][N], QUEEN queens[N], int queen_idx){
     printf("placing queen #%d\n", queen_idx+1);
 }
