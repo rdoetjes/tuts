@@ -4,8 +4,14 @@
 
 static const size_t N = 8;
 
+typedef struct QUEEN {
+    int x;
+    int y;
+    unsigned int t;
+} QUEEN;
+
 /*
-Set the whole board to 0
+Set the whole board to 0 (no queens on the board)
 */
 void clear_board(int board[N][N]) {
     for(int row=0; row < N; row++){
@@ -23,10 +29,23 @@ An empty field by a .
 void show_board(int board[N][N]) {
     for(int row=0; row < N; row++){
         for(int col=0; col < N; col++){
-            if (board[row][col] == 0) 
-                printf(".");
-            else
-                printf("Q");
+            switch (board[row][col])
+            {
+             case 0:
+                printf(" . ");
+                break;
+
+            case 1:
+                printf("\033[32m Q \033[0m");
+                break;
+
+            case 2:
+                printf("\033[31m Q \033[0m");
+                break;
+            
+            default:
+                break;
+            }
         }
         printf("\n");    
     }
@@ -37,88 +56,42 @@ Keep switching queens with each other until none of the queens can take eachothe
 When the value on a cell in the board is 2, then these may not be moved/swapped as
 they are a part of the puzzle
 */
-void solve(int board[N][N]){
-
+void solve(int board[N][N], QUEEN queens[N], int queen_idx){
+    printf("placing queen #%d\n", queen_idx+1);
 }
 
-/*
-A function that will check if the col is free
-This can also be used to validate that a queen 
-is not being taken by another queen
-*/
-bool is_col_free(int board[N][N], int x){
-    for(int y=0; y < N; y++){
-        if(board[y][x] != 0) 
-            return false;
-    }
-    return true;
+void set_start_queens_on_board(int board[N][N], QUEEN queens[N]){
+    for(int i=0; i < N; i++) 
+        board[queens[i].y][queens[i].x] = queens[i].t;
 }
 
-/*
-A function that will check if the row is free
-This can also be used to validate that a queen 
-is not being taken by another queen
-*/
-bool is_row_free(int board[N][N], int y){
+void init_queens(QUEEN queens[N]){
     for(int x=0; x < N; x++){
-        if(board[y][x] != 0) 
-            return false;
+        queens[x].x = -1;
+        queens[x].y = -1;
+        queens[x].t = 0;
     }
-    return true;
 }
 
-/*
-A function that will check if the diagonal x+1, y+1 is free
-This can also be used to validate that a queen 
-is not being taken by another queen
-*/
-bool is_diagp1_free(int board[N][N], int y){
-}
-
-/*
-A function that will check if the diagonal x-1, y-1 is free
-This can also be used to validate that a queen 
-is not being taken by another queen
-*/
-bool is_diagm1_free(int board[N][N], int y){
-}
-
-/*
-Use recursion to find a free spot on that row
-You start with x and y set to 0
-
-Then you will iterate in the calling logic over the x
-for example:
-    for(int x=0; x < N; x++)
-        set_queens(board, x, 0);
-
-This will set one queen per line and per row, even when you have
-already queens set in the boards array as part of a puzzle
-*/
-void set_queens(int board[N][N], int x, int y){
-    if (x==N || y==N)
-        return;
-
-    if(!is_row_free(board, y))
-        set_queens(board, x, y+1);
-    else if(!is_col_free(board,x))
-        set_queens(board, x+1, y);
-    else
-        board[y][x]=1;
+int get_next_queen_idx(QUEEN queens[N]){
+    for(int i=0; i < N; i++)
+        if (queens[i].t == 0) return i;
+    return 0;
 }
 
 int main(){
     int board[N][N];
+    QUEEN queens[N];
+
+    init_queens(queens);
     clear_board(board);
 
-    board[0][0] = 2;
-    board[2][1] = 2;
-    board[7][6] = 2;
-    board[4][3] = 2;
+    //set the puzzle pieces (2 means puzzle piece that may not be moved)
+    queens[0].x = 4; queens[0].y = 4; queens[0].t = 2;
 
-    for(int x=0; x < N; x++)
-        set_queens(board, x, 0);
-    
-    solve(board);
+    set_start_queens_on_board(board, queens);
+
+    solve(board, queens, get_next_queen_idx(queens));
+
     show_board(board);
 }
