@@ -9,16 +9,15 @@ def print_grid(person, buttons):
             print()
     print()
 
-def switch_logic(buttons):
-    n = len(buttons) + 1
-    for person in range(1,n):
-        for button in range(1,n):
-            if (button % person == 0):
-                buttons[button-1] ^= 1
-        print_grid(person, buttons)
+def switch_logic(person, buttons):
+    for button in range(1,n):
+        if (button % person == 0):
+            buttons[button-1] ^= 1
 
 if __name__ == "__main__":
     n = 100
     buttons=[0] * n
 
-    switch_logic(buttons)
+    for person in range(1,n+1):
+        switch_logic(person, buttons)
+        print_grid(person, buttons)

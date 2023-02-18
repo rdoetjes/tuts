@@ -8,19 +8,18 @@ fn print_grid(person: usize, buttons: &[usize]){
     println!();
 }
 
-fn switch_logic(buttons: &mut [usize]){
+fn switch_logic(person: usize, buttons: &mut [usize]){
     let n = buttons.len() + 1;
-    for person in 1..n{
-        for button in 1..n{
-            if button % person == 0 { buttons[button-1] ^= 1 }
-        }
-        print_grid(person, &buttons);
+    for button in 1..n{
+        if button % person == 0 { buttons[button-1] ^= 1 }
     }
 }
 
 fn main() {
     const N: usize = 100;
     let mut buttons: [usize;N] = [0;N];    
-    
-    switch_logic(&mut buttons);
+    for person in 1..N + 1 {
+        switch_logic(person, &mut buttons);
+        print_grid(person, &buttons);
+    }    
 }

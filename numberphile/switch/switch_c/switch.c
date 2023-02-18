@@ -11,13 +11,9 @@ void print_grid(size_t person, char *buttons, size_t size){
     printf("\n");
 }
 
-void switch_logic(char *buttons, size_t size){
-    size_t n = size + 1;
-    for(int person=1; person<n; person++){
-        for (int button=1; button<n; button++){
-            if (button % person == 0) buttons[button-1] ^= 1;
-        }
-        print_grid(person, buttons, size);
+void switch_logic(size_t person, char *buttons, size_t size){    
+    for (int button=1; button < size; button++){
+        if (button % person == 0) buttons[button-1] ^= 1;
     }
 }
 
@@ -25,7 +21,11 @@ int main(){
     size_t n = 100; 
     
     char *buttons = calloc(n,1);
-    switch_logic(buttons, n);
+    
+    for(int person=1; person < n+1; person++){
+        switch_logic(person, buttons, n);
+        print_grid(person, buttons, n);    
+    }
     
     free(buttons);
     return 0;
