@@ -65,10 +65,14 @@ bool is_y_empty(int board[N][N], int x){
     return true;
 }
 
-void solve(int board[N][N], QUEEN queens[N], int queen_idx){
+void solve(int board[N][N], QUEEN queens[N]){
     printf("placing queen #%d\n", queen_idx+1);
 }
 
+/*
+Set up the other pieces so that they are never on the same row or column
+with any of the other already placed pieces
+*/
 void set_other_queens_on_board(int board[N][N], QUEEN queens[N], int queen_idx, int x, int y){
     if (x>=N || y>=N || queen_idx>=N)
         return;
@@ -116,10 +120,9 @@ int main(){
     queens[0].x = 4; queens[0].y = 4; queens[0].t = 2;
     queens[1].x = 7; queens[1].y = 0; queens[1].t = 2;
 
-
     set_start_queens_on_board(board, queens);
 
-    solve(board, queens, get_next_queen_idx(queens));
+    solve(board, queens);
 
     show_board(board);
 }
