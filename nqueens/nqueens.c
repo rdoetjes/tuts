@@ -98,7 +98,7 @@ bool solve(int board[N][N], int col)
 
             if (solve(board, col + 1))
                 return true;
-
+            
             board[i][col] = 0; // BACKTRACK
         }   
     }
@@ -110,10 +110,14 @@ int main(){
     clear_board(board);
 
     //set the puzzle pieces (2 means puzzle piece that may not be moved)
-    board[0][0] = 2;
-    board[7][2] = 2;
+    board[4][1] = 2;
+    board[1][6] = 2;
 
-    solve(board, 0);
 
-    show_board(board);
+    if ( solve(board, 0) ){
+        show_board(board);
+    }
+    else{
+        printf("Couldn't be solved\n");
+    }
 }
