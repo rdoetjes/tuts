@@ -88,13 +88,35 @@ int find_empty_col(QUEEN queens[N]){
     return -1;
 }
 
-void put_piece(QUEEN queens[N], int queen_idx, int x, int y){
+
+void reflect_pieces_to_board(int board[N][N], QUEEN queens[N]){
+    for(int i=0; i < N; i++) 
+        board[queens[i].y][queens[i].x] = queens[i].t;
+}
+
+void put_piece(int board[N][N], QUEEN queens[N], int queen_idx, int x, int y){
     if (queen_idx>=N)
         return;
-    
+
     if (y>=N){
-        return; 
+        
+        printf("backtrack\n");
+        /*
+        queens[queen_idx].t = -1;
+        do{
+            queen_idx--;
+            if(queens[queen_idx].t == 1) queens[queen_idx].t = 0;
+        }while(queens[queen_idx].t == 2);
+        queens[queen_idx].t = -1;
+        y =  queens[queen_idx].y;
+        x =  queens[queen_idx].x;
+        */
+       return;
     }
+    reflect_pieces_to_board(board, queens);
+    show_board(board);
+
+    printf("%d %d %d %d\n", queen_idx, queens[queen_idx].t, x, y);
 
     queens[queen_idx].x = x;
     queens[queen_idx].y = y;
@@ -102,20 +124,19 @@ void put_piece(QUEEN queens[N], int queen_idx, int x, int y){
 
     if (legal_move(queens)){
         queen_idx++;
-        put_piece(queens, queen_idx, find_empty_col(queens), 0);
+        printf("new\n");
+        put_piece(board, queens, queen_idx, find_empty_col(queens), 0);
     }
     else{
-        put_piece(queens, queen_idx, x, y+1);
+        queens[queen_idx].t = -1;
+        queens[queen_idx].y = -1;
+        put_piece(board, queens, queen_idx,x, y+1);
+        printf("voila\n");
     }
 }
 
-void solve(QUEEN queens[N], int start_idx){
-    put_piece(queens, start_idx, find_empty_col(queens), 0);
-}
-
-void reflect_pieces_to_board(int board[N][N], QUEEN queens[N]){
-    for(int i=0; i < N; i++) 
-        board[queens[i].y][queens[i].x] = queens[i].t;
+void solve(int board[N][N], QUEEN queens[N], int start_idx){
+    put_piece(board, queens, start_idx, find_empty_col(queens), 0);
 }
 
 void init_queens(QUEEN queens[N]){
@@ -135,9 +156,11 @@ int main(){
 
     //set the puzzle pieces (2 means puzzle piece that may not be moved)
     queens[0].x = 0; queens[0].y = 3; queens[0].t = 2;
-    queens[1].x = 2; queens[1].y = 0; queens[1].t = 2;
+    //queens[1].x = 2; queens[1].y = 0; queens[1].t = 2;
 
-    solve(queens, get_next_new_queen_idx(queens));
+    reflect_pieces_to_board(board, queens);
+
+    solve(board, queens, get_next_new_queen_idx(queens));
 
     reflect_pieces_to_board(board, queens);
 
