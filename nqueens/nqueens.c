@@ -4,12 +4,6 @@
 
 static const size_t N = 8;
 
-typedef struct QUEEN {
-    int x;
-    int y;
-    unsigned int t;
-} QUEEN;
-
 /*
 Set the whole board to 0 (no queens on the board)
 */
@@ -51,118 +45,75 @@ void show_board(int board[N][N]) {
     }
 }
 
-bool legal_move(QUEEN queens[N]){
-    for (int q=0; q<N; q++){
-        if (queens[q].t == -1) continue;
+bool is_legal_move(int board[N][N], int row, int col){
+    int i, j;
+ 
+    /* Check this row on left side */
+    for (i = 0; i < col; i++)
+        if (board[row][i]>0)
+            return false;
+ 
+   /* Check this row on right side */
+    for (i = row; i < N; i++)
+        if (board[row][i]>0)
+            return false;
 
-        for(int qc=0; qc<N; qc++){
-            if (qc==q || queens[qc].t<0 || queens[qc].x<0 || queens[qc].y<0) continue;
-
-            if(queens[q].x == queens[qc].x) return false;
-
-            if(queens[q].y == queens[qc].y) return false;
-            
-            if( abs(queens[q].y - queens[qc].y) == abs(queens[q].x - queens[qc].x) ) return false;
-        }
-    }
+    /* Check upper diagonal on left side */
+    for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
+        if (board[i][j]>0)
+            return false;
+ 
+    /* Check lower diagonal on left side */
+    for (i = row, j = col; j >= 0 && i < N; i++, j--)
+        if (board[i][j]>0)
+            return false;
+ 
     return true;
 }
 
-int get_next_new_queen_idx(QUEEN queens[N]){
-    for(int i=0; i < N; i++)
-        if (queens[i].t == -1) return i;
-    return 0;
+bool is_piece_in_col(int board[N][N], int col){
+    for (int i=0; i<N; i++)
+        if (board[i][col]>0) return true;
+    return false;
 }
 
-int find_empty_col(QUEEN queens[N]){
-    int used[N];
-    for(int i=0; i<N; i++)
-        used[i] = 0;
+bool solve(int board[N][N], int col)
+{
+    /* base case: If all queens are placed
+      then return true */
+    if (col >= N)
+        return true;
+ 
+    if (is_piece_in_col(board, col)) {
+         if (solve(board, col + 1) )
+            return true;
+    };
 
-    for(int i=0; i<N; i++)
-        used[queens[i].x ]=1;
+    /* Consider this column and try placing
+       this queen in all rows one by one */
+    for (int i = 0; i < N; i++) {
 
-    for(int i=0; i<N; i++)
-        if ( used[i] == 0) return i;
+        if (is_legal_move(board, i, col)) {
+            board[i][col] = 1;
 
-    return -1;
-}
+            if (solve(board, col + 1))
+                return true;
 
-
-void reflect_pieces_to_board(int board[N][N], QUEEN queens[N]){
-    for(int i=0; i < N; i++) 
-        board[queens[i].y][queens[i].x] = queens[i].t;
-}
-
-void put_piece(int board[N][N], QUEEN queens[N], int queen_idx, int x, int y){
-    if (queen_idx>=N)
-        return;
-
-    if (y>=N){
-        
-        printf("backtrack\n");
-        /*
-        queens[queen_idx].t = -1;
-        do{
-            queen_idx--;
-            if(queens[queen_idx].t == 1) queens[queen_idx].t = 0;
-        }while(queens[queen_idx].t == 2);
-        queens[queen_idx].t = -1;
-        y =  queens[queen_idx].y;
-        x =  queens[queen_idx].x;
-        */
-       return;
+            board[i][col] = 0; // BACKTRACK
+        }   
     }
-    reflect_pieces_to_board(board, queens);
-    show_board(board);
-
-    printf("%d %d %d %d\n", queen_idx, queens[queen_idx].t, x, y);
-
-    queens[queen_idx].x = x;
-    queens[queen_idx].y = y;
-    queens[queen_idx].t = 1;
-
-    if (legal_move(queens)){
-        queen_idx++;
-        printf("new\n");
-        put_piece(board, queens, queen_idx, find_empty_col(queens), 0);
-    }
-    else{
-        queens[queen_idx].t = -1;
-        queens[queen_idx].y = -1;
-        put_piece(board, queens, queen_idx,x, y+1);
-        printf("voila\n");
-    }
-}
-
-void solve(int board[N][N], QUEEN queens[N], int start_idx){
-    put_piece(board, queens, start_idx, find_empty_col(queens), 0);
-}
-
-void init_queens(QUEEN queens[N]){
-    for(int x=0; x < N; x++){
-        queens[x].x = -1;
-        queens[x].y = -1;
-        queens[x].t = -1;
-    }
+    return false;
 }
 
 int main(){
     int board[N][N];
-    QUEEN queens[N];
-
-    init_queens(queens);
     clear_board(board);
 
     //set the puzzle pieces (2 means puzzle piece that may not be moved)
-    queens[0].x = 0; queens[0].y = 3; queens[0].t = 2;
-    //queens[1].x = 2; queens[1].y = 0; queens[1].t = 2;
+    board[0][0] = 2;
+    board[7][2] = 2;
 
-    reflect_pieces_to_board(board, queens);
-
-    solve(board, queens, get_next_new_queen_idx(queens));
-
-    reflect_pieces_to_board(board, queens);
+    solve(board, 0);
 
     show_board(board);
 }
