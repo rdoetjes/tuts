@@ -92,11 +92,9 @@ void put_piece(QUEEN queens[N], int queen_idx, int x, int y){
     if (queen_idx>=N)
         return;
     
-     if (y>=N){
-        queen_idx-=2;
-        queens[queen_idx].y ++;
-        return;
-     }
+    if (y>=N){
+        return; 
+    }
 
     queens[queen_idx].x = x;
     queens[queen_idx].y = y;
@@ -137,7 +135,7 @@ int main(){
 
     //set the puzzle pieces (2 means puzzle piece that may not be moved)
     queens[0].x = 0; queens[0].y = 3; queens[0].t = 2;
-    queens[1].x = 2; queens[1].y = 7; queens[1].t = 2;
+    queens[1].x = 2; queens[1].y = 0; queens[1].t = 2;
 
     solve(queens, get_next_new_queen_idx(queens));
 
