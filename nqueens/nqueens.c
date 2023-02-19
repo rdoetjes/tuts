@@ -93,10 +93,10 @@ void put_piece(QUEEN queens[N], int queen_idx, int x, int y){
         return;
     
      if (y>=N){
-        queens[queen_idx].x = -1;
-        queens[queen_idx].y = -1;
+        queen_idx-=2;
+        queens[queen_idx].y ++;
         return;
-    }
+     }
 
     queens[queen_idx].x = x;
     queens[queen_idx].y = y;
