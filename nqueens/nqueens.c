@@ -71,7 +71,7 @@ void solve(int board[N][N], QUEEN queens[N]){
 
 /*
 Set up the other pieces so that they are never on the same row or column
-with any of the other already placed pieces
+as any of the other already placed pieces
 */
 void set_other_queens_on_board(int board[N][N], QUEEN queens[N], int queen_idx, int x, int y){
     if (x>=N || y>=N || queen_idx>=N)
