@@ -47,12 +47,17 @@ void show_board(int board[N][N]) {
 
 bool is_legal_move(int board[N][N], int row, int col){
     int i, j;
- 
-    //Check row on left
-    for (i = 0; i < col; i++)
+
+    //Check  row on right
+    for (i = row; i < N; i--)
         if (board[row][i]>0)
             return false;
- 
+
+    //Check  row on right
+    for (i = 0; i < N; i++)
+        if (board[i][col]>0)
+            return false;
+    
     //Check  row on right
     for (i = row; i < N; i++)
         if (board[row][i]>0)
@@ -107,8 +112,9 @@ int main(){
     clear_board(board);
 
     //set the puzzle pieces (2 means puzzle piece that may not be moved)
-    board[4][1] = 2;
-    board[1][6] = 2;
+    board[2][0] = 2;
+    board[7][6] = 2;
+    board[4][7] = 2;
 
     solve(board, 0);
     show_board(board);
