@@ -48,22 +48,22 @@ void show_board(int board[N][N]) {
 bool is_legal_move(int board[N][N], int row, int col){
     int i, j;
  
-    /* Check this row on left side */
+    //Check row on left
     for (i = 0; i < col; i++)
         if (board[row][i]>0)
             return false;
  
-   /* Check this row on right side */
+    //Check  row on right
     for (i = row; i < N; i++)
         if (board[row][i]>0)
             return false;
 
-    /* Check upper diagonal on left side */
+    //Check upper left diagonal
     for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
         if (board[i][j]>0)
             return false;
  
-    /* Check lower diagonal on left side */
+    // Check lower left diagonal
     for (i = row, j = col; j >= 0 && i < N; i++, j--)
         if (board[i][j]>0)
             return false;
@@ -79,18 +79,14 @@ bool is_piece_in_col(int board[N][N], int col){
 
 bool solve(int board[N][N], int col)
 {
-    /* base case: If all queens are placed
-      then return true */
-    if (col >= N)
+    if (col >= N)        
         return true;
- 
+
     if (is_piece_in_col(board, col)) {
          if (solve(board, col + 1) )
             return true;
     };
 
-    /* Consider this column and try placing
-       this queen in all rows one by one */
     for (int i = 0; i < N; i++) {
 
         if (is_legal_move(board, i, col)) {
@@ -102,6 +98,7 @@ bool solve(int board[N][N], int col)
             board[i][col] = 0; // BACKTRACK
         }   
     }
+
     return false;
 }
 
@@ -113,11 +110,6 @@ int main(){
     board[4][1] = 2;
     board[1][6] = 2;
 
-
-    if ( solve(board, 0) ){
-        show_board(board);
-    }
-    else{
-        printf("Couldn't be solved\n");
-    }
+    solve(board, 0);
+    show_board(board);
 }
