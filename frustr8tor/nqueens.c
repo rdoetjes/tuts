@@ -181,7 +181,7 @@ void print_solution(int board[N][N]){
     for(int i=0; i<N; i++){
         for(int j=0; j<N; j++){
             if (board[i][j] == 1) 
-                printf("%d, %d\n", j+1, i+1);
+                printf("%d,%d\n", j+1, i+1);
         }
     }
 }
