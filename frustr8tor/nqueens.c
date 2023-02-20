@@ -64,8 +64,6 @@ iterate over each of the queens in relation to each other and calculate
 a valid move by just comparing the two pieces' location.
 But backtacking and solving became a hassle so I reverted to the old way
 of using a board.
-
-
 */
 bool is_legal_move(int board[N][N], int row, int col){
     int i,j;
