@@ -188,7 +188,7 @@ void print_solution(const int board[N][N]){
 }
 
 int main(int argc, char **argv){
-    int board[N][N];
+    static int board[N][N];
     clear_board(board);
 
     if (argc == 2)
