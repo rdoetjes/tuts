@@ -23,7 +23,7 @@ A prepopuated "puzzle" Queen is index 2 and is shown as a RED Q
 A "player" queen that the player should put down is index 1 and is shown as a YELLOW Q 
 An empty field by a .
 */
-void show_board(int board[N][N]) {
+void show_board(const int board[N][N]) {
     printf("Board with solution\n");
     for(int row=0; row < N; row++){
         for(int col=0; col < N; col++){
@@ -66,7 +66,7 @@ a valid move by just comparing the two pieces' location.
 But backtacking and solving became a hassle so I reverted to the old way
 of using a board.
 */
-bool is_legal_move(int board[N][N], int row, int col){
+bool is_legal_move(const int board[N][N], int row, int col){
     int i,j;
 
     //Check horizontal
@@ -109,7 +109,7 @@ bool is_legal_move(int board[N][N], int row, int col){
 Check to see if there's already a puzzle piece in the column
 This way we will find an unpopulated column to put our piece into
 */
-bool is_piece_in_col(int board[N][N], int col){
+bool is_piece_in_col(const int board[N][N], int col){
     for (int i=0; i<N; i++)
         if (board[i][col]>0) return true;
     return false;
@@ -150,7 +150,7 @@ Very crude file reading for the puzzle pieces setup
 Nothing robust or clever about it. 
 But good enough ;)
 */
-void parse_file(char *filename, int board[N][N]){
+void parse_file(const char *filename, int board[N][N]){
     FILE *ptr;
     ptr = fopen(filename, "r");
     size_t l = 255;
@@ -177,7 +177,7 @@ void parse_file(char *filename, int board[N][N]){
     free(line);
 }
 
-void print_solution(int board[N][N]){
+void print_solution(const int board[N][N]){
     printf("\nPrinting solution vectors\n");
     for(int i=0; i<N; i++){
         for(int j=0; j<N; j++){
