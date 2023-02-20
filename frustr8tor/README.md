@@ -44,3 +44,11 @@ Omitting the argument will just solve the puzzle without prepopulated queens
 </pre>
 
 ![Alt text](./ss1.png?raw=true "Screenshot")
+
+## Building the application
+
+There's a Makefile already present. I did not rely on any external libraries (hence the config file reading and parsing is a bit janky :) ) so simply type make in the directory with the Makefile.
+
+<pre>
+make
+</pre>
