@@ -130,7 +130,11 @@ int main(){
     clear_board(board);
 
     //set the puzzle pieces (2 means puzzle piece that may not be moved)
-    board[4][4] = 2;
+    board[4][2] = 2;
+    board[7][3] = 2;
+    board[2][5] = 2;
+    board[6][6] = 2;
+    board[1][7] = 2;
 
     solve(board, 0);
     show_board(board);
