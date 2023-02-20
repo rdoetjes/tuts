@@ -176,6 +176,16 @@ void parse_file(char *filename, int board[N][N]){
     free(line);
 }
 
+void print_solution(int board[N][N]){
+    printf("\nPrinting solution vectors\n");
+    for(int i=0; i<N; i++){
+        for(int j=0; j<N; j++){
+            if (board[i][j] == 1) 
+                printf("%d, %d\n", j+1, i+1);
+        }
+    }
+}
+
 int main(int argc, char **argv){
     int board[N][N];
     clear_board(board);
@@ -186,4 +196,6 @@ int main(int argc, char **argv){
     solve(board, 0);
 
     show_board(board);
+
+    print_solution(board);
 }
