@@ -167,5 +167,6 @@ int main(int argc, char **argv){
         parse_file(argv[1], board);
 
     solve(board, 0);
+    
     show_board(board);
 }
