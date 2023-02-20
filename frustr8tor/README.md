@@ -34,3 +34,5 @@ You can pass in the puzzle config file as argument.<br/>
 <pre>
 ./nqueens puzzle.frustr8r
 </pre>
+
+Omitting the argument will just solve the puzzle without prepopulated queens
