@@ -19,7 +19,8 @@ void clear_board(int board[N][N]) {
 
 /*
 print the board to the screen.
-A queen is denoted by a Q
+A prepopuated "puzzle" Queen is index 2 and is shown as a RED Q
+A "player" queen that the player should put down is index 1 and is shown as a YELLOW Q 
 An empty field by a .
 */
 void show_board(int board[N][N]) {
