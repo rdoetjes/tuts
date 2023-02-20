@@ -35,4 +35,6 @@ You can pass in the puzzle config file as argument.<br/>
 ./nqueens puzzle.frustr8r
 </pre>
 
+![Alt text](./ss.png?raw=true "Screenshot")
+
 Omitting the argument will just solve the puzzle without prepopulated queens
