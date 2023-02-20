@@ -46,33 +46,51 @@ void show_board(int board[N][N]) {
 }
 
 bool is_legal_move(int board[N][N], int row, int col){
-    int i, j;
+    int i,j;
 
-    //Check  row on right
-    for (i = row; i < N; i--)
+/*
+    (x+1, y): one step horizontal move to the right. 
+    (x-1, y): one step horizontal move to the left. 
+    (x+1, y+1): one step diagonal move up-right. 
+    (x-1, y-1): one step diagonal move down-left. 
+    (x-1, y+1): one step diagonal move left-up. 
+    (x+1, y-1): one step diagonal move right-down. 
+    (x, y+1): one step downward. 
+    (x, y-1): one step upward.
+*/
+    //Check horizontal
+    for (i=0; i < 8; i++){
         if (board[row][i]>0)
             return false;
+    }
 
-    //Check  row on right
-    for (i = 0; i < N; i++)
+    //Check vertical
+    for (i=0; i < 8; i++){
         if (board[i][col]>0)
             return false;
-    
-    //Check  row on right
-    for (i = row; i < N; i++)
-        if (board[row][i]>0)
-            return false;
+    }
 
-    //Check upper left diagonal
-    for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
-        if (board[i][j]>0)
-            return false;
+    //TODO: FIND OUT ABSOLUTE START AND END POINT SO WE ONLY HAVE TWO DIAGONALS
+    //diagonal down left
+    for (i = row, j = col; i < N && j >= 0; i++, j--){
+        if(board[i][j]>0) return false;
+    }
  
-    // Check lower left diagonal
-    for (i = row, j = col; j >= 0 && i < N; i++, j--)
-        if (board[i][j]>0)
-            return false;
+    //diagonal up left
+    for (i = row, j = col; i >=0 && j >= 0; i--, j--){
+        if(board[i][j]>0) return false;
+    }
  
+    //diagonal up right
+    for (i = row, j = col; i >=0 && j < N; i--, j++){
+        if(board[i][j]>0) return false;
+    }
+ 
+    //diagonal up right
+    for (i = row, j = col; i < N && j < N; i++, j++){
+        if(board[i][j]>0) return false;
+    }
+    
     return true;
 }
 
@@ -112,9 +130,7 @@ int main(){
     clear_board(board);
 
     //set the puzzle pieces (2 means puzzle piece that may not be moved)
-    board[2][0] = 2;
-    board[7][6] = 2;
-    board[4][7] = 2;
+    board[4][4] = 2;
 
     solve(board, 0);
     show_board(board);
