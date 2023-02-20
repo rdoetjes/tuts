@@ -24,6 +24,7 @@ A "player" queen that the player should put down is index 1 and is shown as a YE
 An empty field by a .
 */
 void show_board(int board[N][N]) {
+    printf("Board with solution\n");
     for(int row=0; row < N; row++){
         for(int col=0; col < N; col++){
             switch (board[row][col])
