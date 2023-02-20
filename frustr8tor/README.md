@@ -38,3 +38,9 @@ You can pass in the puzzle config file as argument.<br/>
 ![Alt text](./ss.png?raw=true "Screenshot")
 
 Omitting the argument will just solve the puzzle without prepopulated queens
+
+<pre>
+./nqueens
+</pre>
+
+![Alt text](./ss1.png?raw=true "Screenshot")
