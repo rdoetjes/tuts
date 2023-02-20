@@ -86,7 +86,7 @@ bool is_legal_move(int board[N][N], int row, int col){
         if(board[i][j]>0) return false;
     }
  
-    //diagonal up right
+    //diagonal down right
     for (i = row, j = col; i < N && j < N; i++, j++){
         if(board[i][j]>0) return false;
     }
