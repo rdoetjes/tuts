@@ -47,19 +47,28 @@ void show_board(int board[N][N]) {
     }
 }
 
+/*
+Usually with an NQUEENS problem you only have to check the diagonals
+up and down left of you, since you will put down the pieces
+in order for each column.
+In this case since we already have puzzle pieces populating the board,
+we need to check all directions.
+
+TODO: find an algorithm that determines the start and end vectors of
+an arbitrary vector it's diagonals. That way I just need two loops
+instead of 4 to check all the directions.
+
+I initially started with just an array of 8 queens and I could quickly
+iterate over each of the queens in relation to each other and calculate
+a valid move by just comparing the two pieces' location.
+But backtacking and solving became a hassle so I reverted to the old way
+of using a board.
+
+
+*/
 bool is_legal_move(int board[N][N], int row, int col){
     int i,j;
 
-/*
-    (x+1, y): one step horizontal move to the right. 
-    (x-1, y): one step horizontal move to the left. 
-    (x+1, y+1): one step diagonal move up-right. 
-    (x-1, y-1): one step diagonal move down-left. 
-    (x-1, y+1): one step diagonal move left-up. 
-    (x+1, y-1): one step diagonal move right-down. 
-    (x, y+1): one step downward. 
-    (x, y-1): one step upward.
-*/
     //Check horizontal
     for (i=0; i < 8; i++){
         if (board[row][i]>0)
@@ -96,12 +105,21 @@ bool is_legal_move(int board[N][N], int row, int col){
     return true;
 }
 
+/*
+Check to see if there's already a puzzle piece in the column
+This way we will find an unpopulated column to put our piece into
+*/
 bool is_piece_in_col(int board[N][N], int col){
     for (int i=0; i<N; i++)
         if (board[i][col]>0) return true;
     return false;
 }
 
+/*
+Standard nqueens backtrack algorithm.
+With the addition of checking to see if there's already a puzzle piece
+in the column, if so we skip to the next column
+*/
 bool solve(int board[N][N], int col)
 {
     if (col >= N)        
@@ -167,6 +185,6 @@ int main(int argc, char **argv){
         parse_file(argv[1], board);
 
     solve(board, 0);
-    
+
     show_board(board);
 }
