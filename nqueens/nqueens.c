@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
+
 
 static const size_t N = 8;
 
@@ -125,16 +127,44 @@ bool solve(int board[N][N], int col)
     return false;
 }
 
-int main(){
+/*
+Very crude file reading for the puzzle pieces setup
+Nothing robust or clever about it. 
+But good enough ;)
+*/
+void parse_file(char *filename, int board[N][N]){
+    FILE *ptr;
+    ptr = fopen(filename, "r");
+    size_t l = 255;
+    char *line = calloc(l, 1);
+
+    if (NULL == ptr) {
+        printf("file can't be opened \n");
+        exit(1);
+    }
+
+    printf("Putting down the puzzle pieces\n");
+    while (!feof(ptr)) {
+        getline(&line, &l, ptr);
+        printf("%s", line);
+        if (strlen(line) == 4){
+            int x = atoi(&line[2]) - 1;
+            int y = atoi(&line[0]) - 1;
+            if (x>=0 && x<=7 && y>=0 && y<=7)
+                board[x][y] = 2;
+        }
+    }
+
+    fclose(ptr);
+    free(line);
+}
+
+int main(int argc, char **argv){
     int board[N][N];
     clear_board(board);
 
-    //set the puzzle pieces (2 means puzzle piece that may not be moved)
-    board[4][2] = 2;
-    board[7][3] = 2;
-    board[2][5] = 2;
-    board[6][6] = 2;
-    board[1][7] = 2;
+    if (argc == 2)
+        parse_file(argv[1], board);
 
     solve(board, 0);
     show_board(board);
