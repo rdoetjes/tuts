@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define min(a,b) (((a)<(b))?(a):(b))
+#define max(a,b) (((a)>(b))?(a):(b))
 
 static const size_t N = 8;
 
@@ -195,7 +197,7 @@ int main(int argc, char **argv){
         parse_file(argv[1], board);
 
     solve(board, 0);
-
+    
     show_board(board);
 
     print_solution(board);
