@@ -3,9 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define min(a,b) (((a)<(b))?(a):(b))
-#define max(a,b) (((a)>(b))?(a):(b))
-
 static const size_t N = 8;
 
 /*
