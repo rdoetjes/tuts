@@ -130,7 +130,6 @@ bool solve(int board[N][N], int col)
     };
 
     for (int i = 0; i < N; i++) {
-
         if (is_legal_move(board, i, col)) {
             board[i][col] = 1;
 
