@@ -10,7 +10,8 @@ def print_grid(person, buttons):
     print()
 
 def switch_logic(person, buttons):
-    for button in range(1, n + 1):
+    n = len(buttons) + 1
+    for button in range(1, n):
         if ( button % person == 0 ):
             buttons[button-1] ^= 1
 
