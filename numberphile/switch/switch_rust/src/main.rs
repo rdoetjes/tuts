@@ -15,8 +15,9 @@ fn switch_logic(person: usize, buttons: &mut [usize]){
     }
 }
 
-fn fondle_my_knobs(n: usize, buttons: &mut [usize]){
-    for person in 1..n + 1 {
+fn fondle_my_knobs(buttons: &mut [usize]){
+    let n = buttons.len() + 1;  //derive length from array size; this will prevent us from having to also pass it
+    for person in 1..n {
         switch_logic(person, buttons);
         print_grid(person, &buttons);
     }    
@@ -26,5 +27,5 @@ fn main() {
     const N: usize = 100;
     let mut buttons: [usize;N] = [0;N];    
     
-   fondle_my_knobs(N, &mut buttons);
+   fondle_my_knobs(&mut buttons);
 }
