@@ -175,6 +175,13 @@ void parse_file(const char *filename, int board[N][N]){
     free(line);
 }
 
+/*
+print the solution of a board in vectors, so a player can easily set it up.
+We use numeric vectors and not chessboard location vectors, since Frustr8tor doesn't
+have columns A-H and it may confuse someone.
+The vectors of the player are derived from the board, every cell that has 1 in it,
+is a player's move which is translated into a vector starting from 1 (not 0)
+*/
 void print_solution_vectors(const int board[N][N]){
     printf("\nPrinting solution vectors\n");
     for(int i=0; i<N; i++){
@@ -185,6 +192,11 @@ void print_solution_vectors(const int board[N][N]){
     }
 }
 
+/*
+Main entry point for the solver.
+A board with prepopulated puzzle pieces can be passed in.
+The prepopulated piece will need to have value 2 in the array
+*/
 void frustr8tor(int board[N][N]){
     solve(board, 0);
     show_board(board);
