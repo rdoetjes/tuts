@@ -32,7 +32,7 @@ Example:
 You can pass in the puzzle config file as argument.<br/>
 
 <pre>
-./nqueens puzzle.frustr8r
+./nqueens 1.frustr8r
 </pre>
 
 ![Alt text](./ss.png?raw=true "Screenshot")
