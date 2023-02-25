@@ -185,6 +185,14 @@ void print_solution(const int board[N][N]){
     }
 }
 
+void frustr8tor(int board[N][N]){
+    solve(board, 0);
+    
+    show_board(board);
+
+    print_solution(board);
+}
+
 int main(int argc, char **argv){
     static int board[N][N];
     clear_board(board);
@@ -192,9 +200,5 @@ int main(int argc, char **argv){
     if (argc == 2)
         parse_file(argv[1], board);
 
-    solve(board, 0);
-    
-    show_board(board);
-
-    print_solution(board);
+    frustr8tor(board);
 }

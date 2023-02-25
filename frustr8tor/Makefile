@@ -1,2 +1,2 @@
 switch:
-	gcc -O3 nqueens.c -Wall -Werror -Wpedantic -o nqueens
+	gcc -O3 frustr8tor.c -Wall -Werror -Wpedantic -o frustr8tor
