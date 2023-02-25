@@ -2,7 +2,7 @@
 
 Is a puzzle game created in 2006 by Albert Eckhardt in 2006
 It takes the NQueens problem and adds to it by already populating the board with
-queens on certain positions.
+queens on certain (solvable) positions.
 
 ## nqueens.c
 
@@ -32,7 +32,7 @@ Example:
 You can pass in the puzzle config file as argument.<br/>
 
 <pre>
-./nqueens 1.frustr8r
+./nqueens puzzle.frustr8r
 </pre>
 
 ![Alt text](./ss.png?raw=true "Screenshot")
