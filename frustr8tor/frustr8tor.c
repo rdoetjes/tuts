@@ -65,7 +65,7 @@ a valid move by just comparing the two pieces' location.
 But backtacking and solving became a hassle so I reverted to the old way
 of using a board.
 */
-bool is_legal_move(const int board[N][N], int row, int col){
+bool is_legal_move(const int board[N][N], const int row, const int col){
     int i,j;
 
     //Check horizontal
@@ -108,7 +108,7 @@ bool is_legal_move(const int board[N][N], int row, int col){
 Check to see if there's already a puzzle piece in the column
 This way we will find an unpopulated column to put our piece into
 */
-bool is_piece_in_col(const int board[N][N], int col){
+bool is_piece_in_col(const int board[N][N], const int col){
     for (int i=0; i<N; i++)
         if (board[i][col]>0) return true;
     return false;
@@ -119,7 +119,7 @@ Standard nqueens backtrack algorithm.
 With the addition of checking to see if there's already a puzzle piece
 in the column, if so we skip to the next column
 */
-bool solve(int board[N][N], int col)
+bool solve(int board[N][N], const int col)
 {
     if (col >= N)        
         return true;
