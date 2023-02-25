@@ -27,5 +27,5 @@ fn main() {
     const N: usize = 100;
     let mut buttons: [usize;N] = [0;N];    
     
-   fondle_my_knobs(&mut buttons);
+    fondle_my_knobs(&mut buttons);
 }
