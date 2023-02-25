@@ -175,7 +175,7 @@ void parse_file(const char *filename, int board[N][N]){
     free(line);
 }
 
-void print_solution(const int board[N][N]){
+void print_solution_vectors(const int board[N][N]){
     printf("\nPrinting solution vectors\n");
     for(int i=0; i<N; i++){
         for(int j=0; j<N; j++){
@@ -187,10 +187,8 @@ void print_solution(const int board[N][N]){
 
 void frustr8tor(int board[N][N]){
     solve(board, 0);
-    
     show_board(board);
-
-    print_solution(board);
+    print_solution_vectors(board);
 }
 
 int main(int argc, char **argv){
