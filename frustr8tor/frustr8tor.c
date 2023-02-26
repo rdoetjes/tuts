@@ -80,7 +80,7 @@ bool is_legal_move(const int board[N][N], const int row, const int col){
             return false;
     }
 
-    //TODO: FIND OUT ABSOLUTE START AND END POINT SO WE ONLY HAVE TWO DIAGONALS
+    //TODO: FIND OUT ABSOLUTE START AND END POINT OF DIAGONALS, SO WE ONLY HAVE TWO DIAGONALS
     //diagonal down left
     for (i = row, j = col; i < N && j >= 0; i++, j--){
         if(board[i][j]>0) return false;
