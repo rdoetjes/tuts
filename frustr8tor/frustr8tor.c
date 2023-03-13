@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-static const size_t N = 8;
+#define N 8
 
 /*
 Set the whole board to 0 (no queens on the board)
@@ -22,7 +22,7 @@ A prepopuated "puzzle" Queen is index 2 and is shown as a RED Q
 A "player" queen that the player should put down is index 1 and is shown as a YELLOW Q 
 An empty field by a .
 */
-void show_board(const int board[N][N]) {
+void show_board(int board[N][N]) {
     printf("Board with solution\n");
     for(int row=0; row < N; row++){
         for(int col=0; col < N; col++){
@@ -65,7 +65,7 @@ a valid move by just comparing the two pieces' location.
 But backtacking and solving became a hassle so I reverted to the old way
 of using a board.
 */
-bool is_legal_move(const int board[N][N], const int row, const int col){
+bool is_legal_move(int board[N][N], const int row, const int col){
     int i,j;
 
     //Check horizontal
@@ -104,7 +104,7 @@ bool is_legal_move(const int board[N][N], const int row, const int col){
 Check to see if there's already a puzzle piece in the column
 This way we will find an unpopulated column to put our piece into
 */
-bool is_piece_in_col(const int board[N][N], const int col){
+bool is_piece_in_col(int board[N][N], const int col){
     for (int i=0; i<N; i++)
         if (board[i][col]>0) return true;
     return false;
@@ -178,7 +178,7 @@ have columns A-H and it may confuse someone.
 The vectors of the player are derived from the board, every cell that has 1 in it,
 is a player's move which is translated into a vector starting from 1 (not 0)
 */
-void print_solution_vectors(const int board[N][N]){
+void print_solution_vectors(int board[N][N]){
     printf("\nPrinting solution vectors\n");
     for(int i=0; i<N; i++){
         for(int j=0; j<N; j++){
