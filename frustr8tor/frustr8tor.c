@@ -160,10 +160,10 @@ void parse_file(const char *filename, int board[N][N]){
         getline(&line, &l, ptr);
         printf("%s", line);
         if (strlen(line) == 4){
-            int x = atoi(&line[2]) - 1;
-            int y = atoi(&line[0]) - 1;
+            int x = atoi(&line[0]) - 1;
+            int y = atoi(&line[2]) - 1;
             if (x>=0 && x<=7 && y>=0 && y<=7)
-                board[x][y] = 2;
+                board[y][x] = 2;
         }
     }
 
