@@ -25,14 +25,12 @@ pub fn main() !void {
         var conn = try server.accept();
         _ = try std.Thread.spawn(.{}, print_list, .{ &biglist, conn });
     }
-    biglist.clearAndFree();
 }
 
 fn print_list(biglist: *std.ArrayList(u8), conn: net.StreamServer.Connection) !void {
     var iter = std.mem.split(u8, biglist.items, "|");
     while (iter.next()) |item| {
-        _ = try conn.stream.write(item);
+        _ = try conn.stream.writeAll(item);
     }
-    //iter.reset();
     conn.stream.close();
 }
