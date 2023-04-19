@@ -25,9 +25,9 @@ pub fn main() !void {
 }
 
 fn print_list(list: *std.ArrayList(u8)) !void {
-    //collect the data from all the thread specific lists and combine them in a single list
-    for (list.items) |item| {
-        try stdout.print("{c}", .{item});
+    var iter = std.mem.split(u8, list.items, "|");
+    while (iter.next()) |item| {
+        try stdout.print("{s}", .{item});
     }
 }
 
