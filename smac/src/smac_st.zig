@@ -7,9 +7,9 @@ pub fn main() !void {
 
     for (1..1000001) |index| {
         if (index % 10 == 7 or index % 7 == 0) {
-            try biglist.writer().print("{s}\n|", .{"SMAC"});
+            try biglist.writer().print("{s}\n", .{"SMAC"});
         } else {
-            try biglist.writer().print("{d}\n|", .{index});
+            try biglist.writer().print("{d}\n", .{index});
         }
     }
 
@@ -18,8 +18,8 @@ pub fn main() !void {
 }
 
 fn print_list(list: *std.ArrayList(u8)) !void {
-    var iter = std.mem.split(u8, list.items, "|");
+    var iter = std.mem.split(u8, list.items, "\n");
     while (iter.next()) |item| {
-        try stdout.print("{s}", .{item});
+        try stdout.print("{s}\n", .{item});
     }
 }
