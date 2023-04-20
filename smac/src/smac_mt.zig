@@ -40,9 +40,9 @@ fn count_it(id: u32, list: *std.ArrayList(u8)) !void {
         if (index == 0) continue;
 
         if (index % 7 == 0 or index % 10 == 7) {
-            try list.writer().print("{s}\n", .{"SMAC"});
+            try list.writer().print("{s}\n|", .{"SMAC"});
         } else {
-            try list.writer().print("{d}\n", .{index});
+            try list.writer().print("{d}\n|", .{index});
         }
     }
 }
