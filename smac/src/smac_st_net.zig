@@ -1,5 +1,6 @@
 const std = @import("std");
 const net = std.net;
+const os = std.os;
 const stdout = std.io.getStdOut().writer();
 var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
 const gpa = general_purpose_allocator.allocator();
@@ -17,6 +18,7 @@ pub fn main() !void {
     }
 
     var server = net.StreamServer.init(.{});
+    server.reuse_address = true;
     defer server.deinit();
     try server.listen(net.Address.parseIp("0.0.0.0", 7979) catch unreachable);
     try stdout.print("Listening on {}\n", .{server.listen_address});
