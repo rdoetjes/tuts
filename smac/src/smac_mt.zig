@@ -8,14 +8,16 @@ pub fn main() !void {
     var t: [x]std.Thread = undefined;
     var list: [x]std.ArrayList(u8) = undefined;
 
-    for (0..x) |i| {
+    var i: u32 = 0;
+    while (i < x) : (i += 1) {
         list[i] = std.ArrayList(u8).init(heap_alloc);
         defer list[i].deinit();
         t[i] = try std.Thread.spawn(.{}, count_it, .{ @truncate(u32, i), &list[i] });
     }
 
     //we join all te threads to wait till they're done counting
-    for (0..x) |i| {
+    i = 0;
+    while (i < x) : (i += 1) {
         t[i].join();
         try print_list(&list[i]);
         //let's clean and free the indiviual list after copying
@@ -35,8 +37,8 @@ fn count_it(id: u32, list: *std.ArrayList(u8)) !void {
     var addr: usize = 0;
     if (id == 3) addr += 1;
 
-    //var rnd = rnd_gen.init(0);
-    for (id * 250000..(id * 250000) + 250000 + addr) |index| {
+    var index: usize = id * 250000;
+    while (index < (id * 250000 + 250000 + addr)) : (index += 1) {
         if (index == 0) continue;
 
         if (index % 7 == 0 or index % 10 == 7) {
