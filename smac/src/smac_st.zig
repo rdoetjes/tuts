@@ -5,7 +5,8 @@ pub fn main() !void {
     var biglist = std.ArrayList(u8).init(std.heap.page_allocator);
     defer biglist.deinit();
 
-    for (1..1000001) |index| {
+    var index: u32 = 0;
+    while (index < 1000001) : (index += 1) {
         if (index % 10 == 7 or index % 7 == 0) {
             try biglist.writer().print("{s}\n", .{"SMAC"});
         } else {
