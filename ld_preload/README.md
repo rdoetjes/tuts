@@ -11,5 +11,5 @@ const c_string: [*c]const u8 = "some c string";
 
 * loading the ld_preload
 ```
-export LD_PRELOAD=<absolute_path>/libstrncmp.so;./demo my_argument
+export LD_PRELOAD=<absolute_path>/libstrncmp.so;./demo my_argument;unset LD_PRELOAD
 ```
