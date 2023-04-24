@@ -4,7 +4,7 @@
 zig build-lib -dynamic -isystem . strncmp.zig   
 ```
 
-** c style strings in Zig
+* c style string definition in Zig
 ```
 const c_string: [*c]const u8 = "some c string";
 ```
