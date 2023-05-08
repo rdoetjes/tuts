@@ -9,18 +9,19 @@ pub fn main() !void {
     var biglist = std.ArrayList(u8).init(std.heap.page_allocator);
     defer biglist.deinit();
 
-    for (1..1000001) |index| {
-        if (index % 10 == 7 or index % 7 == 0) {
+    var i: u32 = 1;
+    while (i <= 1_000_000) : (i += 1) {
+        if (i % 10 == 7 or i % 7 == 0) {
             try biglist.writer().print("{s}\n|", .{"SMAC"});
         } else {
-            try biglist.writer().print("{d}\n|", .{index});
+            try biglist.writer().print("{d}\n|", .{i});
         }
     }
 
     var server = net.StreamServer.init(.{});
     server.reuse_address = true;
     defer server.deinit();
-    server.listen(net.Address.parseIp("0.0.0.0", 7979) catch unreachable);
+    try server.listen(net.Address.parseIp("0.0.0.0", 7979) catch unreachable);
     try stdout.print("Listening on {}\n", .{server.listen_address});
 
     while (true) {
