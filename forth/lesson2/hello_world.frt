@@ -1,4 +1,0 @@
-: SLEEP 1 DO i . i CR LOOP ;
-
-1001 SLEEP
-BYE
