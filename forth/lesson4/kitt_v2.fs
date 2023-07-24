@@ -25,7 +25,7 @@ variable high_value
 
 \ indefinitely, scan the bit up and down just like the knightrider scanner
 : KITT
-  1 BEGIN 1 1 = WHILE SCAN_UP SCAN_DOWN REPEAT ;
+  1 BEGIN SCAN_UP SCAN_DOWN AGAIN ;
 
 \ turn key to start the KITT word automatically after the cold start
 KITT `cold
