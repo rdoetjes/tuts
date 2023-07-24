@@ -1,3 +1,6 @@
+variable high_value
+4096 high_value !
+
 : MUL2  
   DUP d2* DROP ;
 
@@ -9,7 +12,7 @@
 
 : SCAN_UP
   BEGIN 
-    DUP 128 < WHILE 
+    DUP high_value @ < WHILE 
       MUL2 
       P_HEX 
       20 ms 
