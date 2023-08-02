@@ -30,5 +30,3 @@
   swap                
   dup                 
   0 > if * else nip then ;                 
-
-
