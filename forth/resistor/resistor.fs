@@ -17,10 +17,8 @@
   begin  
   dup                     \ dup the number of times the comparison removes it
   1 > while               \ as long as larger than 1 run the multiply
-    swap                  \ get the result (or 10 in first iter) on top of the stack
-    10 *                  \ multiply result by 10
-    swap                  \ get the the number of multiplies on the stack
-    1 -                   \ subtract one from the number of multiplies
+    swap 10 *             \ get the current result on top and multiply by 10     
+    swap 1 -              \ get the counter on top and subtract 1     
   repeat   
   drop ;                  \ drop the number of multiplies (1) from stack
     
