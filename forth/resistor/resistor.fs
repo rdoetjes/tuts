@@ -6,6 +6,7 @@
 5 constant green  
 6 constant blue  
 7 constant violet  
+7 constant purple  
 8 constant grey  
 9 constant white  
 
