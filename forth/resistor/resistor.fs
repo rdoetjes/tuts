@@ -11,8 +11,6 @@
 9 constant white  
 
 : exp ( u1 u2 -- u3 ) \ u3 = u1^u2
-   dup
-   0 = if 1 exit then  \ catch the 0 case that should return 1
    over swap 1 ?do over * loop nip ; 
 
 : r ( u1 u2 u3 -- u4 )
@@ -20,7 +18,8 @@
   rot rot >r >r       \ store the first 2 args on return stack
   10                  \ exponent of 10
   swap                \ swap so we have 10 3rd_ring_value on stack
-  exp                 \ calcualte the 10 ^ 3rd_ring
+  dup
+  0 = if 1 else exp then  \ catch the 0 case that should return 1
   r> r> swap          \ pop the first 2 arguments form return stack
 
   \ calculate the 1st_ring * 10 + 2nd_ring
