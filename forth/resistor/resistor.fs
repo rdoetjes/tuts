@@ -10,6 +10,10 @@
 9 constant white  
 
 : 10power ( n -- n ) 
+  dup 
+  1 = if 10 swap drop exit then 
+  dup
+  0 = if 1 swap drop exit then 
   10                      \ multiplier 
   swap                    \ the number of times we multiply by needs to come 1st
   begin  
@@ -23,8 +27,7 @@
   drop ;                  \ drop the number of multiplies (1) from stack
     
 : r ( n1 n2 n3 -- n4 )
-  dup                     \ duplicate the argument the > removed it
-  0 > if 10power then     \ only run the 10 power when arg is not 0
+  10power                 \ only run the 10 power when arg is not 0
   rot 10 *                \ multiply that second argument (2nd ring) by 10
   rot +                   \ add the the rings together
   swap                    \ get the 3rd ring (multiples of 10) on top
