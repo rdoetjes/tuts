@@ -25,9 +25,9 @@
 
   \ calculate the 1st_ring * 10 + 2nd_ring
   10 * +               
-  swap                
 
   \ if 3rd ring calcualted exponent is not 0 than multiply that with the 1_st*10+2_nd 
+  swap                
   dup                 
   0 > if                  
     *
