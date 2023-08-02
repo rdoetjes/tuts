@@ -23,7 +23,7 @@
   drop ;
     
 : r
-  10power
+  0 > if 10power then 
   rot
   10 *
   rot
