@@ -25,19 +25,15 @@
 : r ( n1 n2 n3 -- n4 )
   dup                     \ duplicate the argument the > removed it
   0 > if 10power then     \ only run the 10 power when arg is not 0
-  rot                     \ get the second argument on top
-  10 *                    \ multiply that second argument (2nd ring) by 10
-  rot                     \ get the 1st argument (1st ring) on top 
-  +                       \ add the 1st two rings together 
+  rot 10 *                \ multiply that second argument (2nd ring) by 10
+  rot +                   \ add the the rings together
   swap                    \ get the 3rd ring (multiples of 10) on top
   dup                     \ copy it because 0 > removes it
-  .s
   0 > if                  \ if larger than 0 then we multiply the rd ring with the 2rings
     *
-    swap drop             \ clean up the stuff we don't need
-  else 
-     drop                 \ if multiplier is 0 then just drop it
-  then ;
-
+  else
+    drop                  \ since we do not multiply we need to drop the 0 here
+  then 
+  ;
 
 
