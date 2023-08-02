@@ -22,7 +22,7 @@
   repeat   
   drop ;     \ drop the number of multiplies (1) from stack
     
-: r
+: r ( n1 n2 n3 -- n4 )
   dup \ duplicate the argument the > removed it
   0 > if 10power then \ only run the 10 power when arg is not 0
   rot   \ get the second argument on top
