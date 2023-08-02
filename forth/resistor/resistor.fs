@@ -11,9 +11,11 @@
 
 : 10power ( n -- n ) 
   dup 
-  1 = if 10 swap drop exit then   \ cases that do not require multiplication
-  dup
-  0 = if 1 swap drop exit then    \ case that does not require multiplication
+  0 = if                  \ in case zero return 1 
+    1 
+    swap drop 
+    exit 
+  then                    
   10                      \ multiplier 
   swap                    \ the number of times we multiply by needs to come 1st
   begin  
