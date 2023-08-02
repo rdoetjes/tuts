@@ -19,7 +19,7 @@
   \ calculate the 3rd ring exponent
   rot rot >r >r       \ store the first 2 args on return stack
   10                  \ exponent of 10
-  swap
+  swap                \ swap so we have 10 3rd_ring_value on stack
   exp                 \ calcualte the 10 ^ 3rd_ring
   r> r> swap          \ pop the first 2 arguments form return stack
 
