@@ -29,11 +29,6 @@
   \ if 3rd ring calculated exponent is not 0 than multiply that with the 1st_ring*10+2nd_ring value on the stack
   swap                
   dup                 
-  0 > if                  
-    *
-  else
-    nip
-  then 
-  ;
+  0 > if * else nip then ;                 
 
 
