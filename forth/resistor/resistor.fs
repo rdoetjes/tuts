@@ -23,13 +23,20 @@
   drop ;
     
 : r
+  dup
   0 > if 10power then 
   rot
   10 *
   rot
-  +
-  *
-  ;
+  + 
+  swap
+  dup 
+  0 > if 
+    *
+    swap drop
+  else 
+     drop 
+  then ;
 
 
 
