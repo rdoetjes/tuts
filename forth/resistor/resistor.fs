@@ -10,11 +10,11 @@
 9 constant white  
 
 : 10power ( n -- n ) 
-  dup 
+  dup                     \ deuplicate since the = if removes the it from the stack
   0 = if                  \ in case zero return 1 
     1 
     swap drop 
-    exit 
+    exit                  \ this is a return early 
   then                    
   10                      \ multiplier 
   swap                    \ the number of times we multiply by needs to come 1st
