@@ -9,33 +9,33 @@
 8 constant grey  
 9 constant white  
 
-: 10power  
-  10  
-  swap  
+: 10power ( n -- n ) 
+  10      \ multiplier 
+  swap    \ the number of times we multiply by needs to come 1st
   begin  
-  dup  
-  1 > while  
-    swap  
-    10 *  
-    swap  
-    1 -  
+  dup     \ dup the number of times the comparison removes it
+  1 > while  \ as long as larger than 1 run the multiply
+    swap     \ get the result (or 10 in first iter) on top of the stack
+    10 *     \ multiply result by 10
+    swap     \ get the the number of multiplies on the stack
+    1 -      \ subtract one from the number of multiplies
   repeat   
-  drop ;
+  drop ;     \ drop the number of multiplies (1) from stack
     
 : r
-  dup
-  0 > if 10power then 
-  rot
-  10 *
-  rot
-  + 
-  swap
-  dup 
-  0 > if 
+  dup \ duplicate the argument the > removed it
+  0 > if 10power then \ only run the 10 power when arg is not 0
+  rot   \ get the second argument on top
+  10 *  \ multiply that second argument (2nd ring) by 10
+  rot   \ get the 1st argument (1st ring) on top 
+  +     \ add the 1st two rings together 
+  swap  \ get the 3rd ring (multiples of 10) on top
+  dup   \ copy it because 0 > removes it
+  0 > if \ if larger than 0 then we multiply the rd ring with the 2rings
     *
-    swap drop
+    swap drop \ clean up the stuff we don't need
   else 
-     drop 
+     drop   \ if multiplier is 0 then just drop it
   then ;
 
 
