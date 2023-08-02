@@ -15,7 +15,7 @@
    0 = if 1 exit then
    over swap 1 ?do over * loop nip ; 
 
-: r ( u1 u2 u3 -- u4 )
+: ohm ( u1 u2 u3 -- u4 )
   \ calculate the 3rd ring exponent
   rot rot >r >r       \ store the first 2 args on return stack
   10                  \ exponent of 10
