@@ -12,7 +12,7 @@
 
 : exp ( u1 u2 -- u3 ) \ u3 = u1^u2
    dup
-   0 = if 1 exit then
+   0 = if 1 exit then  \ catch the 0 case that should return 1
    over swap 1 ?do over * loop nip ;
 
 : r ( u1 u2 u3 -- u4 )
