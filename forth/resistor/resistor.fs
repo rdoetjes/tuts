@@ -47,7 +47,7 @@
     convert_fp          \ since we want a x.xx value we need to conver number into fixed point
     1000000,0 f/        \ divide by a million
     0,05 d+             \ round up for displaying a nice 1 digit begind the decimal place f.i 2,2 instead of 2,199999
-    1 f.n ." Mohm" cr exit \ print number in fixed point format
+    1 f.n ." MΩ" cr exit \ print number in fixed point format
   then 
 
   dup
@@ -55,10 +55,10 @@
     convert_fp          \ convert from number into fixed point
     1000,0 f/           \ divide by 1000
     0,05 d+             \ round up for the so that 1.79999999 becomes 1.8
-    1 f.n ." Kohm" cr exit \ print number in fixed point format
+    1 f.n ." KΩ" cr exit \ print number in fixed point format
   then
 
-  . ." ohm" cr          \ number as neither divisabke by 1e6 and 1e3 so we treat it as ohms
+  . ." Ω" cr          \ number as neither divisabke by 1e6 and 1e3 so we treat it as ohms
 ;
 
 : resistor_is ( u1, u2, u3 -- ) \ calculate the value of a resistor by passing in the colours as u1 u2 and u3
