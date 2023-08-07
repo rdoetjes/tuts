@@ -13,10 +13,12 @@
 : exp ( u1 u2 -- u3 ) \ u3 = u1^u2
    dup
    0 = if rot 2drop 1 exit then \ drop the 10 and 0 that are passed
-   over swap 1 ?do over * loop nip ; 
+   over swap 1 ?do over * loop nip 
+; 
 
 : convert_fp ( u1 -- u1 u2 ) \ turn into a 'fp'
-  1,0 * swap ;
+  1,0 * swap 
+;
 
 : ohm ( u1 u2 u3 -- u4 )
   \ calculate the 3rd ring exponent
@@ -32,20 +34,29 @@
   \ if 3rd ring calculated exponent is not 0 than multiply that with the 1st_ring*10+2nd_ring value on the stack
   swap                
   dup                 
-  0 > if * else nip then ;                 
+  0 > if 
+    * 
+  else 
+    nip 
+  then 
+;                 
 
 : print_resistor_value ( u1 -- ) \ takes the ohm value and turns it into ohm, KOhm or MOhm depending on the size
   dup
   1000000 / 1 >= if     \ is the value 1 or higher after dividing by 1e6 than it's mega ohms
-  convert_fp            \ since we want a x.xx value we need to conver number into fixed point
-  1000000,0 f/ f. ." Mohm" cr exit then \ print out the number in fixed point format
+   convert_fp           \ since we want a x.xx value we need to conver number into fixed point
+   1000000,0 f/ f. ." Mohm" cr exit \ print number in fixed point format
+  then 
 
   dup
   1000 / 1 >= if        \ is the value 1 or higher after dividing by 1e3 than it's Kohm
-  convert_fp            \ convert from number into fixed point
-  1000,0 f/ f. ." Kohm" cr exit then
+    convert_fp          \ convert from number into fixed point
+    1000,0 f/ f. ." Kohm" cr exit \ print number in fixed point format
+  then
 
-  . ." Ohm" cr ;        \ number as neither divisabke by 1e6 and 1e3 so we treat it as ohms
+  . ." Ohm" cr          \ number as neither divisabke by 1e6 and 1e3 so we treat it as ohms
+;
 
 : resistor ( u1, u2, u3 -- ) \ calculate the value of a resistor by passing in the colours as u1 u2 and u3
-  ohm print_resistor_value ;  \ convert to ohms and then print into human readdable format
+  ohm print_resistor_value   \ convert to ohms and then print into human readdable format
+;
