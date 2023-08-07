@@ -58,7 +58,7 @@
     1 f.n ." KΩ" cr exit \ print number in fixed point format
   then
 
-  . ." Ω" cr          \ number as neither divisabke by 1e6 and 1e3 so we treat it as ohms
+  . ." Ω" cr          \ number as neither divisable by 1e6 and 1e3 so we treat it as ohms
 ;
 
 : resistor_is ( u1, u2, u3 -- ) \ calculate the value of a resistor by passing in the colours as u1 u2 and u3
