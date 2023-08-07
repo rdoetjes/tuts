@@ -1,14 +1,14 @@
-0,0 constant black  
-2,0 constant red  
-1,0 constant brown  
-3,0 constant orange  
-4,0 constant yellow  
-5,0 constant green  
-6,0 constant blue  
-7,0 constant violet  
-7,0 constant purple  
-8,0 constant grey  
-9,0 constant white  
+0 constant black  
+2 constant red  
+1 constant brown  
+3 constant orange  
+4 constant yellow  
+5 constant green  
+6 constant blue  
+7 constant violet  
+7 constant purple  
+8 constant grey  
+9 constant white  
 
 : exp ( u1 u2 -- u3 ) \ u3 = u1^u2
    dup
@@ -34,16 +34,18 @@
   dup                 
   0 > if * else nip then ;                 
 
-  : into_hr_fmt ( u1 -- ) \ takes the ohm value and turns it into ohm, KOhm or MOhm depending on the size
+  : print_resistor_value ( u1 -- ) \ takes the ohm value and turns it into ohm, KOhm or MOhm depending on the size
     dup
     1000000 / 1 >= if     \ is the value 1 or higher after dividing by 1e6 than it's mega ohms
       convert_fp          \ since we want a x.xx value we need to conver number into fixed point
-      1000000,0 f/ f. ." M ohm" cr exit then \ print out the number in fixed point format
+      1000000,0 f/ f. ." Mohm" cr exit then \ print out the number in fixed point format
 
     dup
     1000 / 1 >= if        \ is the value 1 or higher after dividing by 1e3 than it's Kohm
       convert_fp          \ convert from number into fixed point
-      1000,0 f/ f. ." K ohm" cr exit then
+      1000,0 f/ f. ." Kohm" cr exit then
 
     . ." Ohm" cr ;        \ number as neither divisabke by 1e6 and 1e3 so we treat it as ohms
 
+: resistor ( u1, u2, u3 -- ) \ calculate the value of a resistor by passing in the colours as u1 u2 and u3
+  ohm print_resistor_value ;
