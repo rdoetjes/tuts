@@ -57,6 +57,6 @@
   . ." Ohm" cr          \ number as neither divisabke by 1e6 and 1e3 so we treat it as ohms
 ;
 
-: resistor ( u1, u2, u3 -- ) \ calculate the value of a resistor by passing in the colours as u1 u2 and u3
+: resistor_is ( u1, u2, u3 -- ) \ calculate the value of a resistor by passing in the colours as u1 u2 and u3
   ohm print_resistor_value   \ convert to ohms and then print into human readdable format
 ;
