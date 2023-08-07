@@ -45,16 +45,16 @@
   dup
   1000000 / 1 >= if     \ is the value 1 or higher after dividing by 1e6 than it's mega ohms
     convert_fp          \ since we want a x.xx value we need to conver number into fixed point
-    1000000,0 f/ 
-    0,05 d+              \ round up for displaying 2,2 instead of 2,19
+    1000000,0 f/        \ divide by a million
+    0,05 d+             \ round up for displaying a nice 1 digit begind the decimal place f.i 2,2 instead of 2,199999
     1 f.n ." Mohm" cr exit \ print number in fixed point format
   then 
 
   dup
   1000 / 1 >= if        \ is the value 1 or higher after dividing by 1e3 than it's Kohm
     convert_fp          \ convert from number into fixed point
-    1000,0 f/ 
-    0,05 d+ 
+    1000,0 f/           \ divide by 1000
+    0,05 d+             \ round up for the so that 1.79999999 becomes 1.8
     1 f.n ." Kohm" cr exit \ print number in fixed point format
   then
 
