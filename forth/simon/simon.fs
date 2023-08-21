@@ -1,4 +1,5 @@
 rng import
+pin import
 
 30 constant max-moves
 
@@ -18,6 +19,20 @@ variable step
 : gen-move-seq ( -- ) \ gen. the 31 different random values for the game
   max-moves 0 do gen-move i add-move loop ;
 
+: setup ( -- ) \ sets up the pins
+  2 output-pin
+  3 output-pin
+  4 output-pin
+  5 output-pin
+  6 input-pin
+  6 pull-up-pin
+  7 input-pin
+  7 pull-up-pin
+  8 input-pin
+  8 pull-up-pin
+  9 input-pin
+  9 pull-up-pin ;
+
 : reset-game ( -- ) \ reset the game, set step to 0 and gen. new sequence
   0 step !
   gen-move-seq ;
@@ -26,8 +41,16 @@ variable step
   max-moves 0 do i get-move . loop ;
 
 : simon
+  setup
   reset-game
   4 1 do 
-    cr ." level: " i .
-    i 10 * 0 do i get-move . loop 
+    cr ." level: " i . cr
+    i 10 * 0 do 
+      i get-move
+      .s
+      dup 2 + 1 swap pin!
+      300 ms
+      2 + 0 swap pin!
+      300 ms
+    loop 
   loop ;
