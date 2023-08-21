@@ -1,7 +1,7 @@
 rng import
 pin import
 
-30 constant max-moves \ the maximum amount of steps in sequence
+31 constant max-moves \ the maximum amount of steps in sequence
 
 variable moves max-moves allot \ array that holds the sequence
 
@@ -78,10 +78,25 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   depth 0 > if depth 0 do drop loop then ; 
 
 : game-over ( -- ) \ turn all leds on to indicate game over
-  1 2 pin!
-  1 3 pin!
-  1 4 pin!
-  1 5 pin!
+  10 0 do 
+    2 toggle-pin 
+    3 toggle-pin 
+    4 toggle-pin 
+    5 toggle-pin 
+    100 ms
+ loop
+  cs 
+;
+
+: you-beat-the-game ( -- ) \ a little light show
+  50 0 do 
+    2 toggle-pin 
+    4 toggle-pin 
+    100 ms
+    3 toggle-pin 
+    5 toggle-pin 
+    100 ms
+  loop 
   cs 
 ;
 
@@ -93,10 +108,14 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   loop
 ;
 
-: simon
-  setup
-  reset-game
-  1000 ms
+: wait-for-red-button ( -- ) \ wait for red button to be pressed
+  begin
+    10 ms
+    0 6 pin@ = 
+  until
+;
+
+: game-loop
   begin
     \ speed up every 10 steps 
     step @  9 <= if 300 speed ! then 
@@ -115,4 +134,14 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     
     800 ms  \ wait 800 ms and then let simon start next sequence
     step @ max-moves = \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until ." you won" ;
+  until 1 ; \ flag to indicate you won 
+
+: simon
+  begin
+    setup
+    reset-game
+    wait-for-red-button
+    1000 ms
+    game-loop
+    1 = if you-beat-the-game then
+  again ;
