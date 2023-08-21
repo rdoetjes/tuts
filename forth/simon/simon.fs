@@ -23,22 +23,14 @@ variable speed
   max-moves 0 do gen-move i add-move loop ;
 
 : setup ( -- ) \ sets up the pins
-  2 output-pin
-  0 2 pin!
-  3 output-pin
-  0 3 pin!
-  4 output-pin
-  0 4 pin!
-  5 output-pin
-  0 5 pin!
-  6 input-pin
-  6 pull-up-pin
-  7 input-pin
-  7 pull-up-pin
-  8 input-pin
-  8 pull-up-pin
-  9 input-pin
-  9 pull-up-pin ;
+  2 output-pin 0 2 pin!
+  3 output-pin 0 3 pin!
+  4 output-pin 0 4 pin!
+  5 output-pin 0 5 pin!
+  6 input-pin 6 pull-up-pin
+  7 input-pin 7 pull-up-pin
+  8 input-pin 8 pull-up-pin
+  9 input-pin 9 pull-up-pin ;
 
 : reset-game ( -- ) \ reset the game, set step to 0 and gen. new sequence
   0 step !
