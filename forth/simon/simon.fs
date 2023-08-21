@@ -6,6 +6,7 @@ pin import
 variable moves max-moves allot \ maximum moves in simon
 
 variable step 
+1 step !
 
 variable speed
 250 speed !
@@ -33,11 +34,8 @@ variable speed
   9 input-pin 9 pull-up-pin ;
 
 : reset-game ( -- ) \ reset the game, set step to 0 and gen. new sequence
-  0 step !
+  1 step !
   gen-move-seq ;
-
-: show-moves ( -- ) \ list all the moves to sceen, for  debugging
-  max-moves 0 do i get-move . loop ;
 
 : toggle-pin-ms ( ms move -- ) \ sets the pin corresponded by move (+2 to get gpio) on and of ms millisec
   swap
@@ -51,15 +49,69 @@ variable speed
   ms
   ;
 
+: simons-move ( n -- ) \ plays the steps from 0 to n
+    0 do 
+      i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
+    loop 
+;
+
+: key-down ( n -- n ) \ lights up the led a maximum of ms to corresponding led and returns the move 0,1,2 or 3
+  dup
+  dup
+  4 - toggle-pin
+  begin dup 100 ms -1 swap .s pin@ = until
+  4 - toggle-pin
+  6 -
+  ;
+
+: poll-keys ( -- ) \ checks for a keypress and timesout after 1000ms
+  0
+  begin 
+  10 ms
+  1 + dup 100 = if -1 ." no keypressed" exit then 
+    0 6 pin@ = if drop 6 key-down exit then 
+    0 7 pin@ = if drop 7 key-down exit then 
+    0 8 pin@ = if drop 8 key-down exit then 
+    0 9 pin@ = if drop 9 key-down exit then 
+    ." ."
+  key? until ; 
+
+: game-over
+  ." GAME OVER"
+  1 2 pin!
+  1 3 pin!
+  1 4 pin!
+  1 5 pin!
+  begin key? until
+  -1 
+;
+
+: players-move ( step -- ) \ reads the buttons and checks the value
+  0 do 
+    poll-keys
+    -1 = if -1 exit then
+    swap i if = ." move on" then
+  loop
+;
+
 : simon
   setup
   reset-game
-  4 1 do 
-    i 1 = if 300 speed ! then
-    i 2 = if 250 speed ! then
-    i 3 = if 180 speed ! then
+  1000 ms
+  begin
+    step @ 9 <= if 300 speed ! then
+    step @ 10 >= if 200 speed ! then
+    step @ 20 >= if 150 speed ! then
 
-    i 10 * 0 do 
-      i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
-    loop 
-  loop ;
+    \ simon's move
+    step @ simons-move
+
+   \ do user
+    step @ players-move
+    -1 = if game-over exit then
+
+    step @ 1 + step !
+    
+    800 ms
+    step @ max-moves =
+  until ;
