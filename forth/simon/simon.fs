@@ -134,7 +134,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     
     800 ms  \ wait 800 ms and then let simon start next sequence
     step @ max-moves = \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until 1 ; \ flag to indicate you won 
+  until 100 ; \ flag to indicate you won 
 
 : simon
   begin
@@ -143,5 +143,5 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     wait-for-red-button
     1000 ms
     game-loop
-    1 = if you-beat-the-game then
+    100 = if you-beat-the-game then
   again ;
