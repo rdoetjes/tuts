@@ -50,13 +50,13 @@ variable speed
   ;
 
 : simons-move ( n -- ) \ plays the steps from 0 to n
-    0 do 
-      i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
-    loop 
+  0 do 
+    i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
+  loop 
 ;
 
 : key-down ( n -- n ) \ lights up the led a maximum of ms to corresponding led and returns the move 0,1,2 or 3
-  depth 2 = if swap drop then \ sometimes we seem to have a superious entry and that causes a stack overflow
+  depth 2 = if swap drop then \ sometimes we seem to have a superious entry keybouce?
   dup 4 - toggle-pin
   begin 100 ms dup -1 swap pin@ = until
   dup 4 - toggle-pin
