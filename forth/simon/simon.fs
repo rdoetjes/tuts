@@ -115,4 +115,4 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     
     800 ms  \ wait 800 ms and then let simon start next sequence
     step @ max-moves = \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until ;
+  until ." you won" ;
