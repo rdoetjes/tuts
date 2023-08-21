@@ -56,41 +56,39 @@ variable speed
 ;
 
 : key-down ( n -- n ) \ lights up the led a maximum of ms to corresponding led and returns the move 0,1,2 or 3
-  dup
-  dup
-  4 - toggle-pin
-  begin dup 100 ms -1 swap .s pin@ = until
-  4 - toggle-pin
+  depth 2 = if swap drop then \ sometimes we seem to have a superious entry and that causes a stack overflow
+  dup 4 - toggle-pin
+  begin 100 ms dup -1 swap pin@ = until
+  dup 4 - toggle-pin
   6 -
   ;
 
-: poll-keys ( -- ) \ checks for a keypress and timesout after 1000ms
+: poll-keys ( -- ) \ checks for a keypress and timesout after 2000ms
   0
   begin 
   10 ms
-  1 + dup 100 = if -1 ." no keypressed" exit then 
+  1 + dup 150 = if -1 exit then 
     0 6 pin@ = if drop 6 key-down exit then 
     0 7 pin@ = if drop 7 key-down exit then 
     0 8 pin@ = if drop 8 key-down exit then 
     0 9 pin@ = if drop 9 key-down exit then 
-    ." ."
-  key? until ; 
+  again ; 
+
+: cs depth 0 do . loop ; 
 
 : game-over
-  ." GAME OVER"
   1 2 pin!
   1 3 pin!
   1 4 pin!
   1 5 pin!
-  begin key? until
-  -1 
+  depth 0 > if cs then \ clear stack 
 ;
 
-: players-move ( step -- ) \ reads the buttons and checks the value
+: players-move ( step -- n) \ reads the buttons and checks the value
   0 do 
     poll-keys
-    -1 = if -1 exit then
-    swap i if = ." move on" then
+    dup -1 = if drop -1 exit then 
+    dup i get-move <> if -1 exit then
   loop
 ;
 
