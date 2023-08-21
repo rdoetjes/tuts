@@ -21,9 +21,13 @@ variable step
 
 : setup ( -- ) \ sets up the pins
   2 output-pin
+  0 2 pin!
   3 output-pin
+  0 3 pin!
   4 output-pin
+  0 4 pin!
   5 output-pin
+  0 5 pin!
   6 input-pin
   6 pull-up-pin
   7 input-pin
@@ -40,17 +44,28 @@ variable step
 : show-moves ( -- ) \ list all the moves to sceen, for  debugging
   max-moves 0 do i get-move . loop ;
 
+: toggle-pin-ms ( ms move -- ) \ sets the pin corresponded by move (+2 to get gpio) on and of ms millisec
+  swap
+  dup
+  2 + 1 swap pin!
+  swap
+  dup
+  ms
+  swap
+  2 + 0 swap pin!
+  ms
+  ;
+
 : simon
   setup
   reset-game
   4 1 do 
     cr ." level: " i . cr
     i 10 * 0 do 
-      i get-move
-      .s
-      dup 2 + 1 swap pin!
-      300 ms
-      2 + 0 swap pin!
-      300 ms
+      i get-move 250 toggle-pin-ms
+      \ 300 2 + 1 swap pin!
+      \ 300 ms
+      \ 2 + 0 swap pin!
+      \ 300 ms
     loop 
   loop ;
