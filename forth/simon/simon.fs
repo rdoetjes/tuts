@@ -42,12 +42,12 @@ variable speed
 : toggle-pin-ms ( ms move -- ) \ sets the pin corresponded by move (+2 to get gpio) on and of ms millisec
   swap
   dup
-  2 + 1 swap pin!
+  2 + toggle-pin
   swap
   dup
   ms
   swap
-  2 + 0 swap pin!
+  2 + toggle-pin
   ms
   ;
 
@@ -59,10 +59,7 @@ variable speed
     i 2 = if 250 speed ! then
     i 3 = if 180 speed ! then
 
-    speed @
-    .
-
     i 10 * 0 do 
-      i get-move speed @ toggle-pin-ms
+      i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
     loop 
   loop ;
