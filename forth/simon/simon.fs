@@ -97,7 +97,7 @@ variable speed
   reset-game
   1000 ms
   begin
-    step @ 9 <= if 300 speed ! then
+    step @  9 <= if 300 speed ! then
     step @ 10 >= if 200 speed ! then
     step @ 20 >= if 150 speed ! then
 
