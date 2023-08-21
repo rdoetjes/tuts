@@ -7,6 +7,9 @@ variable moves max-moves allot \ maximum moves in simon
 
 variable step 
 
+variable speed
+250 speed !
+
 : add-move ( value n --) \ adds the value to moves array[n]
   moves + c! ;
 
@@ -60,12 +63,14 @@ variable step
   setup
   reset-game
   4 1 do 
-    cr ." level: " i . cr
+    i 1 = if 300 speed ! then
+    i 2 = if 250 speed ! then
+    i 3 = if 180 speed ! then
+
+    speed @
+    .
+
     i 10 * 0 do 
-      i get-move 250 toggle-pin-ms
-      \ 300 2 + 1 swap pin!
-      \ 300 ms
-      \ 2 + 0 swap pin!
-      \ 300 ms
+      i get-move speed @ toggle-pin-ms
     loop 
   loop ;
