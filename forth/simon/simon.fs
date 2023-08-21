@@ -74,22 +74,22 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     0 9 pin@ = if drop 9 key-down exit then 
   again ; 
 
-: cs depth 0 > if depth 0 do drop loop then ; \ clear the stacl
+: cs ( -- ) \ clear the stack when something is on there
+  depth 0 > if depth 0 do drop loop then ; 
 
-: game-over
-  \ turn all leds on to indicate game over
+: game-over ( -- ) \ turn all leds on to indicate game over
   1 2 pin!
   1 3 pin!
   1 4 pin!
   1 5 pin!
-  cs \ clear stack 
+  cs 
 ;
 
 : players-move ( step -- n) \ reads the buttons and checks the value
   0 do 
     poll-keys
-    dup -1 = if drop -1 exit then 
-    dup i get-move <> if -1 exit then
+    dup -1 = if drop -1 exit then     \ if -1 then timeout accord and return -1 for gameover
+    dup i get-move <> if -1 exit then \ value from get did not match the step value obtained from get-move return -1 for gameover
   loop
 ;
 
