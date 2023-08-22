@@ -1,7 +1,7 @@
 rng import
 pin import
 
-4 constant max-moves \ the maximum amount of steps in sequence
+31 constant max-moves \ the maximum amount of steps (+1) in sequence
 
 variable moves max-moves allot \ array that holds the sequence
 
