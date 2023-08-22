@@ -1,7 +1,7 @@
 rng import
 pin import
 
-31 constant max-moves \ the maximum amount of steps in sequence
+4 constant max-moves \ the maximum amount of steps in sequence
 
 variable moves max-moves allot \ array that holds the sequence
 
@@ -23,17 +23,29 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : gen-move-seq ( -- ) \ gen. the 31 different random values for the game
   max-moves 0 do gen-move i add-move loop ;
 
+: cs ( -- ) \ clear the stack when something is on there (should never need to clean)
+  depth 0 > if depth 0 do drop loop then ; 
+
+: set-leds-off
+ 0 2 pin!
+ 0 3 pin!
+ 0 4 pin!
+ 0 5 pin! ;
+
 : setup ( -- ) \ sets up the pins in such away we can uses maths to calculate step value, led pin and switch from one or the other
-  2 output-pin 0 2 pin!
-  3 output-pin 0 3 pin!
-  4 output-pin 0 4 pin!
-  5 output-pin 0 5 pin!
+  cs
+  2 output-pin 
+  3 output-pin
+  4 output-pin
+  5 output-pin
   6 input-pin 6 pull-up-pin
   7 input-pin 7 pull-up-pin
   8 input-pin 8 pull-up-pin
   9 input-pin 9 pull-up-pin ;
 
 : reset-game ( -- ) \ reset the game, set step to 0 and gen. new sequence
+  cs              \ clear stack just in case
+  set-leds-off    \ set everything to a known state
   1 step !        \ set step to first step of the sequence
   gen-move-seq ;  \ generate the 30 random steps whichs make up the sequence
 
@@ -58,15 +70,12 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   0
   begin 
   10 ms
-  1 + dup 150 = if -1 exit then 
+  1 + dup 150 = if drop -1 exit then 
     0 6 pin@ = if drop 6 key-down exit then 
     0 7 pin@ = if drop 7 key-down exit then 
     0 8 pin@ = if drop 8 key-down exit then 
     0 9 pin@ = if drop 9 key-down exit then 
   again ; 
-
-: cs ( -- ) \ clear the stack when something is on there
-  depth 0 > if depth 0 do drop loop then ; 
 
 : game-over ( -- ) \ turn all leds on to indicate game over
   10 0 do 
@@ -75,26 +84,25 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     4 toggle-pin 
     5 toggle-pin 
     100 ms
- loop
-  cs ; \ just to be sure that nothing is left on stack
+ loop ;
 
 : you-beat-the-game ( -- ) \ a little light show
-  50 0 do 
+  14 0 do 
     2 toggle-pin 
     4 toggle-pin 
     100 ms
     3 toggle-pin 
     5 toggle-pin 
     100 ms
-  loop 
-  cs ; \ just to be sure nothing is left on stack
+  loop ;
 
 : players-move ( step -- n) \ reads the buttons and compare the value against simon's sequence at that step; 
                             \ returns value at step or -1 when player was wrong
   0 do 
     poll-keys
-    dup -1 = if drop -1 exit then          \ if -1 then timeout accord and return -1 for gameover
-    dup i get-move <> if -1 exit then drop \ value from poll-keys didn't match the value from get-move, return -1 for gameover
+    dup -1 = if exit then          \ if -1 then timeout accord and return -1 for gameover
+    dup i get-move <> if drop -1 exit then \ value from poll-keys didn't match the value from get-move, return -1 for gameover
+    drop
   loop ;
 
 : wait-for-red-button ( -- ) \ wait for red button to be pressed, which doubles as start button
@@ -113,7 +121,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     step @ simons-move  \ simon plays the sequence until step
     
     step @ players-move \ user repeats simons sequence
-    -1 = if game-over exit then \ we break out when players-move is -1 (indicating gameover)
+    -1 = if -1 exit then \ we break out when players-move is -1 (indicating gameover)
 
     step @ 1 + step !   \ go to next step in the sequence
     
@@ -128,5 +136,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     wait-for-red-button
     1000 ms
     game-loop
-    100 = if you-beat-the-game then
+    dup -1 = if drop game-over then
+    dup 100 = if drop you-beat-the-game then
   again ;
