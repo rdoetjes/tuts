@@ -27,10 +27,10 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   depth 0 > if depth 0 do drop loop then ; 
 
 : set-leds-off
- 0 2 pin!
- 0 3 pin!
- 0 4 pin!
- 0 5 pin! ;
+  0 2 pin!
+  0 3 pin!
+  0 4 pin!
+  0 5 pin! ;
 
 : setup ( -- ) \ sets up the pins in such away we can uses maths to calculate step value, led pin and switch from one or the other
   cs
