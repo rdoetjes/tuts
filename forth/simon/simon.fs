@@ -55,7 +55,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   begin 100 ms dup -1 swap pin@ = until
   dup 4 - toggle-pin
   6 -
-  ;
+;
 
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
   0
@@ -66,7 +66,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     0 7 pin@ = if drop 7 key-down exit then 
     0 8 pin@ = if drop 8 key-down exit then 
     0 9 pin@ = if drop 9 key-down exit then 
-  again ; 
+  again 
+; 
 
 : cs ( -- ) \ clear the stack when something is on there
   depth 0 > if depth 0 do drop loop then ; 
@@ -126,7 +127,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     
     800 ms              \ wait 800 ms and then let simon start next sequence
     step @ max-moves =  \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until 100 ;           \ 100 is to indicate you beat the whole sequemce
+  until 100             \ 100 is to indicate you beat the whole sequemce
+;
 
 : simon ( -- )          \ SIMON game entry point, loops indefinitely
   setup
