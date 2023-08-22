@@ -56,7 +56,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 ;
 
 : key-down ( n -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
-  depth 2 = if swap drop then \ sometimes we seem to have a superious entry keybouce?
   dup 4 - toggle-pin
   begin 100 ms dup -1 swap pin@ = until
   dup 4 - toggle-pin
@@ -103,8 +102,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : players-move ( step -- n) \ reads the buttons and checks the value
   0 do 
     poll-keys
-    dup -1 = if drop -1 exit then     \ if -1 then timeout accord and return -1 for gameover
-    dup i get-move <> if -1 exit then \ value from get did not match the step value obtained from get-move return -1 for gameover
+    dup -1 = if drop -1 exit then \ if -1 then timeout accord and return -1 for gameover
+    dup i get-move <> if -1 exit then drop \ value from get did not match the step value obtained from get-move return -1 for gameover
   loop
 ;
 
@@ -137,8 +136,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   until 100 ; \ flag to indicate you won 
 
 : simon
+  setup
   begin
-    setup
     reset-game
     wait-for-red-button
     1000 ms
