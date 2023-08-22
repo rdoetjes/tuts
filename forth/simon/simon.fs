@@ -128,7 +128,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     step @ max-moves =  \ did we reach the whole sequence no? continue TODO: victory light show after until
   until 100 ;           \ 100 is to indicate you beat the whole sequemce
 
-: simon
+: simon ( -- )          \ SIMON game entry point, loops indefinitely
   setup
   begin
     reset-game
