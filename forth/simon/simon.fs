@@ -17,7 +17,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : get-move ( n -- n) \ gets the value from the moves list at position n
   moves + c@ ;
 
-: gen-move ( -- n) \ generates random number between 0-4 (4 not incl)
+: gen-move ( -- n) \ generates random number between 0-4 (4 not incl) by using logic and 3 on random int
   random 3 and ;
 
 : gen-move-seq ( -- ) \ gen. the 31 different random values for the game
