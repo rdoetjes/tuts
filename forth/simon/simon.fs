@@ -38,14 +38,9 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   gen-move-seq ;  \ generate the 30 random steps whichs make up the sequence
 
 : toggle-pin-ms ( ms move -- ) \ sets the pin corresponding to move (+2 to get gpio) on and of for ms millisec
-  swap
-  dup
-  2 + toggle-pin
-  swap
-  dup
-  ms
-  swap
-  2 + toggle-pin
+  swap dup 2 + toggle-pin
+  swap dup ms
+  swap 2 + toggle-pin
   ms
   ;
 
@@ -99,41 +94,39 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   cs \ just to be sure nothing is left on stack
 ;
 
-: players-move ( step -- n) \ reads the buttons and checks the value
+: players-move ( step -- n) \ reads the buttons and compare the value against simon's sequence at that step; 
+                            \ returns value at step or -1 when player was wrong
   0 do 
     poll-keys
-    dup -1 = if drop -1 exit then \ if -1 then timeout accord and return -1 for gameover
-    dup i get-move <> if -1 exit then drop \ value from get did not match the step value obtained from get-move return -1 for gameover
+    dup -1 = if drop -1 exit then          \ if -1 then timeout accord and return -1 for gameover
+    dup i get-move <> if -1 exit then drop \ value from poll-keys didn't match the value from get-move, return -1 for gameover
   loop
 ;
 
-: wait-for-red-button ( -- ) \ wait for red button to be pressed
+: wait-for-red-button ( -- ) \ wait for red button to be pressed, which doubles as start button
   begin
     10 ms
     0 6 pin@ = 
   until
 ;
 
-: game-loop
+: game-loop ( -- n ) \ loop from 1 to max-moves if you don't get to max-moves then returns -1 else returns 100
   begin
     \ speed up every 10 steps 
     step @  9 <= if 300 speed ! then 
     step @ 10 >= if 200 speed ! then
     step @ 20 >= if 150 speed ! then
 
-    \ simon's move
-    step @ simons-move
-
-    \ do user
-    step @ players-move
-    -1 = if game-over exit then
-
-    \ no game over do next step in sequence
-    step @ 1 + step !
+    step @ simons-move  \ simon plays the sequence until step
     
-    800 ms  \ wait 800 ms and then let simon start next sequence
-    step @ max-moves = \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until 100 ; \ flag to indicate you won 
+    step @ players-move \ user repeats simons sequence
+    -1 = if game-over exit then \ we break out when players-move is -1 (indicating gameover)
+
+    step @ 1 + step !   \ go to next step in the sequence
+    
+    800 ms              \ wait 800 ms and then let simon start next sequence
+    step @ max-moves =  \ did we reach the whole sequence no? continue TODO: victory light show after until
+  until 100 ;           \ 100 is to indicate you beat the whole sequemce
 
 : simon
   setup
