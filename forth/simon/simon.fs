@@ -9,7 +9,7 @@ variable step   \ current step of the sequence
 1 step !
 
 variable speed  \ speed of simon showing the sequence (gets faster every 10 steps)
-250 speed !     \ default value 
+250 speed !     
 
 : add-move ( value n --) \ adds the value to moves array[n]
   moves + c! ;
@@ -41,21 +41,18 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   swap dup 2 + toggle-pin
   swap dup ms
   swap 2 + toggle-pin
-  ms
-  ;
+  ms ;
 
 : simons-move ( n -- ) \ plays the steps from 0 to n
   0 do 
     i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
-  loop 
-;
+  loop ;
 
 : key-down ( n -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
   dup 4 - toggle-pin
   begin 100 ms dup -1 swap pin@ = until
   dup 4 - toggle-pin
-  6 -
-;
+  6 - ;
 
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
   0
@@ -66,8 +63,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     0 7 pin@ = if drop 7 key-down exit then 
     0 8 pin@ = if drop 8 key-down exit then 
     0 9 pin@ = if drop 9 key-down exit then 
-  again 
-; 
+  again ; 
 
 : cs ( -- ) \ clear the stack when something is on there
   depth 0 > if depth 0 do drop loop then ; 
@@ -80,8 +76,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     5 toggle-pin 
     100 ms
  loop
-  cs  \ just to be sure that nothing is left on stack
-;
+  cs ; \ just to be sure that nothing is left on stack
 
 : you-beat-the-game ( -- ) \ a little light show
   50 0 do 
@@ -92,8 +87,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     5 toggle-pin 
     100 ms
   loop 
-  cs \ just to be sure nothing is left on stack
-;
+  cs ; \ just to be sure nothing is left on stack
 
 : players-move ( step -- n) \ reads the buttons and compare the value against simon's sequence at that step; 
                             \ returns value at step or -1 when player was wrong
@@ -101,15 +95,13 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     poll-keys
     dup -1 = if drop -1 exit then          \ if -1 then timeout accord and return -1 for gameover
     dup i get-move <> if -1 exit then drop \ value from poll-keys didn't match the value from get-move, return -1 for gameover
-  loop
-;
+  loop ;
 
 : wait-for-red-button ( -- ) \ wait for red button to be pressed, which doubles as start button
   begin
     10 ms
     0 6 pin@ = 
-  until
-;
+  until ;
 
 : game-loop ( -- n ) \ loop from 1 to max-moves if you don't get to max-moves then returns -1 else returns 100
   begin
@@ -127,8 +119,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     
     800 ms              \ wait 800 ms and then let simon start next sequence
     step @ max-moves =  \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until 100             \ 100 is to indicate you beat the whole sequemce
-;
+  until 100 ;           \ 100 is to indicate you beat the whole sequemce
 
 : simon ( -- )          \ SIMON game entry point, loops indefinitely
   setup
