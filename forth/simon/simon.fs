@@ -26,7 +26,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : cs ( -- ) \ clear the stack when something is on there (should never need to clean)
   depth 0 > if depth 0 do drop loop then ; 
 
-: set-leds-off
+: set-leds-off ( -- ) \ switch the 4 leds off, this is the starting state of the game
   6 2 do 0 i pin! loop ;
 
 : setup ( -- ) \ sets up the pins in such away we can uses maths to calculate step value, led pin and switch from one or the other
