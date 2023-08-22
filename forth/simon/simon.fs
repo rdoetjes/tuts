@@ -84,7 +84,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     5 toggle-pin 
     100 ms
  loop
-  cs 
+  cs  \ just to be sure that nothing is left on stack
 ;
 
 : you-beat-the-game ( -- ) \ a little light show
@@ -96,7 +96,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     5 toggle-pin 
     100 ms
   loop 
-  cs 
+  cs \ just to be sure nothing is left on stack
 ;
 
 : players-move ( step -- n) \ reads the buttons and checks the value
