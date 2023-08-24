@@ -24,7 +24,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   max-moves 0 do gen-move i add-move loop ;
 
 : cs ( -- ) \ clear the stack when something is on there (should never need to clean)
-  depth 0 > if depth 0 do drop loop then ; 
+  depth 0 > if ." aye" depth 0 do drop loop then ; 
 
 : set-leds-off ( -- ) \ switch the 4 leds off, this is the starting state of the game
   6 2 do 0 i pin! loop ;
@@ -58,8 +58,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   loop ;
 
 : key-down ( n -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
-  dup 4 - toggle-pin
-  begin 30 ms dup -1 swap pin@ = until
+  dup 4 - toggle-pin  \ subtract 4 from the pressed switch pin to get corresponding led pin
+  begin dup -1 swap pin@ = until
   dup 4 - toggle-pin
   6 - ;
 
@@ -136,3 +136,4 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     dup -1 = if drop game-over then
     dup 100 = if drop you-beat-the-game then
   again ;
+  ." what happened?" .s
