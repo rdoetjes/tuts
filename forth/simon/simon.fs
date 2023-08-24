@@ -58,10 +58,10 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   loop ;
 
 : key-is-down ( n -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
-  dup 4 - toggle-pin  \ subtract 4 from the pressed switch pin to get corresponding led pin
-  begin 20 ms dup -1 swap pin@ = until
+  dup 4 - toggle-pin     \ subtract 4 from the pressed switch to turn on correponding led
+  begin 20 ms dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   dup .
-  dup 4 - toggle-pin
+  dup 4 - toggle-pin      \ subtract 4 from pressed switch to turn off corresponding led
   6 -                \ subtract 6 from switch pin to get the step value of the sequence
   dup . cr ;
 
