@@ -136,4 +136,3 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     dup -1 = if drop game-over then
     dup 100 = if drop you-beat-the-game then
   again ;
-  ." what happened?" .s
