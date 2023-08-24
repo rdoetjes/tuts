@@ -66,8 +66,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
   0
   begin 
-  10 ms
-  1 + dup 150 = if drop -1 exit then 
+    10 ms           \ debounce switch
+    1 + dup 150 = if drop -1 exit then 
     0 6 pin@ = if drop 6 key-down exit then 
     0 7 pin@ = if drop 7 key-down exit then 
     0 8 pin@ = if drop 8 key-down exit then 
