@@ -60,13 +60,15 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : key-down ( n -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
   dup 4 - toggle-pin  \ subtract 4 from the pressed switch pin to get corresponding led pin
   begin 30 ms dup -1 swap pin@ = until
+  dup .
   dup 4 - toggle-pin
-  6 - ;               \ subtract 6 from switch pin to get the step value of the sequence
+  6 -                \ subtract 6 from switch pin to get the step value of the sequence
+  dup . cr ;
 
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
   0
   begin 
-    10 ms           \ debounce switch
+    10 ms           \ delay to add to time out (150 * 10 ms is 1500ms and then exit with -1)
     1 + dup 150 = if drop -1 exit then 
     0 6 pin@ = if drop 6 key-down exit then 
     0 7 pin@ = if drop 7 key-down exit then 
