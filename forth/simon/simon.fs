@@ -118,8 +118,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   dup 10 > if 200 speed ! then   \ 11 .. 15 200ms
   dup 15 > if 175 speed ! then   \ 16..20 175ms
   dup 20 > if 150 speed ! then   \ 21..30 150ms
-  24 > if 130 speed ! then       \ 25..30 130ms (don't dup we don't return value)
-;
+  24 > if 130 speed ! then ;      \ 25..30 130ms (don't dup we don't return value)
 
 : game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
