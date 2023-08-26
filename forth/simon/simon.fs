@@ -120,8 +120,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     \ speed up every 10 steps 
     step @  5 <= if 300 speed ! then 
     step @  5 >= if 250 speed ! then
-    step @ 10 >= if 200 speed ! then
-    step @ 15 >= if 175 speed ! then
+    step @ 11 >= if 200 speed ! then
+    step @ 16 >= if 175 speed ! then
     step @ 20 >= if 150 speed ! then
 
     step @ simons-move    \ simon plays the sequence until step
@@ -135,12 +135,12 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
   until 100 ;             \ 100 is to indicate you beat the whole sequemce
 
-: simon ( -- )          \ SIMON game entry point, loops indefinitely
+: simon ( -- )            \ SIMON game entry point, loops indefinitely
   setup
   begin
     reset-game
     wait-for-level-select
-    1000 ms
+    1000 ms               \ wait 1 second for player to get ready
     game-loop
     dup -1 = if drop game-over then
     dup 100 = if drop you-beat-the-game then
