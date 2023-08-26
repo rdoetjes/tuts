@@ -1,7 +1,7 @@
 rng import
 pin import
 
-31 constant sequence-size \ the maximum amount of steps (+1) in sequence
+31 constant sequence-size \ the maximum amount of steps (+1) in sequence, +1 so we can process logic from 1 instead of 0
 
 variable sequence sequence-size allot \ array that holds the sequence
 
@@ -123,6 +123,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     step @ 10 > if 200 speed ! then   \ 11 .. 15 200ms
     step @ 15 > if 175 speed ! then   \ 16..20 175ms
     step @ 20 > if 150 speed ! then   \ 21..30 150ms
+    step @ 24 > if 130 speed ! then   \ 25..30 130ms
 
     step @ simons-move    \ simon plays the sequence until step
     
