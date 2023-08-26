@@ -6,10 +6,8 @@ pin import
 variable sequence sequence-size allot \ array that holds the sequence
 
 variable max-steps  \ number of steps for a level 10, 15, 20 or 30 
-0 max-steps !
 
 variable step   \ current step of the sequence
-1 step !
 
 variable speed  \ speed of simon showing the sequence (gets faster every 10 steps)
 250 speed !     
@@ -46,7 +44,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : reset-game ( -- ) \ reset the game, set step to 0 and gen. new sequence
   cs              \ clear stack just in case
   set-leds-off    \ set everything to a known state
-  1 step !        \ set step to first step of the sequence
+  0 step !        \ set step to 0, we increment by one in beginning of game loop 
   gen-move-seq ;  \ generate the 30 random steps whichs make up the sequence
 
 : toggle-pin-ms ( ms move -- ) \ sets the pin corresponding to move (+2 to get gpio) on and of for ms millisec
@@ -109,14 +107,16 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : wait-for-level-select ( -- ) \ wait for one of the 4 buttons to be pressed to set level and start game
   begin
     10 ms
-    0 6 pin@ = if drop 11 max-steps ! exit then \ 10 steps
-    0 7 pin@ = if drop 16 max-steps ! exit then \ 15 steps
-    0 8 pin@ = if drop 21 max-steps ! exit then \ 20 steps
-    0 9 pin@ = if drop 31 max-steps ! exit then \ 30 steps
+    0 6 pin@ = if drop 10 max-steps ! exit then 
+    0 7 pin@ = if drop 15 max-steps ! exit then 
+    0 8 pin@ = if drop 20 max-steps ! exit then
+    0 9 pin@ = if drop 30 max-steps ! exit then
   again ;
 
 : game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
+    step @ 1 + step !     \ go to next step in the sequence
+
     \ speed up every 10 steps 
     step @ 5 < if 300 speed ! then    \ 1..5 300ms
     step @ 4 > if 250 speed ! then    \ 5..10 250ms
@@ -130,8 +130,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     step @ players-move   \ user repeats simons sequence
     -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
 
-    step @ 1 + step !     \ go to next step in the sequence
-    
     800 ms                \ wait 800 ms and then let simon start next sequence
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
   until 100 ;             \ 100 is to indicate you beat the whole sequemce
