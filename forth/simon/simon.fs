@@ -5,12 +5,11 @@ pin import
 
 variable sequence sequence-size allot \ array that holds the sequence
 
-variable max-steps  \ number of steps for a level 10, 15, 20 or 30 
+variable max-steps  \ number of steps for a level.
 
 variable step   \ current step of the sequence
 
 variable speed  \ speed of simon showing the sequence (gets faster every 10 steps)
-250 speed !     
 
 : add-move ( value n --) \ adds the value to sequence array[n]
   sequence + c! ;
@@ -96,10 +95,9 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   loop ;
 
 : players-move ( step -- n) \ reads the buttons and compare the value against simon's sequence at that step; 
-                            \ returns value at step or -1 when player was wrong
-  0 ?do 
+  0 ?do                     \ returns value at step or -1 when player was wrong
     poll-keys
-    dup -1 = if exit then          \ if -1 then timeout accord and return -1 for gameover
+    dup -1 = if exit then   \ if -1 then timeout accord and return -1 for gameover
     dup i get-move <> if drop -1 exit then \ value from poll-keys didn't match the value from get-move, return -1 for gameover
     drop
   loop ;
@@ -107,23 +105,27 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : wait-for-level-select ( -- ) \ wait for one of the 4 buttons to be pressed to set level and start game
   begin
     10 ms
-    0 6 pin@ = if drop 10 max-steps ! exit then 
+    0 6 pin@ = if drop 6 max-steps ! exit then 
     0 7 pin@ = if drop 15 max-steps ! exit then 
     0 8 pin@ = if drop 20 max-steps ! exit then
     0 9 pin@ = if drop 30 max-steps ! exit then
   again ;
 
+: set-speed ( n -- ) \ n = step, the procedure will update global var speed
+  \ speed up every 10 steps 
+  dup 5 < if 300 speed ! then    \ 1..5 300ms
+  dup 4 > if 250 speed ! then    \ 5..10 250ms
+  dup 10 > if 200 speed ! then   \ 11 .. 15 200ms
+  dup 15 > if 175 speed ! then   \ 16..20 175ms
+  dup 20 > if 150 speed ! then   \ 21..30 150ms
+  24 > if 130 speed ! then       \ 25..30 130ms (don't dup we don't return value)
+;
+
 : game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
-    step @ 1 + step !     \ go to next step in the sequence
+    step @ 1 + step !     \ go to next step in the sequence (steps==0 when game is reset)
 
-    \ speed up every 10 steps 
-    step @ 5 < if 300 speed ! then    \ 1..5 300ms
-    step @ 4 > if 250 speed ! then    \ 5..10 250ms
-    step @ 10 > if 200 speed ! then   \ 11 .. 15 200ms
-    step @ 15 > if 175 speed ! then   \ 16..20 175ms
-    step @ 20 > if 150 speed ! then   \ 21..30 150ms
-    step @ 24 > if 130 speed ! then   \ 25..30 130ms
+    step @ set-speed      \ set simon's speed depedning on step
 
     step @ simons-move    \ simon plays the sequence until step
     
@@ -131,6 +133,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
 
     800 ms                \ wait 800 ms and then let simon start next sequence
+
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
   until 100 ;             \ 100 is to indicate you beat the whole sequemce
 
