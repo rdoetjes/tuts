@@ -62,12 +62,12 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   begin dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
   6 -                    \ subtract 6 from switch pin to get the step value of the sequence
-  40 ms ;
+  50 ms ;                \ debounce the release
 
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
-  0
+  0         \ counter for timeout
   begin 
-    10 ms           \ delay to add to time out (150 * 10 ms is 1500ms and then exit with -1)
+    10 ms   \ delay to add to time out (150 * 10 ms is 1500ms and then exit with -1) doubles as debounce
     1 + dup 150 = if drop -1 exit then 
     0 6 pin@ = if drop 6 key-is-down exit then 
     0 7 pin@ = if drop 7 key-is-down exit then 
