@@ -118,11 +118,11 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
     \ speed up every 10 steps 
-    step @  5 <= if 300 speed ! then 
-    step @  5 >= if 250 speed ! then
-    step @ 11 >= if 200 speed ! then
-    step @ 16 >= if 175 speed ! then
-    step @ 20 >= if 150 speed ! then
+    step @ 5 < if 300 speed ! then    \ 1..5 300ms
+    step @ 4 > if 250 speed ! then    \ 5..10 250ms
+    step @ 10 > if 200 speed ! then   \ 11 .. 15 200ms
+    step @ 15 > if 175 speed ! then   \ 16..20 175ms
+    step @ 20 > if 150 speed ! then   \ 21..30 150ms
 
     step @ simons-move    \ simon plays the sequence until step
     
