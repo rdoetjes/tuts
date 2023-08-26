@@ -1,9 +1,12 @@
 rng import
 pin import
 
-31 constant max-moves \ the maximum amount of steps (+1) in sequence
+31 constant sequence-size \ the maximum amount of steps (+1) in sequence
 
-variable moves max-moves allot \ array that holds the sequence
+variable sequence sequence-size allot \ array that holds the sequence
+
+variable max-steps  \ number of steps for a level 10, 15, 20 or 30 
+0 max-steps !
 
 variable step   \ current step of the sequence
 1 step !
@@ -11,23 +14,23 @@ variable step   \ current step of the sequence
 variable speed  \ speed of simon showing the sequence (gets faster every 10 steps)
 250 speed !     
 
-: add-move ( value n --) \ adds the value to moves array[n]
-  moves + c! ;
+: add-move ( value n --) \ adds the value to sequence array[n]
+  sequence + c! ;
 
-: get-move ( n -- n) \ gets the value from the moves list at position n
-  moves + c@ ;
+: get-move ( n -- n) \ gets the value from the sequence list at position n
+  sequence + c@ ;
 
 : gen-move ( -- n) \ generates random number between 0-4 (4 not incl) by using logic and 3 on random int
   random 3 and ;
 
 : gen-move-seq ( -- ) \ gen. the 31 different random values for the game
-  max-moves 0 do gen-move i add-move loop ;
+  sequence-size 0 ?do gen-move i add-move loop ;
 
 : cs ( -- ) \ clear the stack when something is on there (should never need to clean)
-  depth 0 > if depth 0 do drop loop then ; 
+  depth 0 > if depth 0 ?do drop loop then ; 
 
 : set-leds-off ( -- ) \ switch the 4 leds off, this is the starting state of the game
-  6 2 do 0 i pin! loop ;
+  6 2 ?do 0 i pin! loop ;
 
 : setup ( -- ) \ sets up the pins in such away we can uses maths to calculate step value, led pin and switch from one or the other
   cs
@@ -53,17 +56,16 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   ms ;
 
 : simons-move ( n -- ) \ plays the steps from 0 to n
-  0 do 
+  0 ?do 
     i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
   loop ;
 
 : key-is-down ( n -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
   dup 4 - toggle-pin     \ subtract 4 from the pressed switch to turn on correponding led
-  begin 20 ms dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
-  dup .
+  begin dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
   6 -                    \ subtract 6 from switch pin to get the step value of the sequence
-  dup . cr ;
+  40 ms ;
 
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
   0
@@ -77,7 +79,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   again ; 
 
 : game-over ( -- ) \ turn all leds on to indicate game over
-  10 0 do 
+  10 0 ?do 
     2 toggle-pin 
     3 toggle-pin 
     4 toggle-pin 
@@ -86,7 +88,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
  loop ;
 
 : you-beat-the-game ( -- ) \ a little light show
-  14 0 do 
+  14 0 ?do 
     2 toggle-pin 
     4 toggle-pin 
     100 ms
@@ -97,42 +99,47 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : players-move ( step -- n) \ reads the buttons and compare the value against simon's sequence at that step; 
                             \ returns value at step or -1 when player was wrong
-  0 do 
+  0 ?do 
     poll-keys
     dup -1 = if exit then          \ if -1 then timeout accord and return -1 for gameover
     dup i get-move <> if drop -1 exit then \ value from poll-keys didn't match the value from get-move, return -1 for gameover
     drop
   loop ;
 
-: wait-for-red-button ( -- ) \ wait for red button to be pressed, which doubles as start button
+: wait-for-level-select ( -- ) \ wait for one of the 4 buttons to be pressed to set level and start game
   begin
     10 ms
-    0 6 pin@ = 
-  until ;
+    0 6 pin@ = if drop 11 max-steps ! exit then \ 10 steps
+    0 7 pin@ = if drop 16 max-steps ! exit then \ 15 steps
+    0 8 pin@ = if drop 21 max-steps ! exit then \ 20 steps
+    0 9 pin@ = if drop 31 max-steps ! exit then \ 30 steps
+  again ;
 
-: game-loop ( -- n ) \ loop from 1 to max-moves if you don't get to max-moves then returns -1 else returns 100
+: game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
     \ speed up every 10 steps 
-    step @  9 <= if 300 speed ! then 
+    step @  5 <= if 300 speed ! then 
+    step @  5 >= if 250 speed ! then
     step @ 10 >= if 200 speed ! then
+    step @ 15 >= if 175 speed ! then
     step @ 20 >= if 150 speed ! then
 
-    step @ simons-move  \ simon plays the sequence until step
+    step @ simons-move    \ simon plays the sequence until step
     
-    step @ players-move \ user repeats simons sequence
-    -1 = if -1 exit then \ we break out when players-move is -1 (indicating gameover)
+    step @ players-move   \ user repeats simons sequence
+    -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
 
-    step @ 1 + step !   \ go to next step in the sequence
+    step @ 1 + step !     \ go to next step in the sequence
     
-    800 ms              \ wait 800 ms and then let simon start next sequence
-    step @ max-moves =  \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until 100 ;           \ 100 is to indicate you beat the whole sequemce
+    800 ms                \ wait 800 ms and then let simon start next sequence
+    step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
+  until 100 ;             \ 100 is to indicate you beat the whole sequemce
 
 : simon ( -- )          \ SIMON game entry point, loops indefinitely
   setup
   begin
     reset-game
-    wait-for-red-button
+    wait-for-level-select
     1000 ms
     game-loop
     dup -1 = if drop game-over then
