@@ -124,16 +124,11 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
     step @ 1 + step !     \ go to next step in the sequence (steps==0 when game is reset)
-
     step @ set-speed      \ set simon's speed depedning on step
-
     step @ simons-move    \ simon plays the sequence until step
-    
     step @ players-move   \ user repeats simons sequence
     -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
-
     800 ms                \ wait 800 ms and then let simon start next sequence
-
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
   until 100 ;             \ 100 is to indicate you beat the whole sequemce
 
