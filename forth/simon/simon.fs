@@ -59,10 +59,10 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : play-beep ( led -- ) \ led pin corresponds to a frequency
   0 4 slice pwm-clock-div! \ set octave higher
-  dup 2 = if 45000 slice pwm-top! then
-  dup 3 = if 56000 slice pwm-top! then
-  dup 4 = if 60000 slice pwm-top! then
-  dup 5 = if 65500 slice pwm-top! then
+  dup 0 = if 45000 slice pwm-top! then
+  dup 1 = if 56000 slice pwm-top! then
+  dup 2 = if 60000 slice pwm-top! then
+  dup 3 = if 65500 slice pwm-top! then
 
   \ 0 slice pwm-counter! 
   slice bit enable-pwm
@@ -73,7 +73,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : toggle-pin-ms ( move ms -- ) \ sets the pin corresponding to move (+2 to get gpio) on and of for ms millisec
   swap dup 2 + toggle-pin
-  dup 2 + play-beep
+  dup play-beep
   swap dup ms
   swap 2 + toggle-pin
   stop-beep
@@ -86,7 +86,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : key-is-down ( switch_pin -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
   dup 4 - toggle-pin     \ subtract 4 from the pressed switch to turn on correponding led
-  dup 4 - play-beep      \ subtract 4 from the pressed switch that corresponds with the sound of the led
+  dup 6 - play-beep      \ subtract 4 from the pressed switch that corresponds with the sound of the led
   begin dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
   stop-beep              \ stop the pwm to stop the sound
@@ -105,8 +105,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   again ; 
 
 : game-over-sound ( -- ) \ plays deep buzz
-  0 8 slice pwm-clock-div! 
-  65000 slice pwm-top!
+  0 10 slice pwm-clock-div! 
+  65500 slice pwm-top!
   6000 slice pwm-counter-compare-a! 
   0 slice pwm-counter! 
   slice bit enable-pwm ;
@@ -125,14 +125,14 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : you-beat-the-game ( -- ) \ a little light show
   14 0 ?do 
     2 toggle-pin 
-    1 play-beep
+    0 play-beep
     4 toggle-pin 
-    2 play-beep
+    1 play-beep
     100 ms
     3 toggle-pin 
-    3 play-beep
+    2 play-beep
     5 toggle-pin 
-    4 play-beep
+    3 play-beep
     1 toggle-pin 
     100 ms
   loop stop-beep ;
