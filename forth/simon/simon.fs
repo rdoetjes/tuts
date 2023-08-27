@@ -87,9 +87,10 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : key-is-down ( switch_pin -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
   dup 4 - toggle-pin     \ subtract 4 from the pressed switch to turn on correponding led
   dup 6 - play-beep      \ subtract 4 from the pressed switch that corresponds with the sound of the led
-  begin dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
-  dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
+  begin dup pin@ -1 = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   stop-beep              \ stop the pwm to stop the sound
+  dup . cr
+  dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
   6 -                    \ subtract 6 from switch pin to get the step value of the sequence
   50 ms ;                \ debounce the release
 
@@ -124,16 +125,11 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : you-beat-the-game ( -- ) \ a little light show
   14 0 ?do 
-    2 toggle-pin 
-    0 play-beep
-    4 toggle-pin 
-    1 play-beep
+    2 toggle-pin 0 play-beep
+    4 toggle-pin 1 play-beep
     100 ms
-    3 toggle-pin 
-    2 play-beep
-    5 toggle-pin 
-    3 play-beep
-    1 toggle-pin 
+    3 toggle-pin 2 play-beep
+    5 toggle-pin 3 play-beep
     100 ms
   loop stop-beep ;
 
@@ -183,4 +179,4 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     game-loop
     dup -1 = if drop game-over then
     dup 100 = if drop you-beat-the-game then
-  again reboot ;
+  again ;
