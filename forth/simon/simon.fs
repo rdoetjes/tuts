@@ -1,9 +1,8 @@
 rng import
 pin import
+pwm import
 
 31 constant sequence-size \ the maximum amount of steps (+1) in sequence, +1 so we can process logic from 1 instead of 0
-
-10 constant sound-pin \ pin on which speaker is attached
 
 5 constant slice \ this slice for pin 10 (5A slice)
 
@@ -39,16 +38,17 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   3 output-pin
   4 output-pin
   5 output-pin
-  sound-pin output-pin
+
   6 input-pin 6 pull-up-pin
   7 input-pin 7 pull-up-pin
   8 input-pin 8 pull-up-pin
   9 input-pin 9 pull-up-pin 
+
   \ pwn setup for sound
   slice bit disable-pwm 
-  sound-pin pwm-pin 
-  slice free-running-pwm 
+  10 pwm-pin 
   false slice pwm-phase-correct! 
+  6000 slice pwm-counter-compare-a! 
   0 4 slice pwm-clock-div! ;
 
 : reset-game ( -- ) \ reset the game, set step to 0 and gen. new sequence
@@ -58,16 +58,15 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   gen-move-seq ;  \ generate the 30 random steps whichs make up the sequence
 
 : play-beep ( led -- ) \ led pin corresponds to a frequency
+  0 4 slice pwm-clock-div! \ set octave higher
   dup 2 = if 45000 slice pwm-top! then
   dup 3 = if 56000 slice pwm-top! then
   dup 4 = if 60000 slice pwm-top! then
   dup 5 = if 65000 slice pwm-top! then
 
-  6000 slice pwm-counter-compare-a! 
-  0 slice pwm-counter! 
+  \ 0 slice pwm-counter! 
   slice bit enable-pwm
-  drop
-  ;
+  drop ;
 
 : stop-beep
   slice bit disable-pwm ;
@@ -105,24 +104,38 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     0 9 pin@ = if drop 9 key-is-down exit then 
   again ; 
 
+: game-over-sound ( -- ) \ plays deep buzz
+  0 8 slice pwm-clock-div! 
+  65000 slice pwm-top!
+  6000 slice pwm-counter-compare-a! 
+  0 slice pwm-counter! 
+  slice bit enable-pwm ;
+
 : game-over ( -- ) \ turn all leds on to indicate game over
+  game-over-sound
   10 0 ?do 
     2 toggle-pin 
     3 toggle-pin 
     4 toggle-pin 
     5 toggle-pin 
     100 ms
- loop ;
+ loop 
+ stop-beep ;
 
 : you-beat-the-game ( -- ) \ a little light show
   14 0 ?do 
     2 toggle-pin 
+    1 play-beep
     4 toggle-pin 
+    2 play-beep
     100 ms
     3 toggle-pin 
+    3 play-beep
     5 toggle-pin 
+    4 play-beep
+    1 toggle-pin 
     100 ms
-  loop ;
+  loop stop-beep ;
 
 : players-move ( step -- n) \ reads the buttons and compare the value against simon's sequence at that step; 
   0 ?do                     \ returns value at step or -1 when player was wrong
