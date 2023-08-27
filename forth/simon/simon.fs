@@ -57,10 +57,10 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   0 step !        \ set step to 0, we increment by one in beginning of game loop 
   gen-move-seq ;  \ generate the 30 random steps whichs make up the sequence
 
-: play-beep ( led -- ) \ led pin corresponds to a frequency
+: play-beep ( move -- ) \ play a sound corresponding to the move
   0 4 slice pwm-clock-div! \ set octave higher
   dup 0 = if 45000 slice pwm-top! then
-  dup 1 = if 56000 slice pwm-top! then
+  dup 1 = if 55000 slice pwm-top! then
   dup 2 = if 60000 slice pwm-top! then
   dup 3 = if 65500 slice pwm-top! then
 
