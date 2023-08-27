@@ -3,6 +3,10 @@ pin import
 
 31 constant sequence-size \ the maximum amount of steps (+1) in sequence, +1 so we can process logic from 1 instead of 0
 
+10 constant sound-pin \ pin on which speaker is attached
+
+5 constant slice \ this slice for pin 10 (5A slice)
+
 variable sequence sequence-size allot \ array that holds the sequence
 
 variable max-steps  \ number of steps for a level.
@@ -24,7 +28,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   sequence-size 0 ?do gen-move i add-move loop ;
 
 : cs ( -- ) \ clear the stack when something is on there (should never need to clean)
-  depth 0 > if depth 0 ?do drop loop then ; 
+  depth 0 > if depth 0 ?do ." aye!" drop loop then ; 
 
 : set-leds-off ( -- ) \ switch the 4 leds off, this is the starting state of the game
   6 2 ?do 0 i pin! loop ;
@@ -35,10 +39,17 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   3 output-pin
   4 output-pin
   5 output-pin
+  sound-pin output-pin
   6 input-pin 6 pull-up-pin
   7 input-pin 7 pull-up-pin
   8 input-pin 8 pull-up-pin
-  9 input-pin 9 pull-up-pin ;
+  9 input-pin 9 pull-up-pin 
+  \ pwn setup for sound
+  slice bit disable-pwm 
+  sound-pin pwm-pin 
+  slice free-running-pwm 
+  false slice pwm-phase-correct! 
+  0 4 slice pwm-clock-div! ;
 
 : reset-game ( -- ) \ reset the game, set step to 0 and gen. new sequence
   cs              \ clear stack just in case
@@ -46,10 +57,27 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   0 step !        \ set step to 0, we increment by one in beginning of game loop 
   gen-move-seq ;  \ generate the 30 random steps whichs make up the sequence
 
-: toggle-pin-ms ( ms move -- ) \ sets the pin corresponding to move (+2 to get gpio) on and of for ms millisec
+: play-beep ( led -- ) \ led pin corresponds to a frequency
+  dup 2 = if 45000 slice pwm-top! then
+  dup 3 = if 56000 slice pwm-top! then
+  dup 4 = if 60000 slice pwm-top! then
+  dup 5 = if 65000 slice pwm-top! then
+
+  6000 slice pwm-counter-compare-a! 
+  0 slice pwm-counter! 
+  slice bit enable-pwm
+  drop
+  ;
+
+: stop-beep
+  slice bit disable-pwm ;
+
+: toggle-pin-ms ( move ms -- ) \ sets the pin corresponding to move (+2 to get gpio) on and of for ms millisec
   swap dup 2 + toggle-pin
+  dup 2 + play-beep
   swap dup ms
   swap 2 + toggle-pin
+  2 + stop-beep
   ms ;
 
 : simons-move ( n -- ) \ plays the steps from 0 to n
@@ -140,4 +168,4 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     game-loop
     dup -1 = if drop game-over then
     dup 100 = if drop you-beat-the-game then
-  again ;
+  again reboot ;
