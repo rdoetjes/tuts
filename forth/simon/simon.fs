@@ -62,7 +62,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   dup 2 = if 45000 slice pwm-top! then
   dup 3 = if 56000 slice pwm-top! then
   dup 4 = if 60000 slice pwm-top! then
-  dup 5 = if 65000 slice pwm-top! then
+  dup 5 = if 65500 slice pwm-top! then
 
   \ 0 slice pwm-counter! 
   slice bit enable-pwm
@@ -86,10 +86,10 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : key-is-down ( switch_pin -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
   dup 4 - toggle-pin     \ subtract 4 from the pressed switch to turn on correponding led
-  dup 4 - play-beep
+  dup 4 - play-beep      \ subtract 4 from the pressed switch that corresponds with the sound of the led
   begin dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
-  stop-beep 
+  stop-beep              \ stop the pwm to stop the sound
   6 -                    \ subtract 6 from switch pin to get the step value of the sequence
   50 ms ;                \ debounce the release
 
