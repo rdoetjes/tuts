@@ -77,7 +77,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   dup 2 + play-beep
   swap dup ms
   swap 2 + toggle-pin
-  2 + stop-beep
+  stop-beep
   ms ;
 
 : simons-move ( n -- ) \ plays the steps from 0 to n
@@ -85,10 +85,12 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     i get-move speed @ toggle-pin-ms \ get the move, get the speed in ms toggle-pin which is move+2 to get gpio
   loop ;
 
-: key-is-down ( n -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
+: key-is-down ( switch_pin -- n ) \ lights up the led as long as pressed and returns the step value calculated from switch number (- 6)
   dup 4 - toggle-pin     \ subtract 4 from the pressed switch to turn on correponding led
+  dup 4 - play-beep
   begin dup -1 swap pin@ = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
+  stop-beep 
   6 -                    \ subtract 6 from switch pin to get the step value of the sequence
   50 ms ;                \ debounce the release
 
