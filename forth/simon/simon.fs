@@ -89,7 +89,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   dup 6 - play-beep      \ subtract 4 from the pressed switch that corresponds with the sound of the led
   begin dup pin@ -1 = until \ loop as long as we hold, 20 ms saves a bit of battery energy in this case
   stop-beep              \ stop the pwm to stop the sound
-  dup . cr
   dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
   6 -                    \ subtract 6 from switch pin to get the step value of the sequence
   50 ms ;                \ debounce the release
