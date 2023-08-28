@@ -151,38 +151,46 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : wait-for-level-select ( -- ) \ wait for one of the 4 buttons to be pressed to set level and start game
   begin
     10 ms
-    0 6 pin@ = if drop 10 max-steps ! exit then 
-    0 7 pin@ = if drop 15 max-steps ! exit then 
-    0 8 pin@ = if drop 20 max-steps ! exit then
-    0 9 pin@ = if drop 30 max-steps ! exit then
+    0 6 pin@ = if 10 max-steps ! exit then 
+    0 7 pin@ = if 15 max-steps ! exit then 
+    0 8 pin@ = if 20 max-steps ! exit then
+    0 9 pin@ = if 30 max-steps ! exit then
   again ;
 
 : set-speed ( n -- ) \ n = step, the procedure will update global var speed
-  dup  5 < if 300 speed ! then   \ 1..5 300ms
-  dup  4 > if 250 speed ! then   \ 5..10 250ms
-  dup 10 > if 200 speed ! then   \ 11 .. 15 200ms
-  dup 15 > if 175 speed ! then   \ 16..20 175ms
-  dup 20 > if 150 speed ! then   \ 21..30 150ms
-  24 > if 130 speed ! then ;     \ 25..30 130ms (don't dup we don't return value)
+  dup  5 < if drop 300 speed ! exit then   \ 1..5 300ms
+  dup 24 > if drop 130 speed ! exit then   \ 25..30 130ms (don't dup we don't return value)
+  dup 20 > if drop 150 speed ! exit then   \ 21..30 150ms
+  dup 15 > if drop 175 speed ! exit then   \ 16..20 175ms
+  dup 10 > if drop 200 speed ! exit then   \ 11 .. 15 200ms
+  dup  4 > if drop 250 speed ! exit then ; \ 5..10 250ms
 
 : game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
+    ." start " depth .
     step @ 1 + step !     \ go to next step in the sequence (steps==0 when game is reset)
     step @ set-speed      \ set simon's speed depedning on step
+    ." speed " depth . 
     step @ simons-move    \ simon plays the sequence until step
+    ." simon " depth . .s
     step @ players-move   \ user repeats simons sequence
+    ." player " depth . .s
     -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
     800 ms                \ wait 800 ms and then let simon start next sequence
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
+    ." end " depth . .s
   until you-won ;         \ 100 is to indicate you beat the whole sequemce
 
 : simon ( -- )            \ SIMON game entry point, loops indefinitely
   setup
   begin
+    depth .
     reset-game
     wait-for-level-select
+    depth .
     1000 ms               \ wait 1 second for player to get ready
     game-loop
     dup you-lost = if drop game-over then
     dup you-won = if drop you-beat-the-game then
-  again ;
+    key?
+  until ;
