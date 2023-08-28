@@ -159,7 +159,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   again ;
 
 : set-speed ( n -- ) \ n = step, the procedure will update global var speed
-  \ speed up every 10 steps 
   dup  5 < if 300 speed ! then   \ 1..5 300ms
   dup  4 > if 250 speed ! then   \ 5..10 250ms
   dup 10 > if 200 speed ! then   \ 11 .. 15 200ms
