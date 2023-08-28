@@ -6,6 +6,16 @@ pwm import
 
 5 constant slice \ this slice for pin 10 (5A slice)
 
+2 constant r-led
+3 constant g-led
+4 constant y-led
+5 constant b-led
+6 constant r-switch
+7 constant g-switch
+8 constant y-switch
+9 constant b-switch
+10 constant piezo
+
 variable sequence sequence-size allot \ array that holds the sequence
 
 variable max-steps  \ number of steps for a level.
@@ -34,19 +44,19 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : setup ( -- ) \ sets up the pins in such away we can uses maths to calculate step value, led pin and switch from one or the other
   cs
-  2 output-pin 
-  3 output-pin
-  4 output-pin
-  5 output-pin
+  r-led output-pin 
+  g-led output-pin
+  y-led output-pin
+  b-led output-pin
 
-  6 input-pin 6 pull-up-pin
-  7 input-pin 7 pull-up-pin
-  8 input-pin 8 pull-up-pin
-  9 input-pin 9 pull-up-pin 
+  r-switch input-pin r-switch pull-up-pin
+  g-switch input-pin g-switch pull-up-pin
+  y-switch input-pin y-switch pull-up-pin
+  b-switch input-pin b-switch pull-up-pin 
 
   \ pwn setup for sound
   slice bit disable-pwm 
-  10 pwm-pin 
+  piezo pwm-pin 
   false slice pwm-phase-correct! 
   6000 slice pwm-counter-compare-a! 
   0 4 slice pwm-clock-div! ;
@@ -98,10 +108,10 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   begin 
     10 ms   \ delay to add to time out (150 * 10 ms is 1500ms and then exit with -1) doubles as debounce
     1 + dup 150 = if drop -1 exit then 
-    0 6 pin@ = if drop 6 key-is-down exit then 
-    0 7 pin@ = if drop 7 key-is-down exit then 
-    0 8 pin@ = if drop 8 key-is-down exit then 
-    0 9 pin@ = if drop 9 key-is-down exit then 
+    0 6 pin@ = if drop r-switch key-is-down exit then 
+    0 7 pin@ = if drop g-switch key-is-down exit then 
+    0 8 pin@ = if drop y-switch key-is-down exit then 
+    0 9 pin@ = if drop b-switch key-is-down exit then 
   again ; 
 
 : game-over-sound ( -- ) \ plays deep buzz
@@ -114,21 +124,21 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : game-over ( -- ) \ turn all leds on to indicate game over
   game-over-sound
   10 0 ?do 
-    2 toggle-pin 
-    3 toggle-pin 
-    4 toggle-pin 
-    5 toggle-pin 
+    r-led toggle-pin 
+    g-led toggle-pin 
+    y-led toggle-pin 
+    b-led toggle-pin 
     100 ms
  loop 
  stop-beep ;
 
 : you-beat-the-game ( -- ) \ a little light show
   14 0 ?do 
-    2 toggle-pin 0 play-beep
-    4 toggle-pin 1 play-beep
+    r-led toggle-pin 0 play-beep
+    y-led toggle-pin 1 play-beep
     100 ms
-    3 toggle-pin 2 play-beep
-    5 toggle-pin 3 play-beep
+    g-led toggle-pin 2 play-beep
+    b-led toggle-pin 3 play-beep
     100 ms
   loop stop-beep ;
 
