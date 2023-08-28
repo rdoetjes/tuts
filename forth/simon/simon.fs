@@ -151,7 +151,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : wait-for-level-select ( -- ) \ wait for one of the 4 buttons to be pressed to set level and start game
   begin
     10 ms
-    0 6 pin@ = if drop 2 max-steps ! exit then 
+    0 6 pin@ = if drop 10 max-steps ! exit then 
     0 7 pin@ = if drop 15 max-steps ! exit then 
     0 8 pin@ = if drop 20 max-steps ! exit then
     0 9 pin@ = if drop 30 max-steps ! exit then
