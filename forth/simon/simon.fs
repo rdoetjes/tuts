@@ -17,7 +17,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : add-move ( move --) \ adds the value to sequence array[n]
   sequence + c! ;
 
-: get-move ( index -- move )) \ gets the value from the sequence list at position n
+: get-move ( index -- move ) \ gets the value from the sequence list at position n
   sequence + c@ ;
 
 : gen-move ( -- n) \ generates random number between 0-4 (4 not incl) by using logic and 3 on random int
