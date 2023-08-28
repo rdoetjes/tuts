@@ -146,7 +146,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     dup -1 = if exit then   \ if -1 then timeout accord and return -1 for gameover
     dup i get-move <> if drop -1 exit then \ value from poll-keys didn't match the value from get-move, return -1 for gameover
     drop
-  loop ;
+  loop 0 ;
 
 : wait-for-level-select ( -- ) \ wait for one of the 4 buttons to be pressed to set level and start game
   begin
@@ -167,18 +167,13 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : game-loop ( -- n ) \ loop from 1 to sequence-size if you don't get to sequence-size then returns -1 else returns 100
   begin
-    ." start " depth .
     step @ 1 + step !     \ go to next step in the sequence (steps==0 when game is reset)
     step @ set-speed      \ set simon's speed depedning on step
-    ." speed " depth . 
     step @ simons-move    \ simon plays the sequence until step
-    ." simon " depth . .s
     step @ players-move   \ user repeats simons sequence
-    ." player " depth . .s
-    -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
+    you-lost = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
     800 ms                \ wait 800 ms and then let simon start next sequence
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
-    ." end " depth . .s
   until you-won ;         \ 100 is to indicate you beat the whole sequemce
 
 : simon ( -- )            \ SIMON game entry point, loops indefinitely
