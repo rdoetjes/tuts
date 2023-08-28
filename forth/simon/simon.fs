@@ -13,8 +13,8 @@ pwm import
 8 constant y-switch
 9 constant b-switch
 10 constant piezo
--1 constant you-lost?
-100 constant you-won?
+-1 constant you-lost
+100 constant you-won
 
 variable sequence sequence-size allot \ array that holds the sequence
 
@@ -176,7 +176,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
     800 ms                \ wait 800 ms and then let simon start next sequence
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until 100 ;             \ 100 is to indicate you beat the whole sequemce
+  until you-won ;        \ 100 is to indicate you beat the whole sequemce
 
 : simon ( -- )            \ SIMON game entry point, loops indefinitely
   setup
@@ -185,6 +185,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     wait-for-level-select
     1000 ms               \ wait 1 second for player to get ready
     game-loop
-    dup you-lost? = if drop game-over then
-    dup you-won? = if drop you-beat-the-game then
+    dup you-lost = if drop game-over then
+    dup you-won = if drop you-beat-the-game then
   again ;
