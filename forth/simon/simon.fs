@@ -73,7 +73,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   dup 1 = if 55000 slice pwm-top! then
   dup 2 = if 60000 slice pwm-top! then
   dup 3 = if 65500 slice pwm-top! then
-
   slice bit enable-pwm
   drop ;
 
