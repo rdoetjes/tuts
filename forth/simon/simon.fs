@@ -40,7 +40,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   depth 0 > if depth 0 ?do ." aye!" drop loop then ; 
 
 : set-leds-off ( -- ) \ switch the 4 leds off, this is the starting state of the game
-  6 2 ?do 0 i pin! loop ;
+  b-led 1 + r-led ?do 0 i pin! loop ;
 
 : setup ( -- ) \ sets up the pins in such away we can uses maths to calculate step value, led pin and switch from one or the other
   cs
