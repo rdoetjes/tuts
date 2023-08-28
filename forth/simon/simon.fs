@@ -103,9 +103,9 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   50 ms ;                \ debounce the release, just in case
 
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
-  0         \ counter for timeout
+  0                \ counter for timeout
   begin 
-    10 ms   \ delay to add to time out (150 * 10 ms is 1500ms and then exit with -1) doubles as debounce
+    10 ms          \ delay to add to time out (150 * 10 ms is 1500ms and then exit with -1) doubles as debounce
     1 + dup 150 = if drop -1 exit then 
     0 6 pin@ = if drop r-switch key-is-down exit then 
     0 7 pin@ = if drop g-switch key-is-down exit then 
@@ -175,7 +175,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     -1 = if -1 exit then  \ we break out when players-move is -1 (indicating gameover)
     800 ms                \ wait 800 ms and then let simon start next sequence
     step @ max-steps @ =  \ did we reach the whole sequence no? continue TODO: victory light show after until
-  until you-won ;        \ 100 is to indicate you beat the whole sequemce
+  until you-won ;         \ 100 is to indicate you beat the whole sequemce
 
 : simon ( -- )            \ SIMON game entry point, loops indefinitely
   setup
