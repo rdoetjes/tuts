@@ -74,7 +74,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   dup 2 = if 60000 slice pwm-top! then
   dup 3 = if 65500 slice pwm-top! then
 
-  \ 0 slice pwm-counter! 
   slice bit enable-pwm
   drop ;
 
@@ -101,7 +100,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   stop-beep              \ stop the pwm to stop the sound
   dup 4 - toggle-pin     \ subtract 4 from pressed switch to turn off corresponding led
   6 -                    \ subtract 6 from switch pin to get the step value of the sequence
-  50 ms ;                \ debounce the release
+  50 ms ;                \ debounce the release, just in case
 
 : poll-keys ( -- ) \ checks for a keypress and timeout after ~1500ms
   0         \ counter for timeout
@@ -161,8 +160,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 
 : set-speed ( n -- ) \ n = step, the procedure will update global var speed
   \ speed up every 10 steps 
-  dup 5 < if 300 speed ! then    \ 1..5 300ms
-  dup 4 > if 250 speed ! then    \ 5..10 250ms
+  dup  5 < if 300 speed ! then   \ 1..5 300ms
+  dup  4 > if 250 speed ! then   \ 5..10 250ms
   dup 10 > if 200 speed ! then   \ 11 .. 15 200ms
   dup 15 > if 175 speed ! then   \ 16..20 175ms
   dup 20 > if 150 speed ! then   \ 21..30 150ms
