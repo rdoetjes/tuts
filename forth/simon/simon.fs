@@ -3,9 +3,7 @@ pin import
 pwm import
 
 31 constant sequence-size \ the maximum amount of steps (+1) in sequence, +1 so we can process logic from 1 instead of 0
-
 5 constant slice \ this slice for pin 10 (5A slice)
-
 2 constant r-led
 3 constant g-led
 4 constant y-led
@@ -15,6 +13,8 @@ pwm import
 8 constant y-switch
 9 constant b-switch
 10 constant piezo
+-1 constant you-lost?
+100 constant you-won?
 
 variable sequence sequence-size allot \ array that holds the sequence
 
@@ -185,6 +185,6 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     wait-for-level-select
     1000 ms               \ wait 1 second for player to get ready
     game-loop
-    dup -1 = if drop game-over then
-    dup 100 = if drop you-beat-the-game then
+    dup you-lost? = if drop game-over then
+    dup you-won? = if drop you-beat-the-game then
   again ;
