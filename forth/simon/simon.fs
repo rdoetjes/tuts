@@ -179,10 +179,8 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
 : simon ( -- )            \ SIMON game entry point, loops indefinitely
   setup
   begin
-    depth .
     reset-game
     wait-for-level-select
-    depth .
     1000 ms               \ wait 1 second for player to get ready
     game-loop
     dup you-lost = if drop game-over then
