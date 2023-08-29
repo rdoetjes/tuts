@@ -158,7 +158,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
   again ;
 
 : set-speed ( n -- ) \ n = step, the procedure will update global var speed (order of IFs is important)
-  dup  5 < if drop 300 speed ! exit then   \ 1..5 300ms
+  dup  5 < if drop 300 speed ! exit then   \ 1..5 300ms drop removes the step we do not want to return
   dup 24 > if drop 130 speed ! exit then   \ 25..30 130ms (don't dup we don't return value)
   dup 20 > if drop 150 speed ! exit then   \ 21..30 150ms
   dup 15 > if drop 175 speed ! exit then   \ 16..20 175ms
