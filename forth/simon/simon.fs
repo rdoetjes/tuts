@@ -157,7 +157,7 @@ variable speed  \ speed of simon showing the sequence (gets faster every 10 step
     0 9 pin@ = if 30 max-steps ! exit then
   again ;
 
-: set-speed ( n -- ) \ n = step, the procedure will update global var speed
+: set-speed ( n -- ) \ n = step, the procedure will update global var speed (order of IFs is important)
   dup  5 < if drop 300 speed ! exit then   \ 1..5 300ms
   dup 24 > if drop 130 speed ! exit then   \ 25..30 130ms (don't dup we don't return value)
   dup 20 > if drop 150 speed ! exit then   \ 21..30 150ms
