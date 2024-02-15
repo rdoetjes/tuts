@@ -40,7 +40,10 @@ pub fn main() !void {
         return;
     }) |l| {
         if (is_palindrome(l)) {
-            try stdout.print("{s}\n", .{l});
+            stdout.print("{s}\n", .{l}) catch |err| {
+                std.debug.print("Error: {s}", .{@errorName(err)});
+                std.os.exit(1);
+            };
         }
     }
 }
