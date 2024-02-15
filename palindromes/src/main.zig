@@ -19,7 +19,7 @@ fn is_palindrome(s: []const u8) bool {
     return true;
 }
 
-test "palindrome test" {
+test "palindrome tests" {
     try std.testing.expectEqual(true, is_palindrome("abba"));
     try std.testing.expectEqual(true, is_palindrome("Abba"));
     try std.testing.expectEqual(true, is_palindrome("abbA"));
