@@ -10,16 +10,9 @@ const BUFFER_SIZE = 1024;
 // when they are the same, then the 3rd charachter of s is compared to the 3rd to last character of s etc etc
 // This way half of the string is checked and when that half matches the other half, then the string is a palindrome
 // when a character doesn't match, then the string is not a palindrome and we return false bailing out early.
-fn is_palindrome(s: []const u8) bool {
+fn is_palindrome(s: []const u8, spaces_removed: []u8) bool {
     //see how much memory we need to allocated for the new replaced string (is either the same size or smaller)
     const new_size = std.mem.replacementSize(u8, s, " ", "");
-
-    //allocate enough memory for the string where we removed the spaces
-    const spaces_removed = allocator.alloc(u8, new_size) catch |err| {
-        std.debug.print("Error: {}", .{err});
-        return false;
-    };
-    defer allocator.free(spaces_removed);
 
     //remove the spaces from the string so that Was it a car or a cat I saw, is also seen as a palindrome
     _ = std.mem.replace(u8, s, " ", "", spaces_removed);
@@ -38,17 +31,21 @@ fn is_palindrome(s: []const u8) bool {
 }
 
 test "these are palidromess" {
-    try std.testing.expectEqual(true, is_palindrome("abba"));
-    try std.testing.expectEqual(true, is_palindrome("Abba"));
-    try std.testing.expectEqual(true, is_palindrome("abbA"));
-    try std.testing.expectEqual(true, is_palindrome("aBbA"));
-    try std.testing.expectEqual(true, is_palindrome("A man nam A"));
-    try std.testing.expectEqual(true, is_palindrome("Was it a car or a cat I saw"));
+    var spaces_removed: [BUFFER_SIZE]u8 = undefined;
+
+    try std.testing.expectEqual(true, is_palindrome("abba", &spaces_removed));
+    try std.testing.expectEqual(true, is_palindrome("Abba", &spaces_removed));
+    try std.testing.expectEqual(true, is_palindrome("abbA", &spaces_removed));
+    try std.testing.expectEqual(true, is_palindrome("aBbA", &spaces_removed));
+    try std.testing.expectEqual(true, is_palindrome("A man nam A", &spaces_removed));
+    try std.testing.expectEqual(true, is_palindrome("Was it a car or a cat I saw", &spaces_removed));
 }
 
 test "these are NOT palidromess" {
-    try std.testing.expectEqual(false, is_palindrome("head"));
-    try std.testing.expectEqual(false, is_palindrome("Was it a car or a cat I saw?"));
+    var spaces_removed: [BUFFER_SIZE]u8 = undefined;
+
+    try std.testing.expectEqual(false, is_palindrome("head", &spaces_removed));
+    try std.testing.expectEqual(false, is_palindrome("Was it a car or a cat I saw?", &spaces_removed));
 }
 
 // we read a list of words delimited by newlines from stdin
@@ -58,11 +55,13 @@ pub fn main() !void {
     const std_reader = stdin.reader();
     var br = std.io.bufferedReader(std_reader);
     var buffer: [BUFFER_SIZE]u8 = undefined;
+    var spaces_removed: [BUFFER_SIZE]u8 = undefined;
+
     while (br.reader().readUntilDelimiterOrEof(&buffer, '\n') catch |err| {
         std.debug.print("Error: {s}", .{@errorName(err)});
         return;
     }) |l| {
-        if (is_palindrome(l)) {
+        if (is_palindrome(l, &spaces_removed)) {
             stdout.print("{s}\n", .{l}) catch |err| {
                 std.debug.print("Error: {s}", .{@errorName(err)});
                 std.os.exit(1);
