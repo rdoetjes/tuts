@@ -1,5 +1,5 @@
 const std = @import("std");
-const in = std.io.getStdIn();
+const stdin = std.io.getStdIn();
 const stdout = std.io.getStdOut().writer();
 
 fn is_palindrome(s: []const u8) bool {
@@ -23,7 +23,7 @@ test "palindrome test" {
 }
 
 pub fn main() !void {
-    const std_reader = std.io.getStdIn().reader();
+    const std_reader = stdin.reader();
     var br = std.io.bufferedReader(std_reader);
     var buffer: [8192]u8 = undefined;
 
