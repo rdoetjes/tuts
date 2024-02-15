@@ -24,6 +24,7 @@ test "palindrome test" {
     try std.testing.expectEqual(true, is_palindrome("Abba"));
     try std.testing.expectEqual(true, is_palindrome("abbA"));
     try std.testing.expectEqual(true, is_palindrome("aBbA"));
+    try std.testing.expectEqual(true, is_palindrome("A man nam A"));
     try std.testing.expectEqual(false, is_palindrome("head"));
 }
 
