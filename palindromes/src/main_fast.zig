@@ -1,8 +1,6 @@
 const std = @import("std");
 const stdin = std.io.getStdIn();
 const stdout = std.io.getStdOut().writer();
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-const allocator = gpa.allocator();
 const BUFFER_SIZE = 1024;
 
 // takes the first charachter of s and compares it to the last character of s
