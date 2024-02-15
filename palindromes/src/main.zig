@@ -16,6 +16,9 @@ fn is_palindrome(s: []const u8) bool {
 
 test "palindrome test" {
     try std.testing.expectEqual(true, is_palindrome("abba"));
+    try std.testing.expectEqual(true, is_palindrome("Abba"));
+    try std.testing.expectEqual(true, is_palindrome("abbA"));
+    try std.testing.expectEqual(true, is_palindrome("aBbA"));
     try std.testing.expectEqual(false, is_palindrome("head"));
 }
 
