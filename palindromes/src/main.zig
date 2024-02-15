@@ -33,7 +33,7 @@ test "palindrome test" {
 pub fn main() !void {
     const std_reader = stdin.reader();
     var br = std.io.bufferedReader(std_reader);
-    var buffer: [8192]u8 = undefined;
+    var buffer: [4096]u8 = undefined;
 
     while (br.reader().readUntilDelimiterOrEof(&buffer, '\n') catch |err| {
         std.debug.print("Error: {s}", .{@errorName(err)});
