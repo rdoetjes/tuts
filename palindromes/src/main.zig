@@ -1,6 +1,8 @@
 const std = @import("std");
 const stdin = std.io.getStdIn();
 const stdout = std.io.getStdOut().writer();
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+const allocator = gpa.allocator();
 
 // takes the first charachter of s and compares it to the last character of s
 // when they are the same, then the 2nd charachter of s is compared to the 2nd to last character of s
@@ -8,10 +10,25 @@ const stdout = std.io.getStdOut().writer();
 // This way half of the string is checked and when that half matches the other half, then the string is a palindrome
 // when a character doesn't match, then the string is not a palindrome and we return false bailing out early.
 fn is_palindrome(s: []const u8) bool {
-    for (0..s.len / 2) |i| {
-        const ts = std.ascii.toLower(s[i]);
-        const te = std.ascii.toLower(s[s.len - i - 1]);
+    //see how much memory we need to allocated for the new replaced string (is either the same size or smaller)
+    const new_size = std.mem.replacementSize(u8, s, " ", "");
 
+    //allocate enough memory for the string where we removed the spaces
+    const spaces_removed = allocator.alloc(u8, new_size) catch |err| {
+        std.debug.print("Error: {}", .{err});
+        return false;
+    };
+    defer allocator.free(spaces_removed);
+
+    //remove the spaces from the string so that Was it a car or a cat I saw, is also seen as a palindrome
+    _ = std.mem.replace(u8, s, " ", "", spaces_removed);
+
+    //ieterate through the string and compare the first and last character and then the 2nd and last character and so on
+    for (0..new_size / 2) |i| {
+        const ts = std.ascii.toLower(spaces_removed[i]);
+        const te = std.ascii.toLower(spaces_removed[new_size - i - 1]);
+
+        // if chracters don't match, then the string is not a palindrome and we return false early
         if (ts != te) {
             return false;
         }
@@ -26,6 +43,7 @@ test "palindrome tests" {
     try std.testing.expectEqual(true, is_palindrome("aBbA"));
     try std.testing.expectEqual(true, is_palindrome("A man nam A"));
     try std.testing.expectEqual(false, is_palindrome("head"));
+    try std.testing.expectEqual(true, is_palindrome("Was it a car or a cat I saw"));
 }
 
 // we read a list of words delimited by newlines from stdin
