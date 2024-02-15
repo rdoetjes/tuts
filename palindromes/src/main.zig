@@ -35,7 +35,17 @@ pub fn main() !void {
     var br = std.io.bufferedReader(std_reader);
     var buffer: [8192]u8 = undefined;
 
-    while (try br.reader().readUntilDelimiterOrEof(&buffer, '\n')) |l| {
+    while (true) {
+        const maybe = br.reader().readUntilDelimiterOrEof(&buffer, '\n') catch |err| {
+            std.debug.print("Error: {s}", .{@errorName(err)});
+            break;
+        };
+
+        if (maybe == null) { // null is returned when the end of the file is reached, so then we bail out of the loop
+            break;
+        }
+
+        const l = maybe.?; // we can safely unwrap because we know that maybe is not null
         if (is_palindrome(l)) {
             try stdout.print("{s}\n", .{l});
         }
