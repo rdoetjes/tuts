@@ -36,14 +36,18 @@ fn is_palindrome(s: []const u8) bool {
     return true;
 }
 
-test "palindrome tests" {
+test "these are palidromess" {
     try std.testing.expectEqual(true, is_palindrome("abba"));
     try std.testing.expectEqual(true, is_palindrome("Abba"));
     try std.testing.expectEqual(true, is_palindrome("abbA"));
     try std.testing.expectEqual(true, is_palindrome("aBbA"));
     try std.testing.expectEqual(true, is_palindrome("A man nam A"));
-    try std.testing.expectEqual(false, is_palindrome("head"));
     try std.testing.expectEqual(true, is_palindrome("Was it a car or a cat I saw"));
+}
+
+test "these are NOT palidromess" {
+    try std.testing.expectEqual(false, is_palindrome("head"));
+    try std.testing.expectEqual(false, is_palindrome("Was it a car or a cat I saw?"));
 }
 
 // we read a list of words delimited by newlines from stdin
