@@ -2,7 +2,7 @@ const std = @import("std");
 const stdin = std.io.getStdIn();
 const stdout = std.io.getStdOut().writer();
 
-// takes the first charachter of s and compaires it to the last character of s
+// takes the first charachter of s and compares it to the last character of s
 // when they are the same, then the 2nd charachter of s is compared to the 2nd to last character of s
 // when they are the same, then the 3rd charachter of s is compared to the 3rd to last character of s etc etc
 // This way half of the string is checked and when that half matches the other half, then the string is a palindrome
