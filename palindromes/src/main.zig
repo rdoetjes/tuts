@@ -19,7 +19,7 @@ test "palindrome test" {
 pub fn main() !void {
     const std_reader = std.io.getStdIn().reader();
     var br = std.io.bufferedReader(std_reader);
-    var buffer: [4096]u8 = undefined;
+    var buffer: [8192]u8 = undefined;
     while (try br.reader().readUntilDelimiterOrEof(&buffer, '\n')) |l| {
         if (is_palindrome(l)) {
             try stdout.print("{s}\n", .{l});
