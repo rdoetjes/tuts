@@ -37,7 +37,7 @@ fn is_palindrome(s: []const u8) bool {
     return true;
 }
 
-test "these are palidromess" {
+test "these are palindromess" {
     try std.testing.expectEqual(true, is_palindrome("abba"));
     try std.testing.expectEqual(true, is_palindrome("Abba"));
     try std.testing.expectEqual(true, is_palindrome("abbA"));
@@ -46,7 +46,7 @@ test "these are palidromess" {
     try std.testing.expectEqual(true, is_palindrome("Was it a car or a cat I saw"));
 }
 
-test "these are NOT palidromess" {
+test "these are NOT palindromess" {
     try std.testing.expectEqual(false, is_palindrome("head"));
     try std.testing.expectEqual(false, is_palindrome("Was it a car or a cat I saw?"));
 }

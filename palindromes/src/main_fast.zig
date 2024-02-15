@@ -30,7 +30,7 @@ fn is_palindrome(s: []const u8, spaces_removed: []u8) bool {
     return true;
 }
 
-test "these are palidromess" {
+test "these are palindromess" {
     var spaces_removed: [BUFFER_SIZE]u8 = undefined;
 
     try std.testing.expectEqual(true, is_palindrome("abba", &spaces_removed));
@@ -41,7 +41,7 @@ test "these are palidromess" {
     try std.testing.expectEqual(true, is_palindrome("Was it a car or a cat I saw", &spaces_removed));
 }
 
-test "these are NOT palidromess" {
+test "these are NOT palindromess" {
     var spaces_removed: [BUFFER_SIZE]u8 = undefined;
 
     try std.testing.expectEqual(false, is_palindrome("head", &spaces_removed));
