@@ -57,8 +57,12 @@ pub fn main() !void {
 
     while (br.reader().readUntilDelimiterOrEof(&buffer, '\n') catch |err| {
         std.debug.print("Error: {s}", .{@errorName(err)});
-        return;
+        std.os.exit(1);
     }) |l| {
+        if (l.len > BUFFER_SIZE) {
+            continue;
+        }
+
         if (is_palindrome(l, &spaces_removed)) {
             stdout.print("{s}\n", .{l}) catch |err| {
                 std.debug.print("Error: {s}", .{@errorName(err)});

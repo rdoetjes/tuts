@@ -17,7 +17,7 @@ fn is_palindrome(s: []const u8) bool {
     //allocate enough memory for the string where we removed the spaces
     const spaces_removed = allocator.alloc(u8, new_size) catch |err| {
         std.debug.print("Error: {}", .{err});
-        return false;
+        std.os.exit(1);
     };
     defer allocator.free(spaces_removed);
 
@@ -60,7 +60,7 @@ pub fn main() !void {
     var buffer: [BUFFER_SIZE]u8 = undefined;
     while (br.reader().readUntilDelimiterOrEof(&buffer, '\n') catch |err| {
         std.debug.print("Error: {s}", .{@errorName(err)});
-        return;
+        std.os.exit(1);
     }) |l| {
         if (is_palindrome(l)) {
             stdout.print("{s}\n", .{l}) catch |err| {
