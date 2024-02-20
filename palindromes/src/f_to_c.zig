@@ -7,6 +7,12 @@ fn convert_to_celsius(fahrenheit: f64) f64 {
     return (fahrenheit - 32) * 5.0 / 9.0;
 }
 
+test "to celsius" {
+    try std.testing.expectEqual(0.0, convert_to_celsius(32));
+    try std.testing.expectEqual(-8.888888888888897e-01, convert_to_celsius(30.4));
+    try std.testing.expectEqual(2.627777777777778e+01, convert_to_celsius(79.3));
+}
+
 // we read a list of words delimited by newlines from stdin
 // each word is checked to see if it is a palindrome
 // when it is, it's printed to the stdout
@@ -30,9 +36,9 @@ pub fn main() !void {
                     std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
                     continue;
                 };
+                //if the unit is not F then print the original value
                 try stdout.print("{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
             } else {
-                //if the unit is not F then print the original value
                 std.debug.print("{s}\n", .{l});
             }
         }
