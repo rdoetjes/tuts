@@ -35,6 +35,14 @@ mod tests {
     }
 
     #[test]
+    fn test_read_record_valid_c() {
+        let input = "36.6 C".to_string();
+        let expected = "36.6 C".to_string();
+        let actual = read_record(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_read_record_invalid_temp() {
         let input = "invalid F".to_string();
         let expected = "Error: ".to_string();
