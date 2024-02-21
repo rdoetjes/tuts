@@ -15,6 +15,9 @@ test "covert fahrenheit to celsius" {
     try std.testing.expectApproxEqAbs(-273.15, convert_to_celsius(-459.67), 0.000001);
 }
 
+// l takes a record that contains a temperature and a unit.
+// the temperature is converted to celsius if the unit is F.
+// otherwise the original temperature is printed.
 fn convert_record(l: []const u8, converted_line: []u8) !void {
     var it = std.mem.splitAny(u8, l, " C");
     // get the temperature part of the <temp> <unit> pair
