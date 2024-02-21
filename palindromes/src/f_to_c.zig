@@ -50,8 +50,7 @@ test "convert record to celsius" {
 }
 
 // we read a list of words delimited by newlines from stdin
-// each word is checked to see if it is a palindrome
-// when it is, it's printed to the stdout
+// records that have the unit F are converted to C
 pub fn main() !void {
     const std_reader = stdin.reader();
     var br = std.io.bufferedReader(std_reader);
