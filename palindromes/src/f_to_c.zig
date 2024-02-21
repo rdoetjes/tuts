@@ -52,8 +52,8 @@ test "convert record to celsius" {
     try std.testing.expectStringStartsWith(&converted_line, "22.3 C\n");
 }
 
-// we read a list of words delimited by newlines from stdin
-// records that have the unit F are converted to C
+// we read a list of records delimited by newlines from stdin
+// records contain tenperature and unit.
 pub fn main() !void {
     const std_reader = stdin.reader();
     var br = std.io.bufferedReader(std_reader);
