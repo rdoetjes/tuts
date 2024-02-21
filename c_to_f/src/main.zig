@@ -52,6 +52,25 @@ test "convert record to celsius" {
     try std.testing.expectStringStartsWith(&converted_line, "22.3 C\n");
 }
 
+test "convert faulty record " {
+    //should keep original value
+    var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
+    try convert_record("32", &converted_line);
+    try std.testing.expectStringStartsWith(&converted_line, "");
+
+    converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
+    try convert_record("hello world", &converted_line);
+    try std.testing.expectStringStartsWith(&converted_line, "hello world\n");
+
+    converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
+    convert_record("far toooooooooooooooooooooo long for the record soooo what now?", &converted_line) catch {
+        try std.testing.expect(true);
+        return;
+    };
+
+    try std.testing.expect(false);
+}
+
 // we read a list of records delimited by newlines from stdin
 // records contain tenperature and unit.
 pub fn main() !void {
@@ -63,11 +82,6 @@ pub fn main() !void {
         std.debug.print("Error: {s}", .{@errorName(err)});
         return;
     }) |l| {
-        if (l.len > BUFFER_SIZE) {
-            std.debug.print("Error: line too long moving to next\n", .{});
-            continue;
-        }
-
         var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
 
         convert_record(l, &converted_line) catch |err| {
