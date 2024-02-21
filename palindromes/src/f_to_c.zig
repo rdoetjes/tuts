@@ -17,7 +17,6 @@ test "covert fahrenheit to celsius" {
 
 fn convert_record(l: []const u8, converted_line: []u8) !void {
     var it = std.mem.splitAny(u8, l, " C");
-
     // get the temperature part of the <temp> <unit> pair
     if (it.next()) |temperature| {
         // check if the unit part is F for fahernheit
