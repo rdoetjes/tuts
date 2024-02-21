@@ -21,7 +21,7 @@ fn convert_record(l: []const u8, converted_line: []u8) !void {
     // get the temperature part of the <temp> <unit> pair
     if (it.next()) |temperature| {
         // check if the unit part is F for fahernheit
-        if (std.mem.eql(u8, it.peek() orelse "", "F")) {
+        if (std.mem.eql(u8, it.peek() orelse return, "F")) {
             // convert the fharenheit temperature to celsius and print the new value in C
             const fahrenheit = std.fmt.parseFloat(f64, temperature) catch |err| {
                 std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
@@ -29,9 +29,10 @@ fn convert_record(l: []const u8, converted_line: []u8) !void {
             };
             //if the unit is not F then print the original value
             _ = try std.fmt.bufPrint(converted_line, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
-        } else {
-            _ = try std.fmt.bufPrint(converted_line, "{s}\n", .{l});
+            return;
         }
+        // if it's tempreature is not in F then print the C record
+        _ = try std.fmt.bufPrint(converted_line, "{s}\n", .{l});
     }
 }
 
@@ -62,7 +63,7 @@ pub fn main() !void {
         return;
     }) |l| {
         if (l.len > BUFFER_SIZE) {
-            std.debug.print("Error: line too long moving to next record\n", .{});
+            std.debug.print("Error: line too long moving to next\n", .{});
             continue;
         }
 
