@@ -1,10 +1,13 @@
 use std::io;
 use std::io::prelude::*;
 
+// Convert Fahrenheit to Celsius
 fn fahrenheit_to_celsius(fahrenheit: f64) -> f64 {
     return (fahrenheit - 32.0) * 5.0 / 9.0;
 }
 
+// Takes in a record in b that looks like "36.6 F" and returns a record in c that looks like "2.6 C"
+// when the unit part of the record is not F, then the b is returned unmodified
 fn read_record(b: String) -> String {
     let list = b.split(" ").collect::<Vec<&str>>();
     if list.len() == 2 && list[1] == "F" {
