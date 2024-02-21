@@ -1,5 +1,6 @@
 use std::io;
 use std::io::prelude::*;
+use std::num::ParseFloatError;
 
 /// Converts a Fahrenheit temperature to Celsius
 /// 
@@ -24,19 +25,19 @@ fn fahrenheit_to_celsius(fahrenheit: f64) -> f64 {
 /// Record in Celsius that looks like "2.6 C"
 ///
 /// The temperature converted to Celsius
-fn read_record(b: String) -> String {
+fn read_record(b: String) -> Result<String, ParseFloatError> {
     let list = b.split(" ").collect::<Vec<&str>>();
     if list.len() < 2 || list[1]!= "F" {
-        return b;
+        return Ok(b);
     }
 
     let fahrenheit = list[0].parse::<f64>();
     match fahrenheit {
         Ok(value) => {
-            return format!("{:.1} C", fahrenheit_to_celsius(value));
+            return Ok(format!("{:.1} C", fahrenheit_to_celsius(value)));
         },
         Err(err) => {
-            return format!("Error: {}", err);
+            return Err(err);
         }
     }
 }
@@ -50,7 +51,7 @@ mod tests {
         let input = "36.6 F".to_string();
         let expected = "2.6 C".to_string();
         let actual = read_record(input);
-        assert_eq!(expected, actual);
+        assert_eq!(expected, actual.unwrap());
     }
 
     #[test]
@@ -58,15 +59,14 @@ mod tests {
         let input = "36.6 C".to_string();
         let expected = "36.6 C".to_string();
         let actual = read_record(input);
-        assert_eq!(expected, actual);
+        assert_eq!(expected, actual.unwrap());
     }
 
     #[test]
     fn test_read_record_invalid_temp() {
         let input = "invalid F".to_string();
-        let expected = "Error: ".to_string();
         let actual = read_record(input);
-        assert!(actual.starts_with(&expected));
+        assert!(actual.is_err());
     }
 
     #[test]
@@ -74,7 +74,7 @@ mod tests {
         let input = "36.6".to_string();
         let expected = input.clone();
         let actual = read_record(input);
-        assert_eq!(expected, actual); 
+        assert_eq!(expected, actual.unwrap()); 
     }
 }
 
@@ -82,7 +82,7 @@ fn main() {
     for line in io::stdin().lock().lines() {
         match line {
             Ok(line) => {
-                println!("{}", read_record(line));
+                println!("{}", read_record(line).expect("Error reading line!"));
             },
             Err(err) => {
                 println!("Error: {}", err);
