@@ -82,7 +82,7 @@ fn main() {
     for line in io::stdin().lock().lines() {
         match line {
             Ok(line) => {
-                println!("{}", read_record(line).expect("Error reading line!"));
+                println!("{}", read_record(line).expect("Error parsing records!"));
             },
             Err(err) => {
                 println!("Error: {}", err);
