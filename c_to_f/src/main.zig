@@ -62,6 +62,7 @@ test "convert faulty record " {
     try convert_record("hello world", &converted_line);
     try std.testing.expectStringStartsWith(&converted_line, "hello world\n");
 
+    //should throw error
     converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
     convert_record("far toooooooooooooooooooooo long for the record soooo what now?", &converted_line) catch {
         try std.testing.expect(true);
