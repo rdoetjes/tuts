@@ -86,12 +86,12 @@ pub fn main() !void {
         var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
 
         convert_record(l, &converted_line) catch |err| {
-            std.debug.print("Error: {s}", .{@errorName(err)});
+            std.debug.print("Error: {s} skipping record\n", .{@errorName(err)});
             continue;
         };
 
         stdout.print("{s}", .{converted_line}) catch |err| {
-            std.debug.print("Error: {s}\n", .{@errorName(err)});
+            std.debug.print("Error: {s} skipping record\n", .{@errorName(err)});
             continue;
         };
     }
