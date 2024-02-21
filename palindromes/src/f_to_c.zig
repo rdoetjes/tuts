@@ -62,6 +62,7 @@ pub fn main() !void {
         return;
     }) |l| {
         if (l.len > BUFFER_SIZE) {
+            std.debug.print("Error: line too long moving to next record\n", .{});
             continue;
         }
 
