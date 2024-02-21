@@ -7,7 +7,7 @@ fn convert_to_celsius(fahrenheit: f64) f64 {
     return (fahrenheit - 32) * 5.0 / 9.0;
 }
 
-test "covert fahrenheit to celsius" {
+test "convert fahrenheit to celsius" {
     try std.testing.expectEqual(0.0, convert_to_celsius(32));
     try std.testing.expectApproxEqAbs(-0.888888, convert_to_celsius(30.4), 0.000001);
     try std.testing.expectEqual(-40.0, convert_to_celsius(-40));
