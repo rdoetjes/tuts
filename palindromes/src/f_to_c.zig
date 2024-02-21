@@ -61,6 +61,10 @@ pub fn main() !void {
         std.debug.print("Error: {s}", .{@errorName(err)});
         return;
     }) |l| {
+        if (l.len > BUFFER_SIZE) {
+            continue;
+        }
+
         var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
 
         convert_record(l, &converted_line) catch |err| {
