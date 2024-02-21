@@ -63,10 +63,11 @@ fn main() {
     for line in io::stdin().lock().lines() {
         match line {
             Ok(line) => {
-                print!("{}\n", read_record(line));
+                println!("{}", read_record(line));
             },
             Err(err) => {
                 println!("Error: {}", err);
+                continue;
             }
         }
     }
