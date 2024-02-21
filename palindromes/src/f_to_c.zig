@@ -7,7 +7,7 @@ fn convert_to_celsius(fahrenheit: f64) f64 {
     return (fahrenheit - 32) * 5.0 / 9.0;
 }
 
-test "to celsius" {
+test "covert fahrenheit to celsius" {
     try std.testing.expectEqual(0.0, convert_to_celsius(32));
     try std.testing.expectApproxEqAbs(-0.888888, convert_to_celsius(30.4), 0.000001);
     try std.testing.expectEqual(-40.0, convert_to_celsius(-40));
@@ -35,7 +35,7 @@ fn convert_record(l: []const u8, converted_line: []u8) !void {
     }
 }
 
-test "convert record C" {
+test "convert record to celsius" {
     var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
     try convert_record("32 C", &converted_line);
     try std.testing.expectStringStartsWith(&converted_line, "32 C\n");
