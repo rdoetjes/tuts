@@ -26,18 +26,18 @@ fn fahrenheit_to_celsius(fahrenheit: f64) -> f64 {
 /// The temperature converted to Celsius
 fn read_record(b: String) -> String {
     let list = b.split(" ").collect::<Vec<&str>>();
-    if list.len() == 2 && list[1] == "F" {
-        let fahrenheit = list[0].parse::<f64>();
-        match fahrenheit {
-            Ok(value) => {
-                return format!("{:.1} C", fahrenheit_to_celsius(value));
-            },
-            Err(err) => {
-                return format!("Error: {}", err);
-            }
-        }
-    } else {
+    if list.len() < 2 || list[1]!= "F" {
         return b;
+    }
+
+    let fahrenheit = list[0].parse::<f64>();
+    match fahrenheit {
+        Ok(value) => {
+            return format!("{:.1} C", fahrenheit_to_celsius(value));
+        },
+        Err(err) => {
+            return format!("Error: {}", err);
+        }
     }
 }
 
