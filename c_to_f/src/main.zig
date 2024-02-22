@@ -23,19 +23,21 @@ fn convert_record(l: []const u8, converted_line: []u8) !void {
     var it = std.mem.splitAny(u8, l, " C");
     // get the temperature part of the <temp> <unit> pair
     if (it.next()) |temperature| {
-        // check if the unit part is F for fahernheit
-        if (std.mem.eql(u8, it.peek() orelse return, "F")) {
-            // convert the fahrenheit string to float
-            const fahrenheit = std.fmt.parseFloat(f64, temperature) catch |err| {
-                std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
-                return;
-            };
-            //create a string with the converted temperature in C with 1 decimal place
-            _ = try std.fmt.bufPrint(converted_line, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
+        // check if the unit part is not F for fahernheit
+        if (!std.mem.eql(u8, it.peek() orelse return, "F")) {
+            // if it's temperature is not in F then print the C record
+            _ = try std.fmt.bufPrint(converted_line, "{s}\n", .{l});
             return;
         }
-        // if it's tempreature is not in F then print the C record
-        _ = try std.fmt.bufPrint(converted_line, "{s}\n", .{l});
+
+        // the unit is F, therefore convert the fahrenheit string to float
+        const fahrenheit = std.fmt.parseFloat(f64, temperature) catch |err| {
+            std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
+            return;
+        };
+        //create a string with the converted temperature in C with 1 decimal place
+        _ = try std.fmt.bufPrint(converted_line, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
+        return;
     }
 }
 
