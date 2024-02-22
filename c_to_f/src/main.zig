@@ -93,7 +93,7 @@ pub fn main() !void {
         @memset(converted_line, 0);
 
         convert_record(l, converted_line) catch |err| {
-            std.debug.print("Error: {s} skipping record\n", .{@errorName(err)});
+            std.debug.print("Error: {s} converting record, skipping record\n", .{@errorName(err)});
             continue;
         };
 
