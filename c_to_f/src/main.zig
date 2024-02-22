@@ -2,6 +2,7 @@ const std = @import("std");
 const stdin = std.io.getStdIn();
 const stdout = std.io.getStdOut().writer();
 const BUFFER_SIZE = 50;
+const allocator = std.heap.page_allocator;
 
 fn convert_to_celsius(fahrenheit: f64) f64 {
     return (fahrenheit - 32) * 5.0 / 9.0;
@@ -77,15 +78,21 @@ test "convert faulty record " {
 pub fn main() !void {
     const std_reader = stdin.reader();
     var br = std.io.bufferedReader(std_reader);
-    var buffer: [BUFFER_SIZE]u8 = undefined;
 
-    while (br.reader().readUntilDelimiterOrEof(&buffer, '\n') catch |err| {
+    while (br.reader().readUntilDelimiterOrEofAlloc(allocator, '\n', 10 * BUFFER_SIZE) catch |err| {
         std.debug.print("Error: {s}", .{@errorName(err)});
         return;
     }) |l| {
-        var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
+        defer allocator.free(l);
 
-        convert_record(l, &converted_line) catch |err| {
+        const converted_line = allocator.alloc(u8, BUFFER_SIZE) catch |err| {
+            std.debug.print("Error: {s}", .{@errorName(err)});
+            continue;
+        };
+        defer allocator.free(converted_line);
+        @memset(converted_line, 0);
+
+        convert_record(l, converted_line) catch |err| {
             std.debug.print("Error: {s} skipping record\n", .{@errorName(err)});
             continue;
         };
