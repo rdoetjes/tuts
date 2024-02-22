@@ -25,12 +25,12 @@ fn convert_record(l: []const u8, converted_line: []u8) !void {
     if (it.next()) |temperature| {
         // check if the unit part is F for fahernheit
         if (std.mem.eql(u8, it.peek() orelse return, "F")) {
-            // convert the fharenheit temperature to celsius and print the new value in C
+            // convert the fahrenheit string to float
             const fahrenheit = std.fmt.parseFloat(f64, temperature) catch |err| {
                 std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
                 return;
             };
-            //if the unit is not F then print the original value
+            //create a string with the converted temperature in C with 1 decimal place
             _ = try std.fmt.bufPrint(converted_line, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
             return;
         }
