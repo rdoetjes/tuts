@@ -38,7 +38,6 @@ fn convert_record(l: []const u8, converted_line: []u8) !void {
         };
         //create a string with the converted temperature in C with 1 decimal place
         _ = try std.fmt.bufPrint(converted_line, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
-        return;
     }
 }
 
