@@ -71,7 +71,6 @@ test "convert faulty record " {
         try std.testing.expect(true);
         return;
     };
-
     try std.testing.expect(false);
 }
 
@@ -87,7 +86,7 @@ pub fn main() !u8 {
     }) |l| {
         defer allocator.free(l);
 
-        const converted_line = allocator.alloc(u8, l.len + 3) catch |err| {
+        const converted_line = allocator.alloc(u8, l.len + 10) catch |err| {
             std.debug.print("Error: {s}", .{@errorName(err)});
             return 1;
         };
