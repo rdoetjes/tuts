@@ -33,7 +33,7 @@ fn convert_record(l: []const u8) ![]const u8 {
         // the unit is F, therefore convert the fahrenheit string to float
         const fahrenheit = std.fmt.parseFloat(f64, temperature) catch |err| {
             std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
-            return "";
+            return err;
         };
         //create a string with the converted temperature in C with 1 decimal place
         return std.fmt.allocPrint(allocator, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
