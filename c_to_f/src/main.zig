@@ -21,6 +21,7 @@ test "convert fahrenheit to celsius" {
 // otherwise the original temperature is printed.
 fn convert_record(l: []const u8, converted_line: []u8) !void {
     var it = std.mem.splitAny(u8, l, " ");
+
     // get the temperature part of the <temp> <unit> pair
     if (it.next()) |temperature| {
         // check if the unit part is not F for fahernheit
@@ -87,13 +88,13 @@ pub fn main() !u8 {
     }) |l| {
         defer allocator.free(l);
 
-        const converted_line = allocator.alloc(u8, l.len + 1) catch |err| {
+        const converted_line = allocator.alloc(u8, l.len + 3) catch |err| {
             std.debug.print("Error: {s}", .{@errorName(err)});
             return 1;
         };
         defer allocator.free(converted_line);
         @memset(converted_line, 0);
-        std.debug.print("{d}\n", .{l.len});
+
         convert_record(l, converted_line) catch |err| {
             std.debug.print("Error: {s} converting record, skipping record\n", .{@errorName(err)});
             return 1;

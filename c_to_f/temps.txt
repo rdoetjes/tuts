@@ -7,4 +7,4 @@ temperature unit
 10.2 C
 23.2 F
 29 C
-29 F
+33 F
