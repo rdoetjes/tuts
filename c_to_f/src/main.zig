@@ -19,59 +19,38 @@ test "convert fahrenheit to celsius" {
 // l takes a record that contains a temperature and a unit f.i. 30.0 F
 // the temperature is converted to celsius if the unit is F.
 // otherwise the original temperature is printed.
-fn convert_record(l: []const u8, converted_line: []u8) !void {
+fn convert_record(l: []const u8) ![]u8 {
     var it = std.mem.splitAny(u8, l, " ");
 
     // get the temperature part of the <temp> <unit> pair
     if (it.next()) |temperature| {
         // check if the unit part is not F for fahernheit
-        if (!std.mem.eql(u8, it.peek() orelse return, "F")) {
+        if (!std.mem.eql(u8, it.peek() orelse "", "F")) {
             // if it's temperature is not in F then print the C record
-            _ = try std.fmt.bufPrint(converted_line, "{s}\n", .{l});
-            return;
+            return std.fmt.allocPrint(allocator, "{s}\n", .{l});
         }
 
         // the unit is F, therefore convert the fahrenheit string to float
         const fahrenheit = std.fmt.parseFloat(f64, temperature) catch |err| {
             std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
-            return;
+            return "";
         };
         //create a string with the converted temperature in C with 1 decimal place
-        _ = try std.fmt.bufPrint(converted_line, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
+        return std.fmt.allocPrint(allocator, "{d:.1} C\n", .{convert_to_celsius(fahrenheit)});
     }
+    return "";
 }
 
 test "convert record to celsius" {
-    var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
-    try convert_record("32 C", &converted_line);
-    try std.testing.expectStringStartsWith(&converted_line, "32 C\n");
-
-    converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
-    try convert_record("30 F", &converted_line);
-    try std.testing.expectStringStartsWith(&converted_line, "-1.1 C\n");
-
-    converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
-    try convert_record("72.2 F", &converted_line);
-    try std.testing.expectStringStartsWith(&converted_line, "22.3 C\n");
+    try std.testing.expectStringStartsWith(try convert_record("32 C"), "32 C\n");
+    try std.testing.expectStringStartsWith(try convert_record("30 F"), "-1.1 C\n");
+    try std.testing.expectStringStartsWith(try convert_record("72.2 F"), "22.3 C\n");
 }
 
 test "convert faulty record " {
     //should keep original value
-    var converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
-    try convert_record("32", &converted_line);
-    try std.testing.expectStringStartsWith(&converted_line, "");
-
-    converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
-    try convert_record("hello world", &converted_line);
-    try std.testing.expectStringStartsWith(&converted_line, "hello world\n");
-
-    //should throw error
-    converted_line = std.mem.zeroes([BUFFER_SIZE]u8);
-    convert_record("far toooooooooooooooooooooo long for the record soooo what now?", &converted_line) catch {
-        try std.testing.expect(true);
-        return;
-    };
-    try std.testing.expect(false);
+    try std.testing.expectStringStartsWith(try convert_record("32"), "");
+    try std.testing.expectStringStartsWith(try convert_record("hello world"), "hello world\n");
 }
 
 // we read a list of records delimited by newlines from stdin
@@ -86,17 +65,11 @@ pub fn main() !u8 {
     }) |l| {
         defer allocator.free(l);
 
-        const converted_line = allocator.alloc(u8, l.len + 10) catch |err| {
-            std.debug.print("Error: {s} record {s}\n", .{ @errorName(err), l });
-            return 1;
-        };
-        defer allocator.free(converted_line);
-        @memset(converted_line, 0);
-
-        convert_record(l, converted_line) catch |err| {
+        const converted_line = convert_record(l) catch |err| {
             std.debug.print("Error: {s} converting record, {s}\n", .{ @errorName(err), l });
             return 1;
         };
+        defer allocator.free(converted_line);
 
         stdout.print("{s}", .{converted_line}) catch |err| {
             std.debug.print("Error: {s} converting record {s}\n", .{ @errorName(err), l });
