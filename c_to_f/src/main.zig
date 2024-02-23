@@ -19,7 +19,7 @@ test "convert fahrenheit to celsius" {
 // l takes a record that contains a temperature and a unit f.i. 30.0 F
 // the temperature is converted to celsius if the unit is F.
 // otherwise the original temperature is printed.
-fn convert_record(l: []const u8) ![]u8 {
+fn convert_record(l: []const u8) ![]const u8 {
     var it = std.mem.splitAny(u8, l, " ");
 
     // get the temperature part of the <temp> <unit> pair
