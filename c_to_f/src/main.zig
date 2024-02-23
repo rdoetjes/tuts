@@ -56,8 +56,7 @@ test "convert faulty record " {
 // we read a list of records delimited by newlines from stdin
 // records contain tenperature and unit.
 pub fn main() !u8 {
-    const std_reader = stdin.reader();
-    var br = std.io.bufferedReader(std_reader);
+    var br = std.io.bufferedReader(stdin.reader());
 
     while (br.reader().readUntilDelimiterOrEofAlloc(allocator, '\n', 10 * BUFFER_SIZE) catch |err| {
         std.debug.print("Error: {s}", .{@errorName(err)});
