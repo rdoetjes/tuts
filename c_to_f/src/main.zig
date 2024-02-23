@@ -72,7 +72,7 @@ pub fn main() !u8 {
         defer allocator.free(converted_line);
 
         stdout.print("{s}", .{converted_line}) catch |err| {
-            std.debug.print("Error: {s} converting record {s}\n", .{ @errorName(err), l });
+            std.debug.print("Error: {s}\n", .{@errorName(err)});
             return 1;
         };
     }
