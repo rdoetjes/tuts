@@ -87,19 +87,19 @@ pub fn main() !u8 {
         defer allocator.free(l);
 
         const converted_line = allocator.alloc(u8, l.len + 10) catch |err| {
-            std.debug.print("Error: {s}", .{@errorName(err)});
+            std.debug.print("Error: {s} record {s}\n", .{ @errorName(err), l });
             return 1;
         };
         defer allocator.free(converted_line);
         @memset(converted_line, 0);
 
         convert_record(l, converted_line) catch |err| {
-            std.debug.print("Error: {s} converting record, skipping record\n", .{@errorName(err)});
+            std.debug.print("Error: {s} converting record, {s}\n", .{ @errorName(err), l });
             return 1;
         };
 
         stdout.print("{s}", .{converted_line}) catch |err| {
-            std.debug.print("Error: {s} skipping record\n", .{@errorName(err)});
+            std.debug.print("Error: {s} converting record {s}\n", .{ @errorName(err), l });
             return 1;
         };
     }
