@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
-	"strings"
 )
 
 func convert_c_to_f(c float64) float64 {
@@ -13,16 +13,18 @@ func convert_c_to_f(c float64) float64 {
 }
 
 func conform_line(line string) (string, error) {
-	columns := strings.Split(line, " ")
-	if columns[1] != "F" {
-		return line, nil
+	r := regexp.MustCompile(`^(\d{1,}\.?\d?) F`)
+	fahrenheit_s := r.FindAllStringSubmatch(line, -1)
+
+	if len(fahrenheit_s) > 0 {
+		fahrenheit, err := strconv.ParseFloat(fahrenheit_s[0][1], 64)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("%.1f C", convert_c_to_f(fahrenheit)), nil
 	}
 
-	fahrenheit, err := strconv.ParseFloat(columns[0], 64)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%.1f C", convert_c_to_f(fahrenheit)), nil
+	return line, nil
 }
 
 func main() {
