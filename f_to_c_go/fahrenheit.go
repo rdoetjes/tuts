@@ -22,9 +22,9 @@ func conform_line(line string) (string, error) {
 			return "", err
 		}
 		return fmt.Sprintf("%.1f C", convert_c_to_f(fahrenheit)), nil
+	} else {
+		return line, nil
 	}
-
-	return line, nil
 }
 
 func main() {
