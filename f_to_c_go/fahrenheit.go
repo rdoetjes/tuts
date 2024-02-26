@@ -41,7 +41,7 @@ func main() {
 
 		celcius_conformed_record, err := conform_line(scanner.Text())
 		if err != nil {
-			fmt.Println("Error converting line:", err)
+			fmt.Fprintln(os.Stderr, "Error converting line:", err)
 			continue
 		}
 
