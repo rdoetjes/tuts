@@ -29,12 +29,20 @@ func convert_line(line string) (string, error) {
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
+	for {
+		if !scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				fmt.Fprintln(os.Stderr, "reading standard input:", err)
+			}
+			break
+		}
+
 		line, err := convert_line(scanner.Text())
 		if err != nil {
-			println("Error converting line: ", line, " error ", err)
-			os.Exit(1)
+			println("Error converting line:", err)
+			continue
 		}
+
 		println(line)
 	}
 }
