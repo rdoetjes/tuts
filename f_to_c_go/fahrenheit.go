@@ -45,6 +45,6 @@ func main() {
 			continue
 		}
 
-		println(celcius_conformed_record)
+		fmt.Println(celcius_conformed_record)
 	}
 }
