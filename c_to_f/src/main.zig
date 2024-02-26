@@ -2,9 +2,10 @@ const std = @import("std");
 const stdin = std.io.getStdIn();
 const stdout = std.io.getStdOut().writer();
 const BUFFER_SIZE = 50;
-const allocator = std.heap.page_allocator;
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+const allocator = gpa.allocator();
 
-fn convert_to_celsius(fahrenheit: f64) f64 {
+fn convert_to_celsius(fahrenheit: f32) f32 {
     return (fahrenheit - 32) * 5.0 / 9.0;
 }
 
@@ -31,7 +32,7 @@ fn convert_record(l: []const u8) ![]const u8 {
         }
 
         // the unit is F, therefore convert the fahrenheit string to float
-        const fahrenheit = std.fmt.parseFloat(f64, temperature) catch |err| {
+        const fahrenheit = std.fmt.parseFloat(f32, temperature) catch |err| {
             std.debug.print("Error: {s} value: {s} cannot convert\n", .{ @errorName(err), temperature });
             return err;
         };
@@ -57,6 +58,9 @@ test "convert faulty record " {
 // records contain tenperature and unit.
 pub fn main() !u8 {
     var br = std.io.bufferedReader(stdin.reader());
+    defer if (gpa.deinit() == .leak) {
+        std.log.warn("Has leaked", .{});
+    };
 
     while (br.reader().readUntilDelimiterOrEofAlloc(allocator, '\n', 10 * BUFFER_SIZE) catch |err| {
         std.debug.print("Error: {s}", .{@errorName(err)});
