@@ -1,4 +1,4 @@
-package fahrenheit
+package main
 
 import (
 	"testing"
