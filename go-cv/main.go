@@ -23,6 +23,12 @@ func (fps *Fps) Init() {
 	fps.last_time = time.Now().UnixNano()
 }
 
+func NewFps() *Fps {
+	fps := Fps{}
+	fps.Init()
+	return &fps
+}
+
 // AddFpsOnFrame draws the calculated FPS on the frame
 func AddFpsOnFrame(frame *gocv.Mat, fps_data *Fps) {
 	// store the new data in the struct
@@ -43,8 +49,7 @@ func AddFpsOnFrame(frame *gocv.Mat, fps_data *Fps) {
 
 // main function
 func main() {
-	fps_data := Fps{}
-	fps_data.Init()
+	fps_data := NewFps()
 
 	webcam, err := gocv.VideoCaptureDevice(1)
 	if err != nil {
@@ -69,7 +74,7 @@ func main() {
 		//...
 
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
-		AddFpsOnFrame(&img, &fps_data)
+		AddFpsOnFrame(&img, fps_data)
 
 		//display the frame from the webcam wit the fps on it
 		window.IMShow(img)
