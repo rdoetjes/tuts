@@ -34,11 +34,17 @@ func main() {
 	window := gocv.NewWindow("WebCam")
 	img := gocv.NewMat()
 	for {
-		webcam.Read(&img)
+		success := webcam.Read(&img)
+		if !success {
+			fmt.Println("Device closed")
+			break
+		}
+
 		if window.WaitKey(1) != -1 {
 			break
 		}
 		AddFpsOnFrame(&img, &fps_data)
 		window.IMShow(img)
 	}
+	webcam.Close()
 }
