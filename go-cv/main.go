@@ -9,6 +9,11 @@ import (
 	"gocv.io/x/gocv"
 )
 
+func process_example(img *gocv.Mat) {
+	gocv.CvtColor(*img, img, gocv.ColorBGRToGray)
+	gocv.Flip(*img, img, -1)
+}
+
 func main() {
 	fps_data := cvhelper.NewFps()
 
@@ -35,6 +40,7 @@ func main() {
 
 		// add your image processing functions below
 		//...
+		process_example(&img)
 
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		cvhelper.AddFpsOnFrame(&img, fps_data)

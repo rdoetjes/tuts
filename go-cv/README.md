@@ -15,7 +15,6 @@ Be sure to change the camera id in main.go to 0
 ```
 
 Should become
-
 ```
 	webcam, err := gocv.VideoCaptureDevice(0)
 ```
