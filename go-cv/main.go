@@ -20,7 +20,7 @@ func AddFpsOnFrame(frame *gocv.Mat, fps_data *fps) {
 	fps_data.avg_tot += 1 / ((float64(current_time) - float64(fps_data.last_time)) / 1e9)
 	fps_data.framecount += 1
 	fps := fmt.Sprintf("%.0f", fps_data.avg_tot/float64(fps_data.framecount))
-	pt := image.Point{X: 100, Y: 100}
+	pt := image.Point{X: 10, Y: 20}
 	gocv.PutText(frame, fps, pt, gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
 	fps_data.last_time = current_time
 }
