@@ -57,6 +57,9 @@ func main() {
 			break
 		}
 
+		// add your image processing functions below
+		//...
+
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		AddFpsOnFrame(&img, &fps_data)
 
