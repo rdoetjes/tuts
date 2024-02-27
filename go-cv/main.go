@@ -6,15 +6,18 @@ import (
 	"image/color"
 	"time"
 
+	// Import gocv package for OpenCV wrappers and bindings
 	"gocv.io/x/gocv"
 )
 
+// Fps struct to track FPS calculation related data (statefull)
 type Fps struct {
 	avg_tot    float64
 	framecount int64
 	last_time  int64
 }
 
+// AddFpsOnFrame draws the calculated FPS on the frame
 func AddFpsOnFrame(frame *gocv.Mat, fps_data *Fps) {
 	current_time := time.Now().UnixNano()
 	fps_data.avg_tot += 1 / ((float64(current_time) - float64(fps_data.last_time)) / 1e9)
@@ -25,6 +28,7 @@ func AddFpsOnFrame(frame *gocv.Mat, fps_data *Fps) {
 	fps_data.last_time = current_time
 }
 
+// main function
 func main() {
 	fps_data := Fps{avg_tot: 0, framecount: 0, last_time: 0}
 	webcam, err := gocv.VideoCaptureDevice(1)
