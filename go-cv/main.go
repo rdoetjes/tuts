@@ -15,7 +15,7 @@ type fps struct {
 	last_time  int64
 }
 
-func add_fps(frame *gocv.Mat, fps_data *fps) {
+func AddFpsOnFrame(frame *gocv.Mat, fps_data *fps) {
 	current_time := time.Now().UnixNano()
 	fps_data.avg_tot += 1 / ((float64(current_time) - float64(fps_data.last_time)) / 1e9)
 	fps_data.framecount += 1
@@ -38,7 +38,7 @@ func main() {
 		if window.WaitKey(1) != -1 {
 			break
 		}
-		add_fps(&img, &fps_data)
+		AddFpsOnFrame(&img, &fps_data)
 		window.IMShow(img)
 	}
 }
