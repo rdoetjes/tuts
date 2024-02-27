@@ -55,6 +55,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer webcam.Close()
+
 	window := gocv.NewWindow("WebCam")
 	img := gocv.NewMat()
 	for {
@@ -79,7 +81,4 @@ func main() {
 		//display the frame from the webcam wit the fps on it
 		window.IMShow(img)
 	}
-
-	// be good boy and close resources
-	webcam.Close()
 }
