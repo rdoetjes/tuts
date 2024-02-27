@@ -20,8 +20,11 @@ func add_fps(frame *gocv.Mat, avg_tot float64, framecount int64, last_time int64
 }
 
 func main() {
-	webcam, _ := gocv.VideoCaptureDevice(1)
-	window := gocv.NewWindow("Wbecam")
+	webcam, err := gocv.VideoCaptureDevice(1)
+	if err != nil {
+		panic(err)
+	}
+	window := gocv.NewWindow("WebCam")
 	img := gocv.NewMat()
 	var framecount int64 = 0
 	var avg_tot float64 = 0
