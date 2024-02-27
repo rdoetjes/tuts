@@ -17,6 +17,12 @@ type Fps struct {
 	last_time  int64
 }
 
+func (fps *Fps) Init() {
+	fps.avg_tot = 0
+	fps.framecount = 0
+	fps.last_time = time.Now().UnixNano()
+}
+
 // AddFpsOnFrame draws the calculated FPS on the frame
 func AddFpsOnFrame(frame *gocv.Mat, fps_data *Fps) {
 	// store the new data in the struct
@@ -37,7 +43,9 @@ func AddFpsOnFrame(frame *gocv.Mat, fps_data *Fps) {
 
 // main function
 func main() {
-	fps_data := Fps{avg_tot: 0, framecount: 0, last_time: 0}
+	fps_data := Fps{}
+	fps_data.Init()
+
 	webcam, err := gocv.VideoCaptureDevice(1)
 	if err != nil {
 		panic(err)
