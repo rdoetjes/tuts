@@ -26,7 +26,7 @@ func AddFpsOnFrame(frame *gocv.Mat, fps_data *fps) {
 }
 
 func main() {
-	fps_data := fps{avg_tot: 0, framecount: 0, last_time: time.Now().UnixNano()}
+	fps_data := fps{avg_tot: 0, framecount: 0, last_time: 0}
 	webcam, err := gocv.VideoCaptureDevice(1)
 	if err != nil {
 		panic(err)
