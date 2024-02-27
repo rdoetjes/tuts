@@ -6,9 +6,12 @@ import (
 	"go/cv/cvhelper"
 
 	// Import gocv package for OpenCV wrappers and bindings
+
 	"gocv.io/x/gocv"
 )
 
+// Example function that turns the image into black and white and flips it
+// over all the axes.
 func process_example(img *gocv.Mat) {
 	gocv.CvtColor(*img, img, gocv.ColorBGRToGray)
 	gocv.Flip(*img, img, -1)
