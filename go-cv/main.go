@@ -39,16 +39,24 @@ func main() {
 	img := gocv.NewMat()
 	for {
 		success := webcam.Read(&img)
+		// Check if the frame is read correctly
 		if !success {
 			fmt.Println("Device closed")
 			break
 		}
 
+		// if any key is pressed then exit
 		if window.WaitKey(1) != -1 {
 			break
 		}
+
+		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		AddFpsOnFrame(&img, &fps_data)
+
+		//display the frame from the webcam wit the fps on it
 		window.IMShow(img)
 	}
+
+	// be good boy and close resources
 	webcam.Close()
 }
