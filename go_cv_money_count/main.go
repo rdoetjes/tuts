@@ -38,19 +38,25 @@ func setupImages() (*gocv.Mat, *gocv.Mat) {
 }
 
 func main() {
+	//fps tracking struct
 	fps_data := cvhelper.NewFps()
+	//config for the coincount preprocessing
+	config := coincount.NewDefaultCoinProcessing()
+
+	//webcam setup
 	webcam := setupWebcam()
 	defer webcam.Close()
 
+	//window setup to display the output
 	input_w, process_w := setupWindows()
 	defer input_w.Close()
 	defer process_w.Close()
 
+	//image setup to store the input and output and avoid dynamic allocation in the loop to speed things up
 	img, process := setupImages()
 	defer img.Close()
 	defer process.Close()
 
-	config := coincount.NewDefaultCoinProcessing()
 	for {
 		success := webcam.Read(img)
 		// Check if the frame is read correctly
