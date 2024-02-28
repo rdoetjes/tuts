@@ -28,7 +28,7 @@ func preProcessForCounCount(input *gocv.Mat, process *gocv.Mat, config *CoinProc
 	gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
 }
 
-func CointEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float64 {
+func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float64 {
 	preProcessForCounCount(input, process, config)
 	return 0.0
 }
