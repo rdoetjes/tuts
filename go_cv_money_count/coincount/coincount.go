@@ -2,6 +2,7 @@ package coincount
 
 import (
 	"image"
+	"image/color"
 
 	"gocv.io/x/gocv"
 )
@@ -29,7 +30,22 @@ func preProcessForCoinCount(input *gocv.Mat, process *gocv.Mat, config *CoinProc
 }
 
 func getContours(process *gocv.Mat) {
-	gocv.HoughCirclesWithParams(*process, process, gocv.HoughGradient, 1, float64(process.Rows()/8), 100, 100, 10, 30)
+	circles := gocv.NewMat()
+	defer circles.Close()
+	gocv.HoughCirclesWithParams(*process, &circles, gocv.HoughGradient, 1, float64(process.Rows()/8), 100, 100, 10, 300)
+	for i := 0; i < circles.Cols(); i++ {
+		v := circles.GetVecfAt(0, i)
+		// if circles are found
+		if len(v) > 2 {
+			x := int(v[0])
+			y := int(v[1])
+			r := int(v[2])
+
+			gocv.Circle(process, image.Pt(x, y), r, color.RGBA{0, 0, 255, 0}, 2)
+			gocv.Circle(process, image.Pt(x, y), 2, color.RGBA{255, 0, 255, 0}, 3)
+		}
+	}
+
 }
 
 func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float64 {
