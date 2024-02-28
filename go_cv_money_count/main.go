@@ -63,7 +63,7 @@ func main() {
 		}
 
 		// add your image processing functions below
-		coincount.CointEuros(img, process, config)
+		coincount.CountEuros(img, process, config)
 
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		cvhelper.AddFpsOnFrame(process, fps_data)
