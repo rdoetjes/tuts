@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"go/cv/coincount"
 	"go/cv/cvhelper"
+	"image"
+	"image/color"
 
 	// Import gocv package for OpenCV wrappers and bindings
 	"gocv.io/x/gocv"
@@ -63,10 +65,11 @@ func main() {
 		}
 
 		// add your image processing functions below
-		coincount.CountEuros(img, process, config)
+		totalAmount := coincount.CountEuros(img, process, config)
 
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		cvhelper.AddFpsOnFrame(process, fps_data)
+		gocv.PutText(img, fmt.Sprintf("Total Amount: %.2f", totalAmount), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
 
 		//display the frame from the webcam wit the fps on it
 		process_w.IMShow(*process)

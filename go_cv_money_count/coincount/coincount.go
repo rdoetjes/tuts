@@ -22,13 +22,13 @@ func NewDefaultCoinProcessing() *CoinProcessing {
 
 // Example function that turns the image into black and white and flips it
 // over all the axes.
-func preProcessForCounCount(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) {
+func preProcessForCoinCount(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) {
 	gocv.CvtColor(*input, process, gocv.ColorBGRToGray)
 	gocv.GaussianBlur(*process, process, config.kernel, 0, 0, gocv.BorderDefault)
 	gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
 }
 
 func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float64 {
-	preProcessForCounCount(input, process, config)
+	preProcessForCoinCount(input, process, config)
 	return 0.0
 }
