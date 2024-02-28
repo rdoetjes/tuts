@@ -25,17 +25,19 @@ func NewDefaultCoinProcessing() *CoinProcessing {
 // Example function that turns the image into black and white and flips it
 // over all the axes.
 func preProcessForCoinCount(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) {
-	gocv.CvtColor(*input, process, gocv.ColorBGRToGray)
-
+	gocv.CvtColor(*input, process, gocv.ColorBGRToHLS)
 	gocv.GaussianBlur(*process, process, config.kernel, 0, 0, gocv.BorderDefault)
-	gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
+	gocv.InRangeWithScalar(*process, gocv.NewScalar(0, 10, 10, 0), gocv.NewScalar(15, 155, 155, 0), process)
+	//gocv.CvtColor(*process, process, gocv.ColorBGRToGray)
+	//gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
 }
 
 func getContours(input *gocv.Mat, process *gocv.Mat) int {
 	var result int = 0
 	circles := gocv.NewMat()
 	defer circles.Close()
-	gocv.HoughCirclesWithParams(*process, &circles, gocv.HoughGradient, 1, float64(process.Rows()/8), 20, 40, 20, 0) // maxRadius ste yo 0 for some readon it doesn;t seem to work
+	//25 48
+	gocv.HoughCirclesWithParams(*process, &circles, gocv.HoughGradient, 1, float64(process.Rows()/8), 15, 30, 10, 0) // maxRadius ste yo 0 for some readon it doesn;t seem to work
 	for i := 0; i < circles.Cols(); i++ {
 		v := circles.GetVecfAt(0, i)
 
@@ -45,7 +47,7 @@ func getContours(input *gocv.Mat, process *gocv.Mat) int {
 			y := int(v[1])
 			r := int(v[2])
 
-			if r > 45 {
+			if r > 80 {
 				continue
 			}
 

@@ -90,7 +90,7 @@ func main() {
 				break
 			}
 		}
-		//*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
+		*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
 
 		//// if any key is pressed then exit
 		if input_w.WaitKey(1) != -1 || process_w.WaitKey(1) != -1 {
