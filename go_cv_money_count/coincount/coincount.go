@@ -45,13 +45,14 @@ func getContours(input *gocv.Mat, process *gocv.Mat) int {
 			y := int(v[1])
 			r := int(v[2])
 
-      if (r > 45) {
-        continue
-      }
-      result += 1
-      fmt.Printf("Circle detected at (%d, %d) with radius %d\n", x, y, r)
-      gocv.Circle(input, image.Pt(x, y), r, color.RGBA{0, 0, 255, 0}, 2)
-      gocv.Circle(input, image.Pt(x, y), 2, color.RGBA{255, 0, 255, 0}, 3)
+			if r > 45 {
+				continue
+			}
+
+			result += 1
+			fmt.Printf("Circle detected at (%d, %d) with radius %d\n", x, y, r)
+			gocv.Circle(input, image.Pt(x, y), r, color.RGBA{0, 0, 255, 0}, 2)
+			gocv.Circle(input, image.Pt(x, y), 2, color.RGBA{255, 0, 255, 0}, 3)
 		}
 	}
 	return result
