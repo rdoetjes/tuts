@@ -57,7 +57,6 @@ func main() {
 	defer img.Close()
 	defer process.Close()
 
-	*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
 	for {
 		//	success := webcam.Read(img)
 		//// Check if the frame is read correctly
@@ -65,6 +64,7 @@ func main() {
 		//fmt.Println("Device closed")
 		//break
 		//}
+		*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
 
 		//// if any key is pressed then exit
 		if input_w.WaitKey(1) != -1 || process_w.WaitKey(1) != -1 {

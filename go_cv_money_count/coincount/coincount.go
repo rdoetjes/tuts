@@ -1,6 +1,7 @@
 package coincount
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 
@@ -15,7 +16,7 @@ type CoinProcessing struct {
 
 func NewDefaultCoinProcessing() *CoinProcessing {
 	return &CoinProcessing{
-		kernel:       image.Pt(5, 5),
+		kernel:       image.Pt(7, 7),
 		cannyThresh1: 50,
 		cannyThresh2: 150,
 	}
@@ -25,31 +26,42 @@ func NewDefaultCoinProcessing() *CoinProcessing {
 // over all the axes.
 func preProcessForCoinCount(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) {
 	gocv.CvtColor(*input, process, gocv.ColorBGRToGray)
+
 	gocv.GaussianBlur(*process, process, config.kernel, 0, 0, gocv.BorderDefault)
 	gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
 }
 
-func getContours(process *gocv.Mat) {
+func getContours(input *gocv.Mat, process *gocv.Mat) float32 {
+	var result float32 = 0
 	circles := gocv.NewMat()
 	defer circles.Close()
-	gocv.HoughCirclesWithParams(*process, &circles, gocv.HoughGradient, 1, float64(process.Rows()/8), 100, 100, 10, 300)
+	gocv.HoughCirclesWithParams(*process, &circles, gocv.HoughGradient, 1, float64(process.Rows()/8), 100, 100, 15, 300)
 	for i := 0; i < circles.Cols(); i++ {
 		v := circles.GetVecfAt(0, i)
+
 		// if circles are found
 		if len(v) > 2 {
 			x := int(v[0])
 			y := int(v[1])
 			r := int(v[2])
 
-			gocv.Circle(process, image.Pt(x, y), r, color.RGBA{0, 0, 255, 0}, 2)
-			gocv.Circle(process, image.Pt(x, y), 2, color.RGBA{255, 0, 255, 0}, 3)
+			if r > 80 {
+				result += 2.0
+			}
+
+			if r > 72 && r < 74 {
+				result += 1.0
+			}
+
+			fmt.Printf("Circle detected at (%d, %d) with radius %d\n", x, y, r)
+			gocv.Circle(input, image.Pt(x, y), r, color.RGBA{0, 0, 255, 0}, 2)
+			gocv.Circle(input, image.Pt(x, y), 2, color.RGBA{255, 0, 255, 0}, 3)
 		}
 	}
-
+	return result
 }
 
-func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float64 {
+func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float32 {
 	preProcessForCoinCount(input, process, config)
-	getContours(process)
-	return 0.0
+	return getContours(input, process)
 }
