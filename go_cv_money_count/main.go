@@ -7,20 +7,35 @@ import (
 	"go/cv/cvhelper"
 	"image"
 	"image/color"
+	"os"
 
 	// Import gocv package for OpenCV wrappers and bindings
 	"gocv.io/x/gocv"
 )
 
-func setupWebcam() *gocv.VideoCapture {
+func setupWebcam(os string) *gocv.VideoCapture {
 	// Open webcam this is fo linux (V4L2)
-	webcam, err := gocv.VideoCaptureDeviceWithAPI(0, gocv.VideoCaptureV4L2)
-	if err != nil {
-		panic(err)
+	if os == "linux" {
+		webcam, err := gocv.VideoCaptureDeviceWithAPI(1, gocv.VideoCaptureV4L2)
+		if err != nil {
+			panic(err)
+		}
+		return webcam
+	} else if os == "macos" {
+		//which uses device 1 for some reason
+		webcam, err := gocv.VideoCaptureDevice(1)
+		if err != nil {
+			panic(err)
+		}
+		return webcam
+	} else {
+		//the standard webcam
+		webcam, err := gocv.VideoCaptureDevice(0)
+		if err != nil {
+			panic(err)
+		}
+		return webcam
 	}
-	webcam.Set(gocv.VideoCaptureFrameWidth, 480)
-	webcam.Set(gocv.VideoCaptureFrameHeight, 640)
-	return webcam
 }
 
 func setupWindows() (*gocv.Window, *gocv.Window) {
@@ -44,8 +59,14 @@ func main() {
 	config := coincount.NewDefaultCoinProcessing()
 
 	//webcam setup
-	webcam := setupWebcam()
+	var webcam_type string = "linux"
+	if len(os.Args) > 1 {
+		webcam_type = os.Args[1]
+	}
+	webcam := setupWebcam(webcam_type)
 	defer webcam.Close()
+	webcam.Set(gocv.VideoCaptureFrameWidth, 480)
+	webcam.Set(gocv.VideoCaptureFrameHeight, 640)
 
 	//window setup to display the output
 	input_w, process_w := setupWindows()
@@ -58,14 +79,16 @@ func main() {
 	defer process.Close()
 
 	for {
-    var errCount = 0
+		var errCount = 0
 		success := webcam.Read(img)
-    for !success {
-		  success = webcam.Read(img)
-		  //// Check if the frame is read correctly
-		  fmt.Println("Device closed")
-      errCount += 1
-      if errCount == 15 { break }
+		for !success {
+			success = webcam.Read(img)
+			//// Check if the frame is read correctly
+			fmt.Println("Device closed")
+			errCount += 1
+			if errCount == 15 {
+				break
+			}
 		}
 		//*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
 
@@ -76,7 +99,7 @@ func main() {
 
 		// add your image processing functions below
 		totalAmount := coincount.CountEuros(img, process, config)
-    fmt.Printf("%d\n", totalAmount)
+		fmt.Printf("%d\n", totalAmount)
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		cvhelper.AddFpsOnFrame(process, fps_data)
 		gocv.PutText(img, fmt.Sprintf("Total Amount: %d", totalAmount), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
