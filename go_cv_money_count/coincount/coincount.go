@@ -31,11 +31,11 @@ func preProcessForCoinCount(input *gocv.Mat, process *gocv.Mat, config *CoinProc
 	gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
 }
 
-func getContours(input *gocv.Mat, process *gocv.Mat) float32 {
-	var result float32 = 0
+func getContours(input *gocv.Mat, process *gocv.Mat) int {
+	var result int = 0
 	circles := gocv.NewMat()
 	defer circles.Close()
-	gocv.HoughCirclesWithParams(*process, &circles, gocv.HoughGradient, 1, float64(process.Rows()/8), 100, 100, 15, 300)
+	gocv.HoughCirclesWithParams(*process, &circles, gocv.HoughGradient, 1, float64(process.Rows()/8), 20, 40, 20, 0) // maxRadius ste yo 0 for some readon it doesn;t seem to work
 	for i := 0; i < circles.Cols(); i++ {
 		v := circles.GetVecfAt(0, i)
 
@@ -45,23 +45,19 @@ func getContours(input *gocv.Mat, process *gocv.Mat) float32 {
 			y := int(v[1])
 			r := int(v[2])
 
-			if r > 80 {
-				result += 2.0
-			}
-
-			if r > 72 && r < 74 {
-				result += 1.0
-			}
-
-			fmt.Printf("Circle detected at (%d, %d) with radius %d\n", x, y, r)
-			gocv.Circle(input, image.Pt(x, y), r, color.RGBA{0, 0, 255, 0}, 2)
-			gocv.Circle(input, image.Pt(x, y), 2, color.RGBA{255, 0, 255, 0}, 3)
+      if (r > 45) {
+        continue
+      }
+      result += 1
+      fmt.Printf("Circle detected at (%d, %d) with radius %d\n", x, y, r)
+      gocv.Circle(input, image.Pt(x, y), r, color.RGBA{0, 0, 255, 0}, 2)
+      gocv.Circle(input, image.Pt(x, y), 2, color.RGBA{255, 0, 255, 0}, 3)
 		}
 	}
 	return result
 }
 
-func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float32 {
+func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) int {
 	preProcessForCoinCount(input, process, config)
 	return getContours(input, process)
 }

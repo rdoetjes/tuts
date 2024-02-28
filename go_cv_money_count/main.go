@@ -13,8 +13,8 @@ import (
 )
 
 func setupWebcam() *gocv.VideoCapture {
-	// Open webcam
-	webcam, err := gocv.VideoCaptureDevice(1)
+	// Open webcam this is fo linux (V4L2)
+	webcam, err := gocv.VideoCaptureDeviceWithAPI(0, gocv.VideoCaptureV4L2)
 	if err != nil {
 		panic(err)
 	}
@@ -58,13 +58,16 @@ func main() {
 	defer process.Close()
 
 	for {
-		//	success := webcam.Read(img)
-		//// Check if the frame is read correctly
-		//if !success {
-		//fmt.Println("Device closed")
-		//break
-		//}
-		*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
+    var errCount = 0
+		success := webcam.Read(img)
+    for !success {
+		  success = webcam.Read(img)
+		  //// Check if the frame is read correctly
+		  fmt.Println("Device closed")
+      errCount += 1
+      if errCount == 15 { break }
+		}
+		//*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
 
 		//// if any key is pressed then exit
 		if input_w.WaitKey(1) != -1 || process_w.WaitKey(1) != -1 {
@@ -73,10 +76,10 @@ func main() {
 
 		// add your image processing functions below
 		totalAmount := coincount.CountEuros(img, process, config)
-
+    fmt.Printf("%d\n", totalAmount)
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		cvhelper.AddFpsOnFrame(process, fps_data)
-		gocv.PutText(img, fmt.Sprintf("Total Amount: %.2f", totalAmount), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
+		gocv.PutText(img, fmt.Sprintf("Total Amount: %d", totalAmount), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
 
 		//display the frame from the webcam wit the fps on it
 		process_w.IMShow(*process)
