@@ -28,7 +28,12 @@ func preProcessForCoinCount(input *gocv.Mat, process *gocv.Mat, config *CoinProc
 	gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
 }
 
+func getContours(process *gocv.Mat) {
+	gocv.HoughCirclesWithParams(*process, process, gocv.HoughGradient, 1, float64(process.Rows()/8), 75, 20, 10, 0)
+}
+
 func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) float64 {
 	preProcessForCoinCount(input, process, config)
+	//getContours(process)
 	return 0.0
 }
