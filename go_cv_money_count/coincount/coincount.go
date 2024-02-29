@@ -24,12 +24,10 @@ func NewDefaultCoinProcessing() *CoinProcessing {
 
 // Example function that turns the image into black and white and flips it
 // over all the axes.
-func preProcessForCoinCount(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) {
+func preProcessForChipCount(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) {
 	gocv.CvtColor(*input, process, gocv.ColorBGRToHLS)
 	gocv.GaussianBlur(*process, process, config.kernel, 0, 0, gocv.BorderDefault)
 	gocv.InRangeWithScalar(*process, gocv.NewScalar(0, 10, 10, 0), gocv.NewScalar(15, 155, 155, 0), process)
-	//gocv.CvtColor(*process, process, gocv.ColorBGRToGray)
-	//gocv.Canny(*process, process, config.cannyThresh1, config.cannyThresh2)
 }
 
 func getContours(input *gocv.Mat, process *gocv.Mat) int {
@@ -60,7 +58,7 @@ func getContours(input *gocv.Mat, process *gocv.Mat) int {
 	return result
 }
 
-func CountEuros(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) int {
-	preProcessForCoinCount(input, process, config)
+func CountChips(input *gocv.Mat, process *gocv.Mat, config *CoinProcessing) int {
+	preProcessForChipCount(input, process, config)
 	return getContours(input, process)
 }

@@ -90,19 +90,20 @@ func main() {
 				break
 			}
 		}
-		*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
+		//*img = gocv.IMRead("./euros.jpg", gocv.IMReadColor)
 
-		//// if any key is pressed then exit
+		// if any key is pressed then exit
 		if input_w.WaitKey(1) != -1 || process_w.WaitKey(1) != -1 {
 			break
 		}
 
 		// add your image processing functions below
-		totalAmount := coincount.CountEuros(img, process, config)
+		totalAmount := coincount.CountChips(img, process, config)
+		gocv.PutText(img, fmt.Sprintf("Total Amount: %d", totalAmount), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
 		fmt.Printf("%d\n", totalAmount)
+
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		cvhelper.AddFpsOnFrame(process, fps_data)
-		gocv.PutText(img, fmt.Sprintf("Total Amount: %d", totalAmount), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
 
 		//display the frame from the webcam wit the fps on it
 		process_w.IMShow(*process)
