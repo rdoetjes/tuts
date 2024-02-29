@@ -29,6 +29,18 @@ func NewFps() *Fps {
 	return &fps
 }
 
+// Converts Frame from BFR to HSV and applies the given HSV range
+// returns the filtered frame in the target Mat
+func FilterHue(frame *gocv.Mat, target *gocv.Mat, hue_min gocv.Scalar, hue_max gocv.Scalar) {
+	gocv.CvtColor(*frame, target, gocv.ColorBGRToHSV)
+	gocv.InRangeWithScalar(*frame, hue_min, hue_max, target)
+}
+
+// Solely a wrapper around InRangeWithScalar to filter the frame in the RGB range
+func FilterRGB(frame *gocv.Mat, target *gocv.Mat, rgb_min gocv.Scalar, rgb_max gocv.Scalar) {
+	gocv.InRangeWithScalar(*frame, rgb_min, rgb_max, target)
+}
+
 // AddFpsOnFrame draws the calculated FPS on the frame
 func AddFpsOnFrame(frame *gocv.Mat, fps_data *Fps) {
 	// store the new data in the struct
