@@ -30,7 +30,7 @@ func preProcessForChipCount(input *gocv.Mat, process *gocv.Mat, config *CoinProc
 }
 
 func getContours(process *gocv.Mat) int {
-	var result int = 0
+	result := 0
 	circles := gocv.NewMat()
 	defer circles.Close()
 	// 25 48

@@ -26,7 +26,7 @@ fn fahrenheit_to_celsius(fahrenheit: f64) -> f64 {
 ///
 /// The temperature converted to Celsius
 fn read_record(b: String) -> Result<String, ParseFloatError> {
-    let list = b.split(" ").collect::<Vec<&str>>();
+    let list = b.split(' ').collect::<Vec<&str>>();
     if list.len() < 2 || list[1] != "F" {
         return Ok(b);
     }
