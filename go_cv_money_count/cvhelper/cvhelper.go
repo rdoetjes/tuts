@@ -29,6 +29,32 @@ func NewFps() *Fps {
 	return &fps
 }
 
+func SetupWebcam(idx int, os string) *gocv.VideoCapture {
+	// Open webcam this is fo linux (V4L2)
+	if os == "v4l2" {
+		fmt.Printf("%d\n", idx)
+		webcam, err := gocv.VideoCaptureDeviceWithAPI(idx, gocv.VideoCaptureV4L2)
+		if err != nil {
+			panic(err)
+		}
+		return webcam
+	} else if os == "macos" {
+		//which uses device 1 for some reason
+		webcam, err := gocv.VideoCaptureDevice(idx)
+		if err != nil {
+			panic(err)
+		}
+		return webcam
+	} else {
+		//the standard webcam
+		webcam, err := gocv.VideoCaptureDevice(idx)
+		if err != nil {
+			panic(err)
+		}
+		return webcam
+	}
+}
+
 // Converts Frame from BFR to HSV and applies the given HSV range
 // returns the filtered frame in the target Mat
 func FilterHue(frame *gocv.Mat, target *gocv.Mat, hue_min gocv.Scalar, hue_max gocv.Scalar) {
