@@ -82,8 +82,8 @@ func main() {
 
 		// add your image processing functions below
 		totalAmount := chipcount.CountChips(img, process, config)
-		gocv.PutText(img, fmt.Sprintf("Total Amount: %d", totalAmount), image.Pt(10, 20), gocv.FontHersheyPlain, 1.2, color.RGBA{255, 0, 255, 1}, 2)
-		fmt.Printf("%d\n", totalAmount)
+		gocv.PutText(img, totalAmount, image.Pt(10, 40), gocv.FontHersheyPlain, 3.2, color.RGBA{255, 0, 255, 1}, 2)
+		fmt.Println(totalAmount)
 
 		//add frame count to the upperleft of the frame, the stateful data is held in fps_data and is updated by the function
 		cvhelper.AddFpsOnFrame(process, fps_data)
