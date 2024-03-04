@@ -46,15 +46,12 @@ func preProcessForChipCount(input *gocv.Mat, process *gocv.Mat, config *CoinProc
 }
 
 func MaskColorChips(input *gocv.Mat, output *gocv.Mat, color int, config *CoinProcessing) {
-	if color == RED {
+	switch color {
+	case RED:
 		cvhelper.FilterRGB(input, output, config.red_lb, config.red_ub)
-	}
-
-	if color == BLUE {
+	case BLUE:
 		cvhelper.FilterRGB(input, output, config.blue_lb, config.blue_ub)
-	}
-
-	if color == ORANGE {
+	case ORANGE:
 		cvhelper.FilterRGB(input, output, config.orange_lb, config.orange_ub)
 	}
 
