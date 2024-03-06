@@ -13,7 +13,7 @@ func convert_c_to_f(c float64) float64 {
 }
 
 func conform_line(line string) (string, error) {
-	r := regexp.MustCompile(`^(\d{1,}\.?\d?) F$`)
+	r := regexp.MustCompile(`^(\-?\d{1,}\.?\d?) F$`)
 	fahrenheit_s := r.FindAllStringSubmatch(line, -1)
 	if len(fahrenheit_s) == 0 {
 		return line, nil
