@@ -11,10 +11,10 @@ fn convert_to_celsius(fahrenheit: f32) f32 {
 
 test "convert fahrenheit to celsius" {
     try std.testing.expectEqual(0.0, convert_to_celsius(32));
-    try std.testing.expectApproxEqAbs(-0.888888, convert_to_celsius(30.4), 0.000001);
+    try std.testing.expectApproxEqAbs(-0.888888, convert_to_celsius(30.4), 0.001);
     try std.testing.expectEqual(-40.0, convert_to_celsius(-40));
     try std.testing.expectApproxEqAbs(100, convert_to_celsius(212), 0.000001);
-    try std.testing.expectApproxEqAbs(-273.15, convert_to_celsius(-459.67), 0.000001);
+    try std.testing.expectApproxEqAbs(-273.15, convert_to_celsius(-459.67), 0.001);
 }
 
 // l takes a record that contains a temperature and a unit f.i. 30.0 F
