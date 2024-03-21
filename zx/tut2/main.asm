@@ -20,8 +20,8 @@ l02:    ld a,(ix+0)
         ld b,8    
 l01:    push bc
 
-        halt          ; wait till next irq
-        halt          ; wait till next irq
+        halt          ; wait till next irq (which most likely is the raster)
+        halt          ; wait till next irq (which most likely is the raster)
 
         call screen_scroll
         call buffer_roll_print
@@ -89,11 +89,13 @@ _p1:
 
 black_screen:
         ; clear the screen
-        ld hl, SCR
-        ld de, SCR + 1
-        ld bc, SCRSZ - 1
-        ld (hl), l
-        ldir
+        ;ld hl, SCR
+        ;ld de, SCR + 1
+        ;ld bc, SCRSZ - 1
+        ;ld (hl), l
+        ;ldir
+        ;
+        call 3503   ;saves the above code
 
         ; clear attributes memory
         ld hl, ATTR
