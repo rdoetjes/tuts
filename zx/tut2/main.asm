@@ -31,36 +31,6 @@ l01:    push bc
 
         jr l02
 
-; INCHL - function to calculate the address of the byte in the 
-;         next line on the ZX screen
-; 
-; ZX screen addressing explained:
-; +-----------------------------------------------+
-; |     HIGH BYTE       |   |   LOW BYTE          |
-; 0F 0E 0D 0C 0B 0A 09 08   07 06 05 04 03 02 01 00
-; -------------------------------------------------
-;  0  1  0 P1 P0 L2 L1 L0   Y2 Y1 Y0 X4 X3 X2 X1 X0
-;          |---| |------|   |------| |------------|
-;            |       |          |           |
-;            |       |          |           +-----| X0..X4 : BYTE IN THE CURRENT LINE 0..31 
-;            |       |          +-----------------| Y0..Y2 : CHARACTER POSITION IN THE SCREEN PART 0..7
-;            |       +----------------------------| L0..L2 : LINE IN THE CHARACTER 0..7
-;            +------------------------------------| P0/P1  : PART OF THE SCREEN
-inchl:  inc h
-        ld a,h
-        and 7
-        ret nz
-        ld a,h
-        sub 8
-        ld h,a
-        ld a,l
-        add a,32
-        ld l,a
-        ret nc
-        ld a,h
-        add a,8
-        ld h,a
-        ret
 
 ; SCROLL THE BUFFER WITH LETTER 
 buffer_roll_print:
@@ -70,16 +40,18 @@ buffer_roll_print:
         ld b,8
         ld a,(color)
         ld c, a
-s4:     ld a,0
+_s4:     
+        ld a,0
         sla (iy+0)
-        jr nc,s5
+        jr nc,_s5
         ld a, c
-s5:     ld (hl), a
+_s5:     
+        ld (hl), a
         add hl,de
         ld (hl), a
         add hl,de
         inc iy
-        djnz s4
+        djnz _s4
         ret
 
 ; SCROLL ATTRIBUTES MEMORY 
@@ -88,7 +60,6 @@ screen_scroll:
         ld de, APOS
         ld bc, 16*32-1
         ldir
-
         ret
 
 print_char:
@@ -101,7 +72,8 @@ print_char:
         add hl, de      ; calculate offset into charter list
         ld de, buf
         ld b,8
-p1:     ld a, (hl)
+_p1:     
+        ld a, (hl)
         push bc
         ld c,a
         srl a
@@ -112,7 +84,7 @@ p1:     ld a, (hl)
         inc hl
         inc de
         pop bc
-        djnz p1
+        djnz _p1
         ret
 
 black_screen:
