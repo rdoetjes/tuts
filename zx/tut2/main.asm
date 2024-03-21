@@ -21,6 +21,7 @@ l02:    ld a,(ix+0)
 l01:    push bc
 
         halt          ; wait till next irq
+        halt          ; wait till next irq
 
         call screen_scroll
         call buffer_roll_print
@@ -139,7 +140,7 @@ black_screen:
 color:  defb %00100001
 buf:    defs 8
 
-text:   defb "RETRO IS THE NEW BLACK!!!    ",0
+text:   defb "RETRO IS THE NEW BLACK, BY WOLFGANG KIERDORF!!!    ",0
 
         end $8000
 ; vim: ft=z8a
