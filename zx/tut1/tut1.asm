@@ -41,7 +41,6 @@ CLS
     ret
 
 HELLOWORLD: 
-    defb 22,10,10,"Hello, world"
-    defb 13, 0
-
+    defb 22,11,(32-(E_HELLOWORLD-HELLOWORLD-2))/2,"Thanks, Wolfgang",0
+E_HELLOWORLD
 end $8000
