@@ -1,9 +1,5 @@
 * = $1000
 
-main:
-    lda #0
-    sta bytes+1
-
 loop:
     clc
     lda bytes+3
