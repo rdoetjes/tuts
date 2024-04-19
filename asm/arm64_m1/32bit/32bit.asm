@@ -1,4 +1,6 @@
 .global _start                      //_start is the starting address for MacOS
+
+.text
 .align 4                            //align on even boundaries, to satisfy drawin
 
 _start:
