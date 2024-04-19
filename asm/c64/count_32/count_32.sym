@@ -1,4 +1,0 @@
-.label loop=$1005
-.label bytes=$102f
-.label main=$1000
-.label done=$102e
