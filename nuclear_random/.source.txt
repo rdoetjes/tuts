@@ -48,7 +48,6 @@ loop:
     jsr     $ff84           
     rts
 
-
 //
 //SUBROUTINES
 //
