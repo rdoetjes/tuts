@@ -149,7 +149,7 @@ print_bit_pattern:
 
     !draw_bit:
     rol bit_pattern
-    sta SCREEN_MEM,y    // draw the bit to the screen starting from 400 with offset y
+    sta SCREEN_MEM+500-4,y    // draw the bit to the screen starting from 400 with offset y
     dey                 // decrement the bit counter
     bne !loop-          // if bit counter is not 0 then loop again
 
