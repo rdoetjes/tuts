@@ -1,0 +1,14 @@
+.label wait_for_raster_line=$104f
+.label shift_add_1=$1070
+.label bit_pattern=$20ff
+.label wait_for_decay_pulse=$1057
+.label main=$1000
+.label reset_y=$1087
+.label start_timer_b=$1049
+.label shift_add_nothing=$1068
+.label loop=$1006
+.label mask_lowest_bit=$105f
+.label setup=$103a
+.label prep_for_next_bit=$107a
+.label random_bytes=$2000
+.label print_bit_pattern=$1091
