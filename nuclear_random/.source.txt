@@ -96,6 +96,7 @@ mask_lowest_bit:
 shift_add_nothing:
     lda random_bytes,X  // load the current random byte (X is the offset into the 255 random bytes)
     asl                 // if even just shift result left without adding one to the result
+    jsr print_bit_pattern
     jsr prep_for_next_bit // set everything up for the next bit (or next byte)
     rts
 
@@ -104,6 +105,7 @@ shift_add_1:
     lda random_bytes,X  // load the current random byte (X is the offset into the 255 random bytes)
     asl                 // shift the temporary random result left
     ora #$01            // add one to the result
+    jsr print_bit_pattern
     jsr prep_for_next_bit   // set everything up for the next bit (or next byte)
     rts
 
