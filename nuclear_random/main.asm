@@ -19,8 +19,6 @@ main:
     jsr start_timer_b
 
 loop:
-    lda random_dice_ptr
-    sta SCREEN_MEM+2
     // the detector has a 10ms pulse so we wait max 40ms for the next decay, so we don't flood the whole byte with same bit 
     jsr wait_for_raster_line    // give a 20 ms wait
     jsr wait_for_raster_line    // give a 20 ms wait
@@ -43,6 +41,7 @@ loop:
 
 //sets up the counters
 setup:
+    jsr $e544       // kernal clear screen
     lda CONT_TIMER_B       // load the configuration of TIMER B	   
     and #%1000101   // configure to count clock cycles
     ora #%0000000   // start the timer
