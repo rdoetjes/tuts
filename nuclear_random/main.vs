@@ -1,13 +1,11 @@
-al C:109b .random_byte
-al C:109c .random_dice_ptr
+al C:109a .random_byte
+al C:109b .random_dice_ptr
 al C:103b .wait_for_raster_line
-al C:109d .random_dice
 al C:1059 .shift_add_1
 al C:1076 .print_dice
 al C:1043 .wait_for_decay_pulse
 al C:80b .upstartEnd
 al C:1000 .main
-al C:10a3 .random_dice_end
 al C:1070 .reset_y
 al C:1035 .start_timer_b
 al C:1051 .shift_add_nothing

@@ -118,7 +118,7 @@ print_dice:
     clc
     lda random_dice_ptr
     adc #1
-    cmp #random_dice_end-random_dice
+    cmp #6
     bcs !reset_dice_ptr+
 
     sta random_dice_ptr
@@ -133,13 +133,11 @@ print_dice:
     bne !keep_rolling-
 
     // draw
-    ldx random_dice_ptr
-    lda random_dice, x
+    lda random_dice_ptr
+    adc #49
     sta SCREEN_MEM+500
     rts
 
 // array that holds the 255 random bytes that were generated
 random_byte:        .byte 00
 random_dice_ptr:    .byte 00
-random_dice:        .byte '1', '2', '3', '4', '5', '6'
-random_dice_end:    

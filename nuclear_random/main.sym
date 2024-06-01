@@ -1,12 +1,10 @@
-.label random_byte=$109b
-.label random_dice_ptr=$109c
+.label random_byte=$109a
+.label random_dice_ptr=$109b
 .label wait_for_raster_line=$103b
-.label random_dice=$109d
 .label shift_add_1=$1059
 .label print_dice=$1076
 .label wait_for_decay_pulse=$1043
 .label main=$1000
-.label random_dice_end=$10a3
 .label reset_y=$1070
 .label start_timer_b=$1035
 .label shift_add_nothing=$1051
