@@ -1,0 +1,3 @@
+.label loop=$1000
+.label bytes=$102d
+.label done=$102c
