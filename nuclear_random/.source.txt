@@ -32,7 +32,7 @@ loop:
     beq !back_to_basic+         // if sub routine set Z flag then exit to basic
     jmp loop                    // read the next pulse
 
-!shift_add_1:   
+    !shift_add_1:   
     jsr shift_add_1             // shift left and add 1 to the intermediate result in random_result byte that offset x points to
     beq !back_to_basic+         // if subroutine set Z flag then exit to basic
     jmp loop                    // read next bit
