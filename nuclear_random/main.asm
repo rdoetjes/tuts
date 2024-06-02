@@ -81,7 +81,7 @@ wait_for_decay_pulse:
    !await_pulse:
     //poll joystick button, a button press is a tick from the geiger counter
     lda JOYSTICK_2      // read joystick 2
-    and #$10            // check button pressed
+    and #%11101111            // check button pressed
     bne !await_pulse-   // no new decay measured than wait
     rts
 
