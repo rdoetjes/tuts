@@ -35,6 +35,7 @@ loop:
     !shift_add_1:   
     jsr shift_add_1             // shift left and add 1 to the intermediate result in random_result byte that offset x points to
     beq !back_to_basic+         // if subroutine set Z flag then exit to basic
+    jsr wait_for_pulse_to_release // wait for the joystick button to be released
     jmp loop                    // read next bit
 
 //Exit to basic gracefully
@@ -83,6 +84,15 @@ wait_for_decay_pulse:
     lda JOYSTICK_2      // read joystick 2
     cmp #127
     beq !await_pulse-   // no new decay measured than wait
+    rts
+
+// wait for the joystick button (which is triggered by the geiger counter when a isotope decays)
+wait_for_pulse_to_release:
+   !await_pulse:
+    //poll joystick button, a button press is a tick from the geiger counter
+    lda JOYSTICK_2      // read joystick 2
+    cmp #127
+    bne !await_pulse-   // no new decay measured than wait
     rts
 
 // mask the lowerst bit of timer b LSB value
