@@ -31,7 +31,6 @@ setup:
     and #%1000101   // configure to count clock cycles
     ora #%0000000   // start the timer
     sta CONT_TIMER_B       // store the timer config and start
-    ldx #$00        // offset ponter into random_bytes array 
     ldy #$00        // ofset pointer to bit in the random_byte pointed to by random_bytes+x
 
     sei                          //stop interrupts
@@ -55,7 +54,6 @@ irq:
     tax
     pha
 
-    ldx x                       //load x with the offset into the random_bytes array
     ldy y                       //load y with the offset into the random_byte pointed to by random_bytes+x
     jsr mask_lowest_bit         //mask the lowest bit of timer B and if 1 shift without add if 0 shift with add of 1
     bne !shift_add_1+           // if 0 shift left and add one
@@ -132,6 +130,4 @@ reset_y:
 *=$2000 "random bytes"
 // array that holds the 255 random bytes that were generated
 random_byte: .byte 0
-bit_pattern: .byte 0
-x: .byte 0
 y: .byte 0
