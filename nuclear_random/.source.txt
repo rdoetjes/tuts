@@ -1,9 +1,7 @@
 // The idea is that we have a free running timer that is incremented by the CPU clock. 
-// When a decay happens the joystick button is pressed by a transistor connected between fire button and ground.
-// As the button is pressed the LSB of the timer B is read and shifted into a byte when 8 bits are filled we have
+// When a decay happens the /FLAG2 on the user port id pulled low by a transistor and an NMI is triggered
+// As the NMI is triggered, the LSB of the timer B is read and shifted into a byte when 8 bits are filled we have
 // a truly random byte generated
-// we actually generate 255 bytes in total, so we can do some analysis on the distribution of the bytes
-// those random bytes start at $2000 (8192)
 // Since we use a free running timer that we read when a decay happens, we avoid system entropy.
 .const CONT_TIMER_B = $DC0F 
 .const LSB_TIMER_B = $DC06 
