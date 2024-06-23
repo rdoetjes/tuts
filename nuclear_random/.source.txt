@@ -40,7 +40,7 @@ setup:
     lda #>irq                   // setup high byte irq handler
     sta INTERRUPT_VECTOR_HI     // store the high byte of the interrupt handler
 
-    lda #%10010000               // enable NMI interrupts for FLAG and VBLANK
+    lda #%10010000               // enable NMI interrupts for FLAG
     sta $DD0D                    // store the interrupt flags
     cli
     rts
