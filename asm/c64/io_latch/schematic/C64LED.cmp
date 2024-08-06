@@ -1,0 +1,131 @@
+Cmp-Mod V01 Created by PcbNew   date = 2020 March 07, Saturday 02:07:06
+
+BeginCmp
+TimeStamp = 5E6313F8
+Path = /5E86DF3A
+Reference = J2;
+ValeurCmp = Barrel_Jack;
+IdModule  = Connector_BarrelJack:BarrelJack_CUI_PJ-063AH_Horizontal_CircularHoles;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E631367
+Path = /5E64BB67
+Reference = BAR2;
+ValeurCmp = HDSP-4830_2;
+IdModule  = Display:HDSP-4830;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E637474
+Path = /5E910F75
+Reference = U1;
+ValeurCmp = 74LS541;
+IdModule  = Package_DIP:DIP-20_W7.62mm_Socket;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E6374A4
+Path = /5E91DBB1
+Reference = U2;
+ValeurCmp = 74LS541;
+IdModule  = Package_DIP:DIP-20_W7.62mm_Socket;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E6313DB
+Path = /5E728117
+Reference = J1;
+ValeurCmp = Conn_01x10_Male;
+IdModule  = Connector_PinHeader_2.54mm:PinHeader_1x10_P2.54mm_Vertical;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E63133F
+Path = /5E644CA2
+Reference = BAR1;
+ValeurCmp = HDSP-4830_2;
+IdModule  = Display:HDSP-4830;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E63137C
+Path = /5E67CF03
+Reference = C1;
+ValeurCmp = .1uF;
+IdModule  = Capacitor_THT:C_Disc_D6.0mm_W2.5mm_P5.00mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E63138F
+Path = /5E67DFA2
+Reference = C2;
+ValeurCmp = .1uF;
+IdModule  = Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E6313A2
+Path = /5E67EAF0
+Reference = C3;
+ValeurCmp = .1uF;
+IdModule  = Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E63140A
+Path = /5E7D5AC0
+Reference = Q1;
+ValeurCmp = BC547;
+IdModule  = Package_TO_SOT_THT:TO-92_Inline;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E63141D
+Path = /5E7F2E86
+Reference = R1;
+ValeurCmp = 100K;
+IdModule  = Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E631430
+Path = /5E7D82FC
+Reference = R2;
+ValeurCmp = 1K;
+IdModule  = Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E63145F
+Path = /5E651E4A
+Reference = RN1;
+ValeurCmp = R_Network08;
+IdModule  = Resistor_THT:R_Array_SIP9;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E63147B
+Path = /5E658308
+Reference = RN2;
+ValeurCmp = R_Network08;
+IdModule  = Resistor_THT:R_Array_SIP9;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E62F880
+Path = /5E64C9E5
+Reference = D1;
+ValeurCmp = GP0240;
+IdModule  = Diode_THT:D_DO-34_SOD68_P7.62mm_Horizontal;
+EndCmp
+
+BeginCmp
+TimeStamp = 5E62F89A
+Path = /5E662957
+Reference = U3;
+ValeurCmp = L7805;
+IdModule  = Package_TO_SOT_THT:TO-220-3_Vertical;
+EndCmp
+
+EndListe
