@@ -72,16 +72,25 @@ const GameState = struct {
             scroller.update();
         }
         
-        self.l1[0] += 0.0;
-        self.l1[1] += 0.1;
-        self.l1[2] += 0.4;
-        self.l1[3] += 0.6;
-        self.l1[4] += 0.8;
-        self.l1[5] += 1.0;
+        self.l1[0] += -0.0;
+        self.l1[1] += -0.1;
+        self.l1[2] += -0.4;
+        self.l1[3] += -0.6;
+        self.l1[4] += -0.8;
+        self.l1[5] += -1.0;
+
+        var i: usize = 0;
+        for (self.layers.items) |_| {
+            if (self.l1[i] < 0) {
+                self.l1[i] = 640.0;
+            }
+            i += 1;
+        }
     }
 
     pub fn draw(self: GameState) void {
         rl.clearBackground(rl.Color.white);
+
         var i: usize = 0;
         for (self.layers.items) |layer| {
             rl.drawTextureEx(layer, rl.Vector2.init(self.l1[i], 0), 0.0, 2.0, rl.Color.white);
