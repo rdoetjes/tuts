@@ -2,8 +2,8 @@ const rl = @import("raylib");
 const std = @import("std");
 const ArrayList = std.ArrayList;
 
-const SCREEN_WIDTH = 1200;
-const SCREEN_HEIGHT = 400;
+const SCREEN_WIDTH = 640;
+const SCREEN_HEIGHT = 480;
 
 const Position = struct {
     x: i32,
@@ -43,12 +43,21 @@ const Scroller = struct {
 
 const GameState = struct {
     scrollers: ArrayList(Scroller),
+    layers: ArrayList(rl.Texture2D),
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         var scrollers = ArrayList(Scroller).init(allocator);
         try scrollers.append(Scroller.init("Your first scroller in ZIG", SCREEN_WIDTH, -450, SCREEN_HEIGHT*0.25, -5));
         try scrollers.append(Scroller.init("This one scrolls slower", -300, SCREEN_WIDTH, SCREEN_HEIGHT*0.75, 2));
-        return GameState{ .scrollers = scrollers };
+        
+        var layers = ArrayList(rl.Texture2D).init(allocator);
+        for (0..6) |l| {
+            const layer_name = std.fmt.allocPrintZ(allocator, "layers/l{}.png", .{l}) catch return error.OutOfMemory;
+            defer allocator.free(layer_name);
+            
+            try layers.append(rl.loadTexture(layer_name));
+        }
+        return GameState{ .scrollers = scrollers,  .layers = layers,};
     }
 
     pub fn deinit(self: *GameState) void {
@@ -63,7 +72,9 @@ const GameState = struct {
 
     pub fn draw(self: GameState) void {
         rl.clearBackground(rl.Color.white);
-
+        for (self.layers.items) |layer| {
+            rl.drawTextureEx(layer, rl.Vector2.init(0, 0), 0.0, 2.0, rl.Color.white);
+        }
         for (self.scrollers.items) |scroller| {
             scroller.draw();
         }
@@ -72,14 +83,15 @@ const GameState = struct {
 
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
-    var game_state = try GameState.init(allocator);
-    defer game_state.deinit();
-
+ 
     rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Simple Test Scroller");
     defer rl.closeWindow();
 
-    rl.setTargetFPS(60);
+    var game_state = try GameState.init(allocator);
+    defer game_state.deinit();
 
+    rl.setTargetFPS(60);
+        
     while (!rl.windowShouldClose()) {
         game_state.update();
 
