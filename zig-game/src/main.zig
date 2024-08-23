@@ -44,6 +44,7 @@ const Scroller = struct {
 const GameState = struct {
     scrollers: ArrayList(Scroller),
     layers: ArrayList(rl.Texture2D),
+    l1: [6]f32,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         var scrollers = ArrayList(Scroller).init(allocator);
@@ -51,13 +52,15 @@ const GameState = struct {
         try scrollers.append(Scroller.init("This one scrolls slower", -300, SCREEN_WIDTH, SCREEN_HEIGHT*0.75, 2));
         
         var layers = ArrayList(rl.Texture2D).init(allocator);
+        var l1: [6]f32 = undefined;
         for (0..6) |l| {
-            const layer_name = std.fmt.allocPrintZ(allocator, "layers/l{}.png", .{l}) catch return error.OutOfMemory;
+            const layer_name = std.fmt.allocPrintZ(allocator, "layers/l{}.png", .{l+1}) catch return error.OutOfMemory;
             defer allocator.free(layer_name);
-            
             try layers.append(rl.loadTexture(layer_name));
+
+            l1[l] = 0.0;
         }
-        return GameState{ .scrollers = scrollers,  .layers = layers,};
+        return GameState{ .scrollers = scrollers,  .layers = layers, .l1=l1};
     }
 
     pub fn deinit(self: *GameState) void {
@@ -68,13 +71,24 @@ const GameState = struct {
         for (self.scrollers.items) |*scroller| {
             scroller.update();
         }
+        
+        self.l1[0] += 0.0;
+        self.l1[1] += 0.1;
+        self.l1[2] += 0.4;
+        self.l1[3] += 0.6;
+        self.l1[4] += 0.8;
+        self.l1[5] += 1.0;
     }
 
     pub fn draw(self: GameState) void {
         rl.clearBackground(rl.Color.white);
+        var i: usize = 0;
         for (self.layers.items) |layer| {
-            rl.drawTextureEx(layer, rl.Vector2.init(0100, 0), 0.0, 2.0, rl.Color.white);
+            rl.drawTextureEx(layer, rl.Vector2.init(self.l1[i], 0), 0.0, 2.0, rl.Color.white);
+            rl.drawTextureEx(layer, rl.Vector2.init(self.l1[i] - 640, 0), 0.0, 2.0, rl.Color.white);
+            i += 1;
         }
+
         for (self.scrollers.items) |scroller| {
             scroller.draw();
         }
