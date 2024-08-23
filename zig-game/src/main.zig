@@ -73,7 +73,7 @@ const GameState = struct {
     pub fn draw(self: GameState) void {
         rl.clearBackground(rl.Color.white);
         for (self.layers.items) |layer| {
-            rl.drawTextureEx(layer, rl.Vector2.init(0, 0), 0.0, 2.0, rl.Color.white);
+            rl.drawTextureEx(layer, rl.Vector2.init(0100, 0), 0.0, 2.0, rl.Color.white);
         }
         for (self.scrollers.items) |scroller| {
             scroller.draw();
