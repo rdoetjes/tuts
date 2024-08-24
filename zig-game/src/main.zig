@@ -5,6 +5,7 @@ const ArrayList = std.ArrayList;
 const SCREEN_WIDTH = 640;
 const SCREEN_HEIGHT = 480;
 const BG_IMAGE_WIDTH = 320;
+const GLSL_VERSION = 330;
 
 const Position = struct {
     x: i32,
@@ -45,6 +46,7 @@ const Scroller = struct {
 const GameState = struct {
     scrollers: ArrayList(Scroller),
     layers: ArrayList(rl.Texture2D),
+
     l1: [6]f32,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
@@ -55,13 +57,14 @@ const GameState = struct {
         var layers = ArrayList(rl.Texture2D).init(allocator);
         var l1: [6]f32 = undefined;
         for (0..6) |l| {
-            const layer_name = std.fmt.allocPrintZ(allocator, "layers/l{}.png", .{l+1}) catch return error.OutOfMemory;
+            const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{l+1}) catch return error.OutOfMemory;
             defer allocator.free(layer_name);
             try layers.append(rl.loadTexture(layer_name));
 
             l1[l] = 0.0;
         }
-        return GameState{ .scrollers = scrollers, .layers = layers, .l1=l1};
+
+        return GameState{ .scrollers = scrollers, .layers = layers, .l1=l1, };
     }
 
     pub fn deinit(self: *GameState) void {
@@ -93,6 +96,7 @@ const GameState = struct {
         rl.clearBackground(rl.Color.white);
 
         for (0..self.layers.items.len) |layer_nr| {
+
             rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, SCREEN_WIDTH/BG_IMAGE_WIDTH, rl.Color.white);
             rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, SCREEN_WIDTH/BG_IMAGE_WIDTH, rl.Color.white);
 
@@ -101,7 +105,7 @@ const GameState = struct {
                 for (self.scrollers.items) |scroller| {
                     scroller.draw();
                 }
-            }
+            } 
         }
     }
 };
@@ -114,13 +118,13 @@ pub fn main() !void {
 
     var game_state = try GameState.init(allocator);
     defer game_state.deinit();
-
-    rl.setTargetFPS(60);
-        
+    
+    rl.setTargetFPS(60);        
     while (!rl.windowShouldClose()) {
         game_state.update();
 
         rl.beginDrawing();
+        
         game_state.draw();
         rl.endDrawing();
     }

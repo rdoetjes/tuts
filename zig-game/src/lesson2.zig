@@ -55,7 +55,7 @@ const GameState = struct {
         var layers = ArrayList(rl.Texture2D).init(allocator);
         var l1: [6]f32 = undefined;
         for (0..6) |l| {
-            const layer_name = std.fmt.allocPrintZ(allocator, "layers/l{}.png", .{l+1}) catch return error.OutOfMemory;
+            const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{l+1}) catch return error.OutOfMemory;
             defer allocator.free(layer_name);
             try layers.append(rl.loadTexture(layer_name));
 
