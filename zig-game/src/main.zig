@@ -61,11 +61,12 @@ const GameState = struct {
 
             l1[l] = 0.0;
         }
-        return GameState{ .scrollers = scrollers,  .layers = layers, .l1=l1};
+        return GameState{ .scrollers = scrollers, .layers = layers, .l1=l1};
     }
 
     pub fn deinit(self: *GameState) void {
         self.scrollers.deinit();
+        self.layers.deinit();
     }
 
     pub fn update(self: *GameState) void {
