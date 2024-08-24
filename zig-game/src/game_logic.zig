@@ -1,12 +1,18 @@
 const config = @import("config.zig");
 const gs = @import("game_state.zig");
+const gi = @import("game_input.zig");
 
 pub fn update(state: *gs.GameState) void {
     state.frameCounter += 1;
+    gi.handleInput(state);
+    reload_ammo(state);
+    shiftBgLayers(state);
+}
+
+fn reload_ammo(state: *gs.GameState) void {
     if (state.player.ammo < state.player.max_ammo and state.frameCounter % 25 == 0) {
         state.player.ammo += 1;
     }
-    shiftBgLayers(state);
 }
 
 pub fn player_right(state: *gs.GameState) void {
