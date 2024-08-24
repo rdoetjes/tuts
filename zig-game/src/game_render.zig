@@ -32,5 +32,6 @@ fn drawHud(state: gs.GameState, allocator: std.mem.Allocator) !void {
         state.score,
         fps,
     }) catch return error.OutOfMemory;
+    defer allocator.free(hud);
     rl.drawText(hud, 10, 10, 20, rl.Color.black);
 }
