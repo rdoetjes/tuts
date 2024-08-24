@@ -1,148 +1,17 @@
+const config = @import("config.zig");
 const rl = @import("raylib");
 const std = @import("std");
-const ArrayList = std.ArrayList;
-
-const SCREEN_WIDTH = 640;
-const SCREEN_HEIGHT = 480;
-const BG_IMAGE_WIDTH = 320;
-const GLSL_VERSION = 330;
-const PLAYFIELD_LAYER = 4;
-const NR_BG_LAYERS = 6;
-
-const Position = struct {
-    x: i32,
-    y: i32,
-};
-
-const Scroller = struct {
-    pos: Position,
-    msg: [*:0]const u8,
-    start_x_pos: i32,
-    end_x_pos: i32,
-    speed: i32,
-
-    pub fn init(msg: [*:0]const u8, start_x: i32, end_x: i32, start_y: i32, speed: i32) Scroller {
-        return .{
-            .msg = msg,
-            .pos = .{
-                .x = start_x,
-                .y = start_y,
-            },
-            .start_x_pos = start_x,
-            .end_x_pos = end_x,
-            .speed = speed,
-        };
-    }
-
-    pub fn update(self: *Scroller) void {
-        self.pos.x += self.speed;
-        if (self.speed < 0 and self.pos.x <= self.end_x_pos) {
-            self.pos.x = self.start_x_pos;
-        } else if (self.speed > 0 and self.pos.x >= self.end_x_pos) {
-            self.pos.x = self.start_x_pos;
-        }
-    }
-
-    pub fn draw(self: Scroller) void {
-        rl.drawText(self.msg, self.pos.x, self.pos.y, 20, rl.Color.red);
-    }
-};
-
-const GameState = struct {
-    scrollers: ArrayList(Scroller),
-    layers: ArrayList(rl.Texture2D),
-    score: u32,
-    l1: [NR_BG_LAYERS]f32,
-
-    pub fn init(allocator: std.mem.Allocator) !GameState {
-        var scrollers = ArrayList(Scroller).init(allocator);
-        try scrollers.append(Scroller.init("Your first scroller in ZIG", SCREEN_WIDTH, -450, SCREEN_HEIGHT * 0.25, -5));
-        try scrollers.append(Scroller.init("This one scrolls slower", -300, SCREEN_WIDTH, SCREEN_HEIGHT * 0.75, 2));
-
-        var layers = ArrayList(rl.Texture2D).init(allocator);
-        var l1: [6]f32 = undefined;
-        for (0..6) |i| {
-            const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{i + 1}) catch return error.OutOfMemory;
-            defer allocator.free(layer_name);
-            try layers.append(rl.loadTexture(layer_name));
-
-            l1[i] = 0.0;
-        }
-
-        return GameState{
-            .scrollers = scrollers,
-            .layers = layers,
-            .l1 = l1,
-            .score = 0,
-        };
-    }
-
-    pub fn deinit(self: *GameState) void {
-        self.scrollers.deinit();
-        self.layers.deinit();
-    }
-
-    pub fn update(self: *GameState) void {
-        for (self.scrollers.items) |*scroller| {
-            scroller.update();
-        }
-        shiftBgLayers(self);
-    }
-
-    pub fn draw(self: GameState, allocator: std.mem.Allocator) !void {
-        rl.clearBackground(rl.Color.white);
-
-        for (0..self.layers.items.len) |layer_nr| {
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, SCREEN_WIDTH / BG_IMAGE_WIDTH, rl.Color.white);
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, SCREEN_WIDTH / BG_IMAGE_WIDTH, rl.Color.white);
-
-            // this is the layer with the action
-            if (layer_nr == PLAYFIELD_LAYER) {
-                drawGameItems(self);
-            }
-        }
-        try drawHud(self, allocator);
-    }
-
-    fn shiftBgLayers(self: *GameState) void {
-        // shift the layers layer 0 with the sun and clouds remains stationary
-        self.l1[1] += -0.1;
-        self.l1[2] += -0.2;
-        self.l1[3] += -0.5;
-        self.l1[4] += -0.9;
-        self.l1[5] += -1.3;
-
-        //check if layer needs to be reset
-        for (0..self.layers.items.len) |layer_nr| {
-            if (self.l1[layer_nr] < 0) {
-                self.l1[layer_nr] = SCREEN_WIDTH;
-            }
-        }
-    }
-
-    fn drawGameItems(self: GameState) void {
-        for (self.scrollers.items) |scroller| {
-            scroller.draw();
-        }
-    }
-
-    fn drawHud(self: GameState, allocator: std.mem.Allocator) !void {
-        const fps = rl.getFPS();
-        const hud = std.fmt.allocPrintZ(allocator, "SCORE: {d:0<6}  FPS: {d}", .{
-            self.score,
-            fps,
-        }) catch return error.OutOfMemory;
-        rl.drawText(hud, 10, 10, 20, rl.Color.black);
-    }
-};
+const gs = @import("game_state.zig");
+const gl = @import("game_logic.zig");
+const gr = @import("game_render.zig");
 
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
-    rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Simple Test Scroller");
+    rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "Simple Test Scroller");
     defer rl.closeWindow();
 
-    var game_state = GameState.init(allocator) catch |err| {
+    var game_state = gs.GameState.init(allocator) catch |err| {
         std.log.err("Failed to initialize game state: {s}", .{@errorName(err)});
         return;
     };
@@ -150,10 +19,10 @@ pub fn main() !void {
 
     rl.setTargetFPS(60);
     while (!rl.windowShouldClose()) {
-        game_state.update();
+        gl.update(&game_state);
 
         rl.beginDrawing();
-        game_state.draw(allocator) catch |err| {
+        gr.draw(game_state, allocator) catch |err| {
             std.log.err("Failed to draw game state: {s}", .{@errorName(err)});
             return;
         };
