@@ -1,6 +1,6 @@
 const config = @import("config.zig");
 const rl = @import("raylib");
-const position = @import("game_position.zig");
+const position = @import("position.zig");
 
 pub const Scroller = struct {
     pos: position.Position,

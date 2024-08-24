@@ -1,6 +1,6 @@
 const config = @import("config.zig");
 const rl = @import("raylib");
-const pos = @import("game_position.zig");
+const pos = @import("position.zig");
 
 pub const Player = struct {
      pos: pos.Position,

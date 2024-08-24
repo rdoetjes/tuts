@@ -15,6 +15,8 @@ pub const GameState = struct {
     player: game_player.Player,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
+        const player = try game_player.Player.init();
+
         var scrollers = ArrayList(text_scroller.Scroller).init(allocator);
         try scrollers.append(text_scroller.Scroller.init("Your first scroller in ZIG", config.SCREEN_WIDTH, -450, config.SCREEN_HEIGHT * 0.25, -5));
         try scrollers.append(text_scroller.Scroller.init("This one scrolls slower", -300, config.SCREEN_WIDTH, config.SCREEN_HEIGHT * 0.75, 2));
@@ -27,8 +29,6 @@ pub const GameState = struct {
             try layers.append(rl.loadTexture(layer_name));
             l1[i] = 0.0;
         }
-
-        const player = try game_player.Player.init();
         
         return GameState{
             .scrollers = scrollers,
