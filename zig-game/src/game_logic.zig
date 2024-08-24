@@ -9,12 +9,6 @@ pub fn update(state: *gs.GameState) void {
     shiftBgLayers(state);
 }
 
-fn reload_ammo(state: *gs.GameState) void {
-    if (state.player.ammo < state.player.max_ammo and state.frameCounter % 25 == 0) {
-        state.player.ammo += 1;
-    }
-}
-
 pub fn player_right(state: *gs.GameState) void {
     if (state.player.pos.x < config.SCREEN_WIDTH-state.player.sprite.width) { 
         state.player.pos.x += state.player.speed;
@@ -58,5 +52,11 @@ fn shiftBgLayers(state: *gs.GameState) void {
         if (state.l1[layer_nr] < 0) {
             state.l1[layer_nr] = config.SCREEN_WIDTH;
         }
+    }
+}
+
+fn reload_ammo(state: *gs.GameState) void {
+    if (state.player.ammo < state.player.max_ammo and state.frameCounter % 25 == 0) {
+        state.player.ammo += 1;
     }
 }
