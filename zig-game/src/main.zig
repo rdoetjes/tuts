@@ -4,6 +4,7 @@ const ArrayList = std.ArrayList;
 
 const SCREEN_WIDTH = 640;
 const SCREEN_HEIGHT = 480;
+const BG_IMAGE_WIDTH = 320;
 
 const Position = struct {
     x: i32,
@@ -91,8 +92,8 @@ const GameState = struct {
         rl.clearBackground(rl.Color.white);
 
         for (0..self.layers.items.len) |layer_nr| {
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, 2.0, rl.Color.white);
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, 2.0, rl.Color.white);
+            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, SCREEN_WIDTH/BG_IMAGE_WIDTH, rl.Color.white);
+            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, SCREEN_WIDTH/BG_IMAGE_WIDTH, rl.Color.white);
 
             // this is the layer with the action
             if (layer_nr==4){  
