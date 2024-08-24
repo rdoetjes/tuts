@@ -21,7 +21,7 @@ pub fn main() !void {
     while (!rl.windowShouldClose()) {
         gl.update(&game_state);
 
-        gr.draw(game_state, allocator) catch |err| {
+        gr.draw(game_state) catch |err| {
             std.log.err("Failed to draw game state: {s}", .{@errorName(err)});
             gs.GameState.deinit(&game_state);
             return;

@@ -9,6 +9,7 @@ pub const GameState = struct {
     scrollers: ArrayList(text_scroller.Scroller),
     layers: ArrayList(rl.Texture2D),
     score: u32,
+    allocator: std.mem.Allocator,
     l1: [config.NR_BG_LAYERS]f32,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
@@ -30,6 +31,7 @@ pub const GameState = struct {
             .scrollers = scrollers,
             .layers = layers,
             .l1 = l1,
+            .allocator = allocator,
             .score = 0,
         };
     }
