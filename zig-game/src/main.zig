@@ -94,6 +94,7 @@ const GameState = struct {
             rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, 2.0, rl.Color.white);
             rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, 2.0, rl.Color.white);
 
+            // this is the layer with the action
             if (layer_nr==4){  
                 for (self.scrollers.items) |scroller| {
                     scroller.draw();
