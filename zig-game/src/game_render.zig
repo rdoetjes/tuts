@@ -22,15 +22,14 @@ pub fn draw(state: gs.GameState) !void {
 
 fn drawGameItems(state: gs.GameState) void {
     state.player.draw();
-    for (state.scrollers.items) |scroller| {
-        scroller.draw();
-    }
 }
 
 fn drawHud(state: gs.GameState) !void {
     const fps = rl.getFPS();
-    const hud = std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0<6}  FPS: {d}", .{
+    const hud = std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}  AMMO: {d:0>3}  HEALTH: {d:0>2}  FPS: {d}", .{
         state.score,
+        state.player.ammo,
+        state.player.health,
         fps,
     }) catch return error.OutOfMemory;
     defer state.allocator.free(hud);

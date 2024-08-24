@@ -19,4 +19,8 @@ pub fn handleInput(state: *gs.GameState) void {
     if (rl.isKeyDown(rl.KeyboardKey.key_down)) {
        gl.player_down(state);
     }
+
+     if (rl.isKeyDown(rl.KeyboardKey.key_space)) {
+       gl.player_fire(state);
+    }
 }

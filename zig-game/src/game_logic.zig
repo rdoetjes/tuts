@@ -2,7 +2,10 @@ const config = @import("config.zig");
 const gs = @import("game_state.zig");
 
 pub fn update(state: *gs.GameState) void {
-    scrollText(state);
+    state.frameCounter += 1;
+    if (state.player.ammo < 255 and state.frameCounter % 25 == 0) {
+        state.player.ammo += 1;
+    }
     shiftBgLayers(state);
 }
 
@@ -30,6 +33,12 @@ pub fn player_down(state: *gs.GameState) void {
     }
 }
 
+pub fn player_fire(state: *gs.GameState) void {
+    if (state.player.ammo > 0) {
+        state.player.ammo -= 1;
+    }
+}
+
 
 fn shiftBgLayers(state: *gs.GameState) void {
     // shift the layers layer 0 with the sun and clouds remains stationary
@@ -44,11 +53,5 @@ fn shiftBgLayers(state: *gs.GameState) void {
         if (state.l1[layer_nr] < 0) {
             state.l1[layer_nr] = config.SCREEN_WIDTH;
         }
-    }
-}
-
-fn scrollText(state: *gs.GameState) void {
-    for (state.scrollers.items) |*scroller| {
-        scroller.update();
     }
 }
