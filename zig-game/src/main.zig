@@ -96,10 +96,12 @@ const GameState = struct {
             rl.drawTextureEx(layer, rl.Vector2.init(self.l1[i], 0), 0.0, 2.0, rl.Color.white);
             rl.drawTextureEx(layer, rl.Vector2.init(self.l1[i] - 640, 0), 0.0, 2.0, rl.Color.white);
             i += 1;
-        }
 
-        for (self.scrollers.items) |scroller| {
-            scroller.draw();
+            if (i==5){  
+                for (self.scrollers.items) |scroller| {
+                    scroller.draw();
+                }
+            }
         }
     }
 };
