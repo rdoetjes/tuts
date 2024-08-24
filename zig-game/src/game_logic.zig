@@ -39,7 +39,6 @@ pub fn player_fire(state: *gs.GameState) void {
     }
 }
 
-
 fn shiftBgLayers(state: *gs.GameState) void {
     // shift the layers layer 0 with the sun and clouds remains stationary
     state.l1[1] += -0.1;
