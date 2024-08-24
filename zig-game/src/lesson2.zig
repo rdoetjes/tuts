@@ -50,6 +50,7 @@ const Scroller = struct {
 const GameState = struct {
     scrollers: ArrayList(Scroller),
     layers: ArrayList(rl.Texture2D),
+    score: u32,
 
     l1: [6]f32,
 
@@ -72,6 +73,7 @@ const GameState = struct {
             .scrollers = scrollers,
             .layers = layers,
             .l1 = l1,
+            .score = 0,
         };
     }
 
@@ -100,7 +102,16 @@ const GameState = struct {
         }
     }
 
-    pub fn draw(self: GameState) void {
+    fn drawHud(self: GameState, allocator: std.mem.Allocator) !void {
+        const fps = rl.getFPS();
+        const hud = std.fmt.allocPrintZ(allocator, "SCORE: {d:0<6}  FPS: {d:0<2}", .{
+            self.score,
+            fps,
+        }) catch return error.OutOfMemory;
+        rl.drawText(hud, 10, 10, 20, rl.Color.black);
+    }
+
+    pub fn draw(self: GameState, allocator: std.mem.Allocator) !void {
         rl.clearBackground(rl.Color.white);
 
         for (0..self.layers.items.len) |layer_nr| {
@@ -114,6 +125,7 @@ const GameState = struct {
                 }
             }
         }
+        try drawHud(self, allocator);
     }
 };
 
@@ -123,7 +135,10 @@ pub fn main() !void {
     rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Simple Test Scroller");
     defer rl.closeWindow();
 
-    var game_state = try GameState.init(allocator);
+    var game_state = GameState.init(allocator) catch |err| {
+        std.log.err("Failed to initialize game state: {s}", .{@errorName(err)});
+        return;
+    };
     defer game_state.deinit();
 
     rl.setTargetFPS(60);
@@ -131,8 +146,10 @@ pub fn main() !void {
         game_state.update();
 
         rl.beginDrawing();
-
-        game_state.draw();
+        game_state.draw(allocator) catch |err| {
+            std.log.err("Failed to draw game state: {s}", .{@errorName(err)});
+            return;
+        };
         rl.endDrawing();
     }
 }
