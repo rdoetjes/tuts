@@ -82,7 +82,7 @@ const GameState = struct {
     pub fn update(self: *GameState) void {
         for (self.scrollers.items) |*scroller| {
             scroller.update();
-        };
+        }
 
         // shift the layers
         self.l1[1] += -0.1;
