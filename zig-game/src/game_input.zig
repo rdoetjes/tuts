@@ -12,11 +12,9 @@ pub fn handleInput(state: *gs.GameState) void {
        gl.player_left(state);
     }
 
-
     if (rl.isKeyDown(rl.KeyboardKey.key_up)) {
        gl.player_up(state);
     }
-
 
     if (rl.isKeyDown(rl.KeyboardKey.key_down)) {
        gl.player_down(state);
