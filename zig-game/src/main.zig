@@ -80,9 +80,9 @@ const GameState = struct {
         self.l1[5] += -1.0;
 
         //check if layer needs to be reset
-        for (0..self.layers.items.len) |i| {
-            if (self.l1[i] < 0) {
-                self.l1[i] = 640.0;
+        for (0..self.layers.items.len) |layer_nr| {
+            if (self.l1[layer_nr] < 0) {
+                self.l1[layer_nr] = 640.0;
             }
         }
     }
@@ -90,13 +90,11 @@ const GameState = struct {
     pub fn draw(self: GameState) void {
         rl.clearBackground(rl.Color.white);
 
-        var i: usize = 0;
         for (0..self.layers.items.len) |layer_nr| {
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[i], 0), 0.0, 2.0, rl.Color.white);
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[i] - 640, 0), 0.0, 2.0, rl.Color.white);
-            i += 1;
+            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, 2.0, rl.Color.white);
+            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - 640, 0), 0.0, 2.0, rl.Color.white);
 
-            if (i==5){  
+            if (layer_nr==4){  
                 for (self.scrollers.items) |scroller| {
                     scroller.draw();
                 }
