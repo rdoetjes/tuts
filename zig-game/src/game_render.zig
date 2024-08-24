@@ -3,7 +3,7 @@ const std = @import("std");
 const rl = @import("raylib");
 const gs = @import("game_state.zig");
 
-pub fn draw(state: gs.GameState, allocator: std.mem.Allocator) !void {
+pub fn draw(state: gs.GameState) !void {
     rl.beginDrawing();
     rl.clearBackground(rl.Color.white);
 
@@ -16,7 +16,7 @@ pub fn draw(state: gs.GameState, allocator: std.mem.Allocator) !void {
             drawGameItems(state);
         }
     }
-    try drawHud(state, allocator);
+    try drawHud(state);
     rl.endDrawing();
 }
 
@@ -26,12 +26,12 @@ fn drawGameItems(state: gs.GameState) void {
     }
 }
 
-fn drawHud(state: gs.GameState, allocator: std.mem.Allocator) !void {
+fn drawHud(state: gs.GameState) !void {
     const fps = rl.getFPS();
-    const hud = std.fmt.allocPrintZ(allocator, "SCORE: {d:0<6}  FPS: {d}", .{
+    const hud = std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0<6}  FPS: {d}", .{
         state.score,
         fps,
     }) catch return error.OutOfMemory;
-    defer allocator.free(hud);
+    defer state.allocator.free(hud);
     rl.drawText(hud, 10, 10, 20, rl.Color.black);
 }
