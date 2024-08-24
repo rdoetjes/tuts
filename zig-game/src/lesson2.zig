@@ -7,6 +7,7 @@ const SCREEN_HEIGHT = 480;
 const BG_IMAGE_WIDTH = 320;
 const GLSL_VERSION = 330;
 const PLAYFIELD_LAYER = 4;
+const NR_BG_LAYERS = 6;
 
 const Position = struct {
     x: i32,
@@ -51,8 +52,7 @@ const GameState = struct {
     scrollers: ArrayList(Scroller),
     layers: ArrayList(rl.Texture2D),
     score: u32,
-
-    l1: [6]f32,
+    l1: [NR_BG_LAYERS]f32,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         var scrollers = ArrayList(Scroller).init(allocator);
@@ -61,12 +61,12 @@ const GameState = struct {
 
         var layers = ArrayList(rl.Texture2D).init(allocator);
         var l1: [6]f32 = undefined;
-        for (0..6) |l| {
-            const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{l + 1}) catch return error.OutOfMemory;
+        for (0..6) |i| {
+            const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{i + 1}) catch return error.OutOfMemory;
             defer allocator.free(layer_name);
             try layers.append(rl.loadTexture(layer_name));
 
-            l1[l] = 0.0;
+            l1[i] = 0.0;
         }
 
         return GameState{
@@ -86,8 +86,26 @@ const GameState = struct {
         for (self.scrollers.items) |*scroller| {
             scroller.update();
         }
+        shiftBgLayers(self);
+    }
 
-        // shift the layers
+    pub fn draw(self: GameState, allocator: std.mem.Allocator) !void {
+        rl.clearBackground(rl.Color.white);
+
+        for (0..self.layers.items.len) |layer_nr| {
+            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, SCREEN_WIDTH / BG_IMAGE_WIDTH, rl.Color.white);
+            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, SCREEN_WIDTH / BG_IMAGE_WIDTH, rl.Color.white);
+
+            // this is the layer with the action
+            if (layer_nr == PLAYFIELD_LAYER) {
+                drawItems(self);
+            }
+        }
+        try drawHud(self, allocator);
+    }
+
+    fn shiftBgLayers(self: *GameState) void {
+        // shift the layers layer 0 with the sun and clouds remains stationary
         self.l1[1] += -0.1;
         self.l1[2] += -0.2;
         self.l1[3] += -0.5;
@@ -102,30 +120,19 @@ const GameState = struct {
         }
     }
 
+    fn drawItems(self: GameState) void {
+        for (self.scrollers.items) |scroller| {
+            scroller.draw();
+        }
+    }
+
     fn drawHud(self: GameState, allocator: std.mem.Allocator) !void {
         const fps = rl.getFPS();
-        const hud = std.fmt.allocPrintZ(allocator, "SCORE: {d:0<6}  FPS: {d:0<2}", .{
+        const hud = std.fmt.allocPrintZ(allocator, "SCORE: {d:0<6}  FPS: {d}", .{
             self.score,
             fps,
         }) catch return error.OutOfMemory;
         rl.drawText(hud, 10, 10, 20, rl.Color.black);
-    }
-
-    pub fn draw(self: GameState, allocator: std.mem.Allocator) !void {
-        rl.clearBackground(rl.Color.white);
-
-        for (0..self.layers.items.len) |layer_nr| {
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, SCREEN_WIDTH / BG_IMAGE_WIDTH, rl.Color.white);
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, SCREEN_WIDTH / BG_IMAGE_WIDTH, rl.Color.white);
-
-            // this is the layer with the action
-            if (layer_nr == PLAYFIELD_LAYER) {
-                for (self.scrollers.items) |scroller| {
-                    scroller.draw();
-                }
-            }
-        }
-        try drawHud(self, allocator);
     }
 };
 
