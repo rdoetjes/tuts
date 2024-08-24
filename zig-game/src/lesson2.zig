@@ -98,7 +98,7 @@ const GameState = struct {
 
             // this is the layer with the action
             if (layer_nr == PLAYFIELD_LAYER) {
-                drawItems(self);
+                drawGameItems(self);
             }
         }
         try drawHud(self, allocator);
@@ -120,7 +120,7 @@ const GameState = struct {
         }
     }
 
-    fn drawItems(self: GameState) void {
+    fn drawGameItems(self: GameState) void {
         for (self.scrollers.items) |scroller| {
             scroller.draw();
         }
