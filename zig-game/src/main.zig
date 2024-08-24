@@ -82,7 +82,7 @@ const GameState = struct {
         //check if layer needs to be reset
         for (0..self.layers.items.len) |layer_nr| {
             if (self.l1[layer_nr] < 0) {
-                self.l1[layer_nr] = 640.0;
+                self.l1[layer_nr] = SCREEN_WIDTH;
             }
         }
     }
@@ -92,7 +92,7 @@ const GameState = struct {
 
         for (0..self.layers.items.len) |layer_nr| {
             rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr], 0), 0.0, 2.0, rl.Color.white);
-            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - 640, 0), 0.0, 2.0, rl.Color.white);
+            rl.drawTextureEx(self.layers.items[layer_nr], rl.Vector2.init(self.l1[layer_nr] - SCREEN_WIDTH, 0), 0.0, 2.0, rl.Color.white);
 
             if (layer_nr==4){  
                 for (self.scrollers.items) |scroller| {
