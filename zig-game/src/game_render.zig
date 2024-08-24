@@ -21,6 +21,7 @@ pub fn draw(state: gs.GameState) !void {
 }
 
 fn drawGameItems(state: gs.GameState) void {
+    state.player.draw();
     for (state.scrollers.items) |scroller| {
         scroller.draw();
     }

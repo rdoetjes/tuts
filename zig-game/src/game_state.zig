@@ -3,6 +3,7 @@ const rl = @import("raylib");
 const std = @import("std");
 const text_scroller = @import("game_text_scroller.zig");
 const game_logic = @import("game_logic.zig");
+const game_player = @import("player.zig");
 const ArrayList = std.ArrayList;
 
 pub const GameState = struct {
@@ -11,6 +12,7 @@ pub const GameState = struct {
     score: u32,
     allocator: std.mem.Allocator,
     l1: [config.NR_BG_LAYERS]f32,
+    player: game_player.Player,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         var scrollers = ArrayList(text_scroller.Scroller).init(allocator);
@@ -23,21 +25,24 @@ pub const GameState = struct {
             const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{i + 1}) catch return error.OutOfMemory;
             defer allocator.free(layer_name);
             try layers.append(rl.loadTexture(layer_name));
-
             l1[i] = 0.0;
         }
 
+        const player = try game_player.Player.init();
+        
         return GameState{
             .scrollers = scrollers,
             .layers = layers,
             .l1 = l1,
             .allocator = allocator,
             .score = 0,
+            .player = player,
         };
     }
 
     pub fn deinit(self: *GameState) void {
         self.scrollers.deinit();
         self.layers.deinit();
+        self.player.deinit();
     }
 };
