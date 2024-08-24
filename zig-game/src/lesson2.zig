@@ -21,11 +21,9 @@ pub fn main() !void {
     while (!rl.windowShouldClose()) {
         gl.update(&game_state);
 
-        rl.beginDrawing();
         gr.draw(game_state, allocator) catch |err| {
             std.log.err("Failed to draw game state: {s}", .{@errorName(err)});
             return;
         };
-        rl.endDrawing();
     }
 }

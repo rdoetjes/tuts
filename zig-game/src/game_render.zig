@@ -4,6 +4,7 @@ const rl = @import("raylib");
 const gs = @import("game_state.zig");
 
 pub fn draw(state: gs.GameState, allocator: std.mem.Allocator) !void {
+    rl.beginDrawing();
     rl.clearBackground(rl.Color.white);
 
     for (0..state.layers.items.len) |layer_nr| {
@@ -16,6 +17,7 @@ pub fn draw(state: gs.GameState, allocator: std.mem.Allocator) !void {
         }
     }
     try drawHud(state, allocator);
+    rl.endDrawing();
 }
 
 fn drawGameItems(state: gs.GameState) void {
