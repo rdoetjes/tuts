@@ -11,7 +11,7 @@ const pl = @import("player.zig");
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
-    rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "Simple Test Scroller");
+    rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "Simple Game");
     defer rl.closeWindow();
 
     rl.initAudioDevice();      
