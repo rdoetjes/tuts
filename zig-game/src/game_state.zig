@@ -15,6 +15,7 @@ pub const GameState = struct {
     frame_counter: u32,
     snd_gun: rl.Sound,
     snd_music: rl.Music,
+    font: rl.Font,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         const player = try game_player.Player.init();
@@ -30,6 +31,7 @@ pub const GameState = struct {
             l1[i] = 0.0;
         }
 
+        const font = rl.loadFontEx("resources/fonts/Blankenburg.ttf", 20, null);
         rl.playMusicStream(snd_music);
         
         return GameState{
@@ -41,6 +43,7 @@ pub const GameState = struct {
             .frame_counter = 0,
             .snd_gun = snd_gun,
             .snd_music = snd_music,
+            .font = font,
         };
     }
 
