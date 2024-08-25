@@ -48,6 +48,4 @@ fn drawHud(state: gs.GameState) !void {
     rl.drawTextEx(state.font, ammo,  (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH/2)-(ammo.len/2*11)), 10)), 30, 2, rl.Color.black);
     rl.drawTextEx(state.font, health,  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH-10)-(health.len*11)), 10)), 30, 2, rl.Color.black);
 
-
-    //rl.drawText(hud, 10, 10, 20, rl.Color.black);
 }
