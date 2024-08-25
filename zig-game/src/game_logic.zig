@@ -27,8 +27,9 @@ pub fn player_left(state: *gs.GameState) void {
 }
 
 pub fn player_up(state: *gs.GameState) void {
-    if (state.player.pos.y > 0) { 
+    if (state.player.pos.y > 0 and state.player.pos.x > 0) { 
         state.player.pos.y -= state.player.speed;
+        state.player.pos.x -= state.player.speed/2;
         state.player.rot = -20;
     }
 }
@@ -37,16 +38,16 @@ pub fn player_up_release(state: *gs.GameState) void {
         state.player.rot = -10;
 }
 
+pub fn player_down(state: *gs.GameState) void {
+    if (state.player.pos.y < config.SCREEN_HEIGHT-state.player.sprite.height and state.player.pos.x < config.SCREEN_WIDTH-state.player.sprite.width) { 
+        state.player.pos.y += state.player.speed;
+        state.player.pos.x += state.player.speed;
+        state.player.rot = 20;
+    }
+}
 
 pub fn player_down_release(state: *gs.GameState) void {
         state.player.rot = 10;
-}
-
-pub fn player_down(state: *gs.GameState) void {
-    if (state.player.pos.y < config.SCREEN_HEIGHT-state.player.sprite.height) { 
-        state.player.pos.y += state.player.speed;
-        state.player.rot = 20;
-    }
 }
 
 pub fn player_fire(state: *gs.GameState) void {
