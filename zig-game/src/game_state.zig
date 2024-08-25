@@ -7,6 +7,9 @@ const game_player = @import("player.zig");
 const game_enemy = @import("enemy.zig");
 const ArrayList = std.ArrayList;
 
+var sprite_enemy_1: rl.Texture2D = undefined;
+var sprite_player_1: rl.Texture2D = undefined;
+
 pub const GameState = struct {
     layers: ArrayList(rl.Texture2D),
     enemies: ArrayList(game_enemy.Enemy),
@@ -20,11 +23,13 @@ pub const GameState = struct {
     font: rl.Font,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
-        const player = try game_player.Player.init();
-        
+        sprite_player_1 = rl.loadTexture("resources/sprites/player.png");
+        const player = try game_player.Player.init(&sprite_player_1);
+
+        sprite_enemy_1 = rl.loadTexture("resources/sprites/blimp.png");
         var enemies = ArrayList(game_enemy.Enemy).init(allocator);
         for (0..config.NR_ENEMIES) |_| {
-            try enemies.append(try game_enemy.Enemy.init());
+            try enemies.append(try game_enemy.Enemy.init(&sprite_enemy_1));
         }
 
         const snd_gun = rl.loadSound("resources/sounds/gun.wav");
@@ -58,8 +63,8 @@ pub const GameState = struct {
 
     pub fn deinit(self: *GameState) void {
         self.layers.deinit();
-        self.player.deinit();
-        self.enemies.deinit();
+        rl.unloadTexture(sprite_player_1);
+        rl.unloadTexture(sprite_enemy_1);
         rl.unloadSound(self.snd_gun);
         rl.unloadMusicStream(self.snd_music);
     }

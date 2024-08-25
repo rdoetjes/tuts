@@ -12,9 +12,9 @@ pub const Enemy = struct {
      max_health: u8,
      speed: u8,
      max_speed: u8,
-     sprite: rl.Texture2D,
+     sprite: *const rl.Texture2D,
 
-     pub fn init() !Enemy {
+     pub fn init(sprite: *const rl.Texture2D) !Enemy {
         const max_speed = 3;
         const max_health = 5;
 
@@ -24,7 +24,7 @@ pub const Enemy = struct {
             .max_speed = max_speed,
             .max_health = max_health,
             .health = 10,
-            .sprite = rl.loadTexture("resources/sprites/blimp.png"),
+            .sprite = sprite,
          };
      }
 
@@ -35,11 +35,7 @@ pub const Enemy = struct {
         self.health = self.max_health;
     }
 
-    pub fn deinit(self: Enemy) void {
-        rl.unloadTexture(self.sprite);
-     }
-
      pub fn draw(self: Enemy) void {
-        rl.drawTexture(self.sprite, self.pos.x, self.pos.y, rl.Color.white);
+        rl.drawTexture(self.sprite.*, self.pos.x, self.pos.y, rl.Color.white);
      }
 };
