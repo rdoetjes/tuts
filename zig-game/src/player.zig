@@ -14,7 +14,7 @@ pub const Player = struct {
      pub fn init() !Player {
          const start_ammo = 100;
          return .{
-            .pos = .{ .x = config.SCREEN_HEIGHT/2, .y = config.SCREEN_WIDTH/2, },
+            .pos = .{ .x = 10, .y = config.SCREEN_HEIGHT/2, },
             .speed = 3,
             .health = 10,
             .max_ammo = start_ammo,
