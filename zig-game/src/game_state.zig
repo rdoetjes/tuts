@@ -4,10 +4,12 @@ const std = @import("std");
 const text_scroller = @import("game_text_scroller.zig");
 const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
+const game_enemy = @import("enemy.zig");
 const ArrayList = std.ArrayList;
 
 pub const GameState = struct {
     layers: ArrayList(rl.Texture2D),
+    enemies: ArrayList(game_enemy.Enemy),
     score: u32,
     allocator: std.mem.Allocator,
     l1: [config.NR_BG_LAYERS]f32,
@@ -19,6 +21,12 @@ pub const GameState = struct {
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         const player = try game_player.Player.init();
+        
+        var enemies = ArrayList(game_enemy.Enemy).init(allocator);
+        for (0..config.NR_ENEMIES) |_| {
+            try enemies.append(try game_enemy.Enemy.init());
+        }
+
         const snd_gun = rl.loadSound("resources/sounds/gun.wav");
         const snd_music = rl.loadMusicStream("resources/sounds/music.wav");
         
@@ -40,6 +48,7 @@ pub const GameState = struct {
             .allocator = allocator,
             .score = 0,
             .player = player,
+            .enemies = enemies,
             .frame_counter = 0,
             .snd_gun = snd_gun,
             .snd_music = snd_music,
@@ -50,6 +59,7 @@ pub const GameState = struct {
     pub fn deinit(self: *GameState) void {
         self.layers.deinit();
         self.player.deinit();
+        self.enemies.deinit();
         rl.unloadSound(self.snd_gun);
         rl.unloadMusicStream(self.snd_music);
     }

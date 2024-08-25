@@ -2,14 +2,38 @@ const config = @import("config.zig");
 const gs = @import("game_state.zig");
 const gi = @import("game_input.zig");
 const rl = @import("raylib");
+const std = @import("std");
 
 pub fn update(state: *gs.GameState) void {
     state.frame_counter += 1;
     state.player.rot = 0;
     gi.handleInput(state);
+
     reload_ammo(state);
     shiftBgLayers(state);
+    moveEnemies(state);
+    
     rl.updateMusicStream(state.snd_music);
+}
+
+fn moveEnemies(state: *gs.GameState) void {
+    for (state.enemies.items) |*enemy| {
+        enemy.pos.x -= enemy.speed;
+        if (enemy.pos.x < -64) {
+
+            if (state.score > 10000 and state.score < 20000){
+                enemy.max_speed = 10;
+            }
+            else if (state.score > 20000 and state.score < 30000){
+                enemy.max_speed = 15;
+            }
+            else if (state.score > 30000){
+                enemy.max_speed = 20;
+            }
+            
+            enemy.respawn();
+        }
+    }
 }
 
 pub fn player_right(state: *gs.GameState) void {
