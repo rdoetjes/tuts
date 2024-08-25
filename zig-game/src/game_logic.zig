@@ -8,6 +8,7 @@ pub fn update(state: *gs.GameState) void {
     gi.handleInput(state);
     reload_ammo(state);
     shiftBgLayers(state);
+    rl.updateMusicStream(state.snd_music);
 }
 
 pub fn player_right(state: *gs.GameState) void {
