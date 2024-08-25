@@ -1,6 +1,7 @@
 const config = @import("config.zig");
 const gs = @import("game_state.zig");
 const gi = @import("game_input.zig");
+const rl = @import("raylib");
 
 pub fn update(state: *gs.GameState) void {
     state.frame_counter += 1;
@@ -36,6 +37,20 @@ pub fn player_down(state: *gs.GameState) void {
 pub fn player_fire(state: *gs.GameState) void {
     if (state.player.ammo > 0 and state.frame_counter % 3 == 0) {
         state.player.ammo -= 1;
+    }
+
+    if (!rl.isSoundPlaying(state.snd_gun) and state.player.ammo > 0) {
+        rl.playSound(state.snd_gun);
+    }
+
+    if (rl.isSoundPlaying(state.snd_gun) and state.player.ammo == 0) {
+        rl.stopSound(state.snd_gun);
+    }
+}
+
+pub fn player_fire_release(state: *gs.GameState) void {
+    if (rl.isSoundPlaying(state.snd_gun)) {
+         rl.stopSound(state.snd_gun);
     }
 }
 

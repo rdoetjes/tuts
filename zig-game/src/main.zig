@@ -14,6 +14,9 @@ pub fn main() !void {
     rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "Simple Test Scroller");
     defer rl.closeWindow();
 
+    rl.initAudioDevice();      
+    defer rl.closeAudioDevice();
+
     var game_state = gs.GameState.init(allocator) catch |err| {
         std.log.err("Failed to initialize game state: {s}", .{@errorName(err)});
         return;

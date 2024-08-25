@@ -13,10 +13,12 @@ pub const GameState = struct {
     l1: [config.NR_BG_LAYERS]f32,
     player: game_player.Player,
     frame_counter: u32,
+    snd_gun: rl.Sound,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         const player = try game_player.Player.init();
-     
+        const snd_gun = rl.loadSound("resources/sounds/gun.wav");
+
         var layers = ArrayList(rl.Texture2D).init(allocator);
         var l1: [6]f32 = undefined;
         for (0..6) |i| {
@@ -33,11 +35,13 @@ pub const GameState = struct {
             .score = 0,
             .player = player,
             .frame_counter = 0,
+            .snd_gun = snd_gun,
         };
     }
 
     pub fn deinit(self: *GameState) void {
         self.layers.deinit();
         self.player.deinit();
+        rl.unloadSound(self.snd_gun);
     }
 };
