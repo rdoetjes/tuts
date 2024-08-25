@@ -73,5 +73,8 @@ fn shiftBgLayers(state: *gs.GameState) void {
 fn reload_ammo(state: *gs.GameState) void {
     if (state.player.ammo < state.player.max_ammo and state.frame_counter % 120 == 0) {
         state.player.ammo += 5;
+        if (state.player.ammo > state.player.max_ammo) {
+            state.player.ammo = state.player.max_ammo;
+        }
     }
 }
