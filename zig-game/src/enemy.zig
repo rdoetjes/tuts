@@ -15,7 +15,7 @@ pub const Enemy = struct {
      sprite: rl.Texture2D,
 
      pub fn init() !Enemy {
-        const max_speed = 5;
+        const max_speed = 3;
         const max_health = 5;
 
         return .{
