@@ -12,7 +12,7 @@ pub const GameState = struct {
     allocator: std.mem.Allocator,
     l1: [config.NR_BG_LAYERS]f32,
     player: game_player.Player,
-    frameCounter: u32,
+    frame_counter: u32,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         const player = try game_player.Player.init();
@@ -32,7 +32,7 @@ pub const GameState = struct {
             .allocator = allocator,
             .score = 0,
             .player = player,
-            .frameCounter = 0,
+            .frame_counter = 0,
         };
     }
 

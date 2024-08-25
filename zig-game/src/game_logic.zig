@@ -3,7 +3,7 @@ const gs = @import("game_state.zig");
 const gi = @import("game_input.zig");
 
 pub fn update(state: *gs.GameState) void {
-    state.frameCounter += 1;
+    state.frame_counter += 1;
     gi.handleInput(state);
     reload_ammo(state);
     shiftBgLayers(state);
@@ -34,7 +34,7 @@ pub fn player_down(state: *gs.GameState) void {
 }
 
 pub fn player_fire(state: *gs.GameState) void {
-    if (state.player.ammo > 0 and state.frameCounter % 3 == 0) {
+    if (state.player.ammo > 0 and state.frame_counter % 3 == 0) {
         state.player.ammo -= 1;
     }
 }
@@ -56,7 +56,7 @@ fn shiftBgLayers(state: *gs.GameState) void {
 }
 
 fn reload_ammo(state: *gs.GameState) void {
-    if (state.player.ammo < state.player.max_ammo and state.frameCounter % 25 == 0) {
+    if (state.player.ammo < state.player.max_ammo and state.frame_counter % 25 == 0) {
         state.player.ammo += 1;
     }
 }
