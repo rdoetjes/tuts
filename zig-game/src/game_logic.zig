@@ -51,9 +51,15 @@ pub fn player_left(state: *gs.GameState) void {
 }
 
 pub fn player_up(state: *gs.GameState) void {
-    if (state.player.pos.y > 0 and state.player.pos.x > 0) { 
+    if (state.player.pos.y > 0 ) {
+
         state.player.pos.y -= state.player.speed;
-        state.player.pos.x -= state.player.speed/2;
+        if (state.player.pos.x > 0){
+            state.player.pos.x -= state.player.speed/2;
+        } 
+        else {
+            state.player.pos.x = 0;
+        }
         state.player.rot = -20;
     }
 }
