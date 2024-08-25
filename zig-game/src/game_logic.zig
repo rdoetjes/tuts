@@ -5,6 +5,7 @@ const rl = @import("raylib");
 
 pub fn update(state: *gs.GameState) void {
     state.frame_counter += 1;
+    state.player.rot = 0;
     gi.handleInput(state);
     reload_ammo(state);
     shiftBgLayers(state);
@@ -14,24 +15,37 @@ pub fn update(state: *gs.GameState) void {
 pub fn player_right(state: *gs.GameState) void {
     if (state.player.pos.x < config.SCREEN_WIDTH-state.player.sprite.width) { 
         state.player.pos.x += state.player.speed;
+        state.player.rot = 0;
     }
 }
 
 pub fn player_left(state: *gs.GameState) void {
     if (state.player.pos.x > 0) { 
         state.player.pos.x -= state.player.speed;
+        state.player.rot = 0;
     }
 }
 
 pub fn player_up(state: *gs.GameState) void {
     if (state.player.pos.y > 0) { 
         state.player.pos.y -= state.player.speed;
+        state.player.rot = -20;
     }
+}
+
+pub fn player_up_release(state: *gs.GameState) void {
+        state.player.rot = -10;
+}
+
+
+pub fn player_down_release(state: *gs.GameState) void {
+        state.player.rot = 10;
 }
 
 pub fn player_down(state: *gs.GameState) void {
     if (state.player.pos.y < config.SCREEN_HEIGHT-state.player.sprite.height) { 
         state.player.pos.y += state.player.speed;
+        state.player.rot = 20;
     }
 }
 

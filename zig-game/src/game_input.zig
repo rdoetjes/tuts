@@ -4,13 +4,6 @@ const gl = @import("game_logic.zig");
 const config = @import("config.zig");
 
 pub fn handleInput(state: *gs.GameState) void {
-    if (rl.isKeyDown(rl.KeyboardKey.key_right)) {
-        gl.player_right(state);
-    }
-
-    if (rl.isKeyDown(rl.KeyboardKey.key_left)) {
-       gl.player_left(state);
-    }
 
     if (rl.isKeyDown(rl.KeyboardKey.key_up)) {
        gl.player_up(state);
@@ -20,11 +13,27 @@ pub fn handleInput(state: *gs.GameState) void {
        gl.player_down(state);
     }
 
+    if (rl.isKeyDown(rl.KeyboardKey.key_right)) {
+        gl.player_right(state);
+    }
+
+    if (rl.isKeyDown(rl.KeyboardKey.key_left)) {
+       gl.player_left(state);
+    }
+
     if (rl.isKeyDown(rl.KeyboardKey.key_space)) {
          gl.player_fire(state);
     }
 
     if (rl.isKeyReleased(rl.KeyboardKey.key_space)) {
          gl.player_fire_release(state);
+    }
+
+    if (rl.isKeyReleased(rl.KeyboardKey.key_down)) {
+         gl.player_down_release(state);
+    }
+
+    if (rl.isKeyReleased(rl.KeyboardKey.key_up)) {
+         gl.player_up_release(state);
     }
 }

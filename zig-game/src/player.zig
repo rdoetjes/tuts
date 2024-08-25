@@ -8,6 +8,7 @@ pub const Player = struct {
      speed: u8,
      ammo: u8,
      max_ammo: u8,
+     rot: f32,
      sprite: rl.Texture2D,
 
      pub fn init() !Player {
@@ -19,6 +20,7 @@ pub const Player = struct {
             .max_ammo = start_ammo,
             .ammo = start_ammo,
             .sprite = rl.loadTexture("resources/sprites/player.png"),
+            .rot = 0,
          };
      }
 
@@ -27,6 +29,6 @@ pub const Player = struct {
      }
 
      pub fn draw(self: Player) void {
-        rl.drawTexture(self.sprite, self.pos.x, self.pos.y, rl.Color.white);
+        rl.drawTextureEx(self.sprite, (rl.Vector2.init(@floatFromInt(self.pos.x), @floatFromInt(self.pos.y))), self.rot, 1, rl.Color.white);
      }
 };
