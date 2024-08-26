@@ -3,10 +3,10 @@ const rl = @import("raylib");
 const pos = @import("position.zig");
 const std = @import("std");
 
-var prng = std.rand.DefaultPrng.init(666); //fixed seed so that every game is the same
-const rand = prng.random();
 const col_y_offset = 20;
 const col_x_offset = 13;
+var prng = std.rand.DefaultPrng.init(666); //fixed seed so that every game is the same
+const rand = prng.random();
 
 pub const Enemy = struct {
     pos: pos.Position,

@@ -77,6 +77,9 @@ pub const GameState = struct {
         self.stage = 0;
         rl.seekMusicStream(self.snd_music, 0.0);
         self.player=try game_player.Player.init(&sprite_player_1);
+        for (self.enemies.items) |*enemy| {
+            enemy.* = try game_enemy.Enemy.init(&sprite_enemy_1);
+        }
         self.screen = screen.playing;
     }
 
