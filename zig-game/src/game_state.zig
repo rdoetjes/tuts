@@ -94,7 +94,11 @@ pub const GameState = struct {
     }
 
     pub fn deinit(self: *GameState) void {
+        for (self.layers.items) |layer| {
+            rl.unloadTexture(layer);
+        }
         self.layers.deinit();
+        self.enemies.deinit();
         rl.unloadTexture(sprite_player_1);
         rl.unloadTexture(sprite_enemy_1);
         self.sound.deinit();
