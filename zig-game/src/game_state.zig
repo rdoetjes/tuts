@@ -6,7 +6,7 @@ const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
 const game_enemy = @import("enemy.zig");
 const ArrayList = std.ArrayList;
-const screen = enum {splash, playing, gameover};
+const screen = enum { splash, playing, gameover };
 var sprite_enemy_1: rl.Texture2D = undefined;
 var sprite_player_1: rl.Texture2D = undefined;
 
@@ -40,7 +40,7 @@ pub const GameState = struct {
         const snd_hit = rl.loadSound("resources/sounds/hit.wav");
         const snd_alert = rl.loadSound("resources/sounds/alert.wav");
         const snd_music = rl.loadMusicStream("resources/sounds/music.wav");
-        
+
         var layers = ArrayList(rl.Texture2D).init(allocator);
         var l1: [6]f32 = undefined;
         for (0..6) |i| {
@@ -52,7 +52,7 @@ pub const GameState = struct {
 
         const font = rl.loadFontEx("resources/fonts/Blankenburg.ttf", 20, null);
         rl.playMusicStream(snd_music);
-        
+
         return GameState{
             .layers = layers,
             .l1 = l1,
@@ -67,7 +67,7 @@ pub const GameState = struct {
             .snd_alert = snd_alert,
             .font = font,
             .stage = 0,
-            .screen = screen.gameover,
+            .screen = screen.splash,
         };
     }
 
@@ -76,7 +76,7 @@ pub const GameState = struct {
         self.score = 0;
         self.stage = 0;
         rl.seekMusicStream(self.snd_music, 0.0);
-        self.player=try game_player.Player.init(&sprite_player_1);
+        self.player = try game_player.Player.init(&sprite_player_1);
         for (self.enemies.items) |*enemy| {
             enemy.* = try game_enemy.Enemy.init(&sprite_enemy_1);
         }
