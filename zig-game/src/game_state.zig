@@ -6,7 +6,7 @@ const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
 const game_enemy = @import("enemy.zig");
 const ArrayList = std.ArrayList;
-
+const screen = enum {splash, playing, gameover};
 var sprite_enemy_1: rl.Texture2D = undefined;
 var sprite_player_1: rl.Texture2D = undefined;
 
@@ -18,11 +18,12 @@ pub const GameState = struct {
     l1: [config.NR_BG_LAYERS]f32,
     player: game_player.Player,
     frame_counter: f32,
-    stage: u8,
     snd_gun: rl.Sound,
     snd_hit: rl.Sound,
     snd_alert: rl.Sound,
     snd_music: rl.Music,
+    stage: u32,
+    screen: screen,
     font: rl.Font,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
@@ -66,7 +67,17 @@ pub const GameState = struct {
             .snd_alert = snd_alert,
             .font = font,
             .stage = 0,
+            .screen = screen.gameover,
         };
+    }
+
+    pub fn reset(self: *GameState) void {
+        self.frame_counter = 0;
+        self.score = 0;
+        self.stage = 0;
+        rl.seekMusicStream(self.snd_music, 0.0);
+        self.player=try game_player.Player.init(&sprite_player_1);
+        self.screen = screen.playing;
     }
 
     pub fn deinit(self: *GameState) void {

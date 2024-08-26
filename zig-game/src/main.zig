@@ -26,10 +26,8 @@ pub fn main() !void {
 
     rl.setTargetFPS(60);
     while (!rl.windowShouldClose()) {        
-        if ( gl.update(&game_state) ){
-            break;
+        gl.update(&game_state);
         
-        }
         gr.draw(game_state) catch |err| {
             std.log.err("Failed to draw game state: {s}", .{@errorName(err)});
             gs.GameState.deinit(&game_state);

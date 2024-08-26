@@ -5,12 +5,27 @@ const rl = @import("raylib");
 const std = @import("std");
 
 // this is called every frame and controls the game's behaviour
-pub fn update(state: *gs.GameState) bool {
+pub fn update(state: *gs.GameState) void {
     state.frame_counter += 1;
+
+    if (state.screen == .gameover) {
+        rl.drawText("...GAME OVER...", config.SCREEN_WIDTH/2, config.SCREEN_HEIGHT/2, 40, rl.Color.red);
+    }
+
+    if (state.screen == .playing ){
+        gamePlay(state);
+        rl.updateMusicStream(state.snd_music);
+    }
+
+    gi.handleInput(state);
+}
+
+fn gamePlay(state: *gs.GameState) void {
     processCollisions(state);
 
-    if (state.player.health <= 0 ){
-        return true;
+    if (state.player.health == 0) {
+        state.screen = .gameover;
+        return;
     }
 
     if (@mod(state.frame_counter, 10) == 0) {
@@ -18,14 +33,10 @@ pub fn update(state: *gs.GameState) bool {
     }
 
     state.player.moveToXY(state.player.pos.x, state.player.pos.y, 0);
-    gi.handleInput(state);
 
     reload_ammo(state);
     shiftBgLayers(state);
     moveEnemies(state);
-    rl.updateMusicStream(state.snd_music);
-
-    return false;
 }
 
 // check the collision boxes between player and enemies. When collision happened deduct 1 point of health from enemy and player
