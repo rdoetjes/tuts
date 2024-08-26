@@ -12,6 +12,10 @@ pub fn update(state: *gs.GameState) bool {
         return true;
     }
 
+    if (state.frame_counter % 10 == 0) {
+        state.score += 10;
+    }
+
     state.player.rot = 0;
     gi.handleInput(state);
 
@@ -19,7 +23,7 @@ pub fn update(state: *gs.GameState) bool {
     shiftBgLayers(state);
     moveEnemies(state);
     rl.updateMusicStream(state.snd_music);
-    
+
     return false;
 }
 
@@ -39,7 +43,7 @@ fn processCollisions(state: *gs.GameState) void {
 fn moveEnemies(state: *gs.GameState) void {
     for (state.enemies.items) |*enemy| {
         enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y);
-        
+
         if (enemy.pos.x < -64) {
 
             if (state.score > 10000 and state.score < 20000){
