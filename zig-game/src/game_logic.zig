@@ -43,23 +43,35 @@ fn processCollisions(state: *gs.GameState) void {
     }
 }
 
+fn progressStage(state: *gs.GameState, current_stage: u8) void {           
+    if (state.stage == current_stage) {
+        rl.playSound(state.snd_alert);
+        state.stage += 1;
+    }
+}
+
+
 fn moveEnemies(state: *gs.GameState) void {
     const sin_offset_y: i32 = @intFromFloat(std.math.sin( state.frame_counter / 20)*10);
 
     for (state.enemies.items) |*enemy| {
         if (state.score > 5000 and state.score < 10000){
+            progressStage(state, 0);
             enemy.max_speed = 7;
             enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,8)));
         }
         else if (state.score > 10000 and state.score < 20000){
             enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,6)));
+            progressStage(state, 1);
             enemy.max_speed = 10;
         }
         else if (state.score > 20000 and state.score < 30000){
+            progressStage(state, 2);
             enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,4)));
             enemy.max_speed = 15;
         }
         else if (state.score > 30000){
+            progressStage(state, 3);
             enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,2)));
             enemy.max_speed = 20;
         }
@@ -67,7 +79,7 @@ fn moveEnemies(state: *gs.GameState) void {
             enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y);
         }
 
-        if (enemy.pos.x < -64) {    
+        if (enemy.pos.x < -64) {    //when enemy s of screen respawn
             enemy.respawn();
         }
     }
