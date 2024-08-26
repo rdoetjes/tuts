@@ -18,7 +18,8 @@ pub fn update(state: *gs.GameState) void {
 
 fn moveEnemies(state: *gs.GameState) void {
     for (state.enemies.items) |*enemy| {
-        enemy.pos.x -= enemy.speed;
+        enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y);
+        
         if (enemy.pos.x < -64) {
 
             if (state.score > 10000 and state.score < 20000){
@@ -38,29 +39,27 @@ fn moveEnemies(state: *gs.GameState) void {
 
 pub fn player_right(state: *gs.GameState) void {
     if (state.player.pos.x < config.SCREEN_WIDTH-state.player.sprite.width) { 
-        state.player.pos.x += state.player.speed;
-        state.player.rot = 0;
+        state.player.moveToXY( state.player.pos.x + state.player.speed, state.player.pos.y, 0);
     }
 }
 
 pub fn player_left(state: *gs.GameState) void {
     if (state.player.pos.x > 0) { 
-        state.player.pos.x -= state.player.speed;
-        state.player.rot = 0;
+        state.player.moveToXY(state.player.pos.x - state.player.speed, state.player.pos.y, 0);
     }
 }
 
 pub fn player_up(state: *gs.GameState) void {
     if (state.player.pos.y > 0 ) {
 
-        state.player.pos.y -= state.player.speed;
+        state.player.moveToXY(state.player.pos.x, state.player.pos.y - state.player.speed, state.player.rot);
         if (state.player.pos.x > 0){
-            state.player.pos.x -= state.player.speed/2;
+            state.player.moveToXY(state.player.pos.x - state.player.speed/2, state.player.pos.y, state.player.rot);
         } 
         else {
-            state.player.pos.x = 0;
+            state.player.moveToXY(0, state.player.pos.y, state.player.rot);
         }
-        state.player.rot = -20;
+        state.player.moveToXY(state.player.pos.x, state.player.pos.y, -20);
     }
 }
 
@@ -70,14 +69,12 @@ pub fn player_up_release(state: *gs.GameState) void {
 
 pub fn player_down(state: *gs.GameState) void {
     if (state.player.pos.y < config.SCREEN_HEIGHT-state.player.sprite.height and state.player.pos.x < config.SCREEN_WIDTH-state.player.sprite.width) { 
-        state.player.pos.y += state.player.speed;
-        state.player.pos.x += state.player.speed;
-        state.player.rot = 20;
+        state.player.moveToXY(state.player.pos.x + state.player.speed, state.player.pos.y + state.player.speed, 10);
     }
 }
 
 pub fn player_down_release(state: *gs.GameState) void {
-        state.player.rot = 10;
+    state.player.moveToXY(state.player.pos.x, state.player.pos.y, 10);
 }
 
 pub fn player_fire(state: *gs.GameState) void {
