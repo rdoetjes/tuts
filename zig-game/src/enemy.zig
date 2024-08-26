@@ -48,7 +48,7 @@ pub const Enemy = struct {
     }
 
     pub fn draw(self: Enemy) void {
-        rl.drawRectangleRec(self.collision_box, rl.Color.red);
+        //rl.drawRectangleRec(self.collision_box, rl.Color.red);
         rl.drawTexture(self.sprite.*, self.pos.x, self.pos.y, rl.Color.white);
     }
 };
