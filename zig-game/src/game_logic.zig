@@ -55,28 +55,30 @@ fn moveEnemies(state: *gs.GameState) void {
     const sin_offset_y: i32 = @intFromFloat(std.math.sin( state.frame_counter / 20)*10);
 
     for (state.enemies.items) |*enemy| {
-        if (state.score > 5000 and state.score < 10000){
-            progressStage(state, 0);
-            enemy.max_speed = 7;
-            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,8)));
-        }
-        else if (state.score > 10000 and state.score < 20000){
-            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,6)));
-            progressStage(state, 1);
-            enemy.max_speed = 10;
-        }
-        else if (state.score > 20000 and state.score < 30000){
-            progressStage(state, 2);
-            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,4)));
-            enemy.max_speed = 15;
-        }
-        else if (state.score > 30000){
-            progressStage(state, 3);
-            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,2)));
-            enemy.max_speed = 20;
-        }
-        else {
-            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y);
+        switch(state.score){
+            5000...9999 => {
+                progressStage(state, 0);
+                enemy.max_speed = 7;
+                enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,8)));
+            },
+            10000...19999 => {
+                enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,6)));
+                progressStage(state, 1);
+                enemy.max_speed = 10;
+            },
+            20000...29999 => {
+                progressStage(state, 2);
+                enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,4)));
+                enemy.max_speed = 15;
+            },
+            30000...std.math.maxInt(i32) => {
+                progressStage(state, 3);
+                enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,2)));
+                enemy.max_speed = 20;
+            },
+            else => {
+                enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y);
+            }
         }
 
         if (enemy.pos.x < -64) {    //when enemy s of screen respawn
