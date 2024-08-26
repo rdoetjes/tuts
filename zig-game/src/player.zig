@@ -22,7 +22,7 @@ pub const Player = struct {
       return .{
          .pos = position,
          .speed = 3,
-         .health = 10,
+         .health = 100,
          .max_ammo = start_ammo,
          .ammo = start_ammo,
          .sprite = sprite,

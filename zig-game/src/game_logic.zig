@@ -4,16 +4,36 @@ const gi = @import("game_input.zig");
 const rl = @import("raylib");
 const std = @import("std");
 
-pub fn update(state: *gs.GameState) void {
+pub fn update(state: *gs.GameState) bool {
     state.frame_counter += 1;
+    processCollisions(state);
+
+    if (state.player.health <= 0 ){
+        return true;
+    }
+
     state.player.rot = 0;
     gi.handleInput(state);
 
     reload_ammo(state);
     shiftBgLayers(state);
     moveEnemies(state);
-    
     rl.updateMusicStream(state.snd_music);
+    
+    return false;
+}
+
+fn processCollisions(state: *gs.GameState) void {
+    for (state.enemies.items) |*enemy| {
+        if (rl.checkCollisionRecs(state.player.collision_box, enemy.collision_box)) {
+            state.player.health -= 1;
+            enemy.health -= 1;
+        }
+
+        if (enemy.health == 0) {
+            enemy.respawn();
+        }
+    }
 }
 
 fn moveEnemies(state: *gs.GameState) void {

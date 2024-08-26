@@ -27,7 +27,7 @@ pub const Enemy = struct {
             .speed = rand.intRangeAtMost(u8, 3, max_speed),
             .max_speed = max_speed,
             .max_health = max_health,
-            .health = 10,
+            .health = max_health,
             .sprite = sprite,
             .collision_box = collision_box,
          };
