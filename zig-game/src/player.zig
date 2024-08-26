@@ -17,7 +17,7 @@ pub const Player = struct {
    pub fn init(sprite: *const rl.Texture2D) !Player {
       const position: pos.Position = .{ .x = 10, .y = config.SCREEN_HEIGHT/2,};
       const start_ammo = 100;
-      const collision_box = rl.Rectangle.init(position.x+col_x_offset, position.y+col_y_offset, 64, 21);
+      const collision_box = rl.Rectangle.init(position.x+col_x_offset, position.y+col_y_offset, 62, 18);
 
       return .{
          .pos = position,
@@ -35,8 +35,12 @@ pub const Player = struct {
       self.pos.x = x;
       self.pos.y = y;
       self.rot = rot;
-      self.collision_box.x = @floatFromInt(x + col_x_offset);
-      self.collision_box.y = @floatFromInt(y + col_y_offset);
+      if (self.rot >= 0) {
+         self.collision_box.x = @floatFromInt(x + col_x_offset);
+         self.collision_box.y = @floatFromInt(y + col_y_offset);
+      } else {
+         self.collision_box.x = @floatFromInt(x + col_x_offset + 9); // this compensates from some weird rotation offset because of sprite
+      }
    }
 
    pub fn draw(self: Player) void {

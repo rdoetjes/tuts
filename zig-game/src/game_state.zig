@@ -17,7 +17,7 @@ pub const GameState = struct {
     allocator: std.mem.Allocator,
     l1: [config.NR_BG_LAYERS]f32,
     player: game_player.Player,
-    frame_counter: u32,
+    frame_counter: f32,
     snd_gun: rl.Sound,
     snd_music: rl.Music,
     font: rl.Font,

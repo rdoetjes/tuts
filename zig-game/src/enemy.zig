@@ -5,7 +5,8 @@ const std = @import("std");
 
 var prng = std.rand.DefaultPrng.init(666); //fixed seed so that every game is the same
 const rand = prng.random();
-const col_y_offset = 13;
+const col_y_offset = 20;
+const col_x_offset = 13;
 
 pub const Enemy = struct {
     pos: pos.Position,
@@ -20,7 +21,7 @@ pub const Enemy = struct {
         const position: pos.Position = .{ .x = rand.intRangeAtMost(i32, config.SCREEN_HEIGHT, config.SCREEN_HEIGHT*2), .y = rand.intRangeAtMost(i32, 0, config.SCREEN_HEIGHT-64), };
         const max_speed = 3;
         const max_health = 5;
-        const collision_box = rl.Rectangle.init(@floatFromInt(position.x), @floatFromInt(position.y+col_y_offset), 64, 44);
+        const collision_box = rl.Rectangle.init(@floatFromInt(position.x+col_x_offset), @floatFromInt(position.y+col_y_offset), 44, 30);
 
         return .{
             .pos = position,
@@ -43,12 +44,12 @@ pub const Enemy = struct {
     pub fn moveToXY(self: *Enemy, x: i32, y: i32)  void {
       self.pos.x = x;
       self.pos.y = y;
-      self.collision_box.x = @floatFromInt(x);
+      self.collision_box.x = @floatFromInt(x+col_x_offset);
       self.collision_box.y = @floatFromInt(y+col_y_offset);
     }
 
     pub fn draw(self: Enemy) void {
-        //rl.drawRectangleRec(self.collision_box, rl.Color.red);
         rl.drawTexture(self.sprite.*, self.pos.x, self.pos.y, rl.Color.white);
+        //rl.drawRectangleRec(self.collision_box, rl.Color.red);
     }
 };

@@ -12,11 +12,11 @@ pub fn update(state: *gs.GameState) bool {
         return true;
     }
 
-    if (state.frame_counter % 10 == 0) {
+    if (@mod(state.frame_counter, 10) == 0) {
         state.score += 30;
     }
 
-    state.player.rot = 0;
+    state.player.moveToXY(state.player.pos.x, state.player.pos.y, 0);
     gi.handleInput(state);
 
     reload_ammo(state);
@@ -41,24 +41,30 @@ fn processCollisions(state: *gs.GameState) void {
 }
 
 fn moveEnemies(state: *gs.GameState) void {
+    const sin_offset_y: i32 = @intFromFloat(std.math.sin( state.frame_counter / 20)*10);
+
     for (state.enemies.items) |*enemy| {
-        enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y);
+        if (state.score > 5000 and state.score < 10000){
+            enemy.max_speed = 7;
+            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,8)));
+        }
+        else if (state.score > 10000 and state.score < 20000){
+            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,6)));
+            enemy.max_speed = 10;
+        }
+        else if (state.score > 20000 and state.score < 30000){
+            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,4)));
+            enemy.max_speed = 15;
+        }
+        else if (state.score > 30000){
+            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y + (@divFloor(sin_offset_y,2)));
+            enemy.max_speed = 20;
+        }
+        else {
+            enemy.moveToXY(enemy.pos.x - enemy.speed, enemy.pos.y);
+        }
 
-        if (enemy.pos.x < -64) {
-
-            if (state.score > 5000 and state.score < 10000){
-                enemy.max_speed = 7;
-            }
-            else if (state.score > 10000 and state.score < 20000){
-                enemy.max_speed = 10;
-            }
-            else if (state.score > 20000 and state.score < 30000){
-                enemy.max_speed = 15;
-            }
-            else if (state.score > 30000){
-                enemy.max_speed = 20;
-            }
-            
+        if (enemy.pos.x < -64) {    
             enemy.respawn();
         }
     }
@@ -91,7 +97,7 @@ pub fn player_up(state: *gs.GameState) void {
 }
 
 pub fn player_up_release(state: *gs.GameState) void {
-        state.player.rot = -10;
+        state.player.moveToXY(state.player.pos.x, state.player.pos.y, -10);
 }
 
 pub fn player_down(state: *gs.GameState) void {
@@ -105,7 +111,7 @@ pub fn player_down_release(state: *gs.GameState) void {
 }
 
 pub fn player_fire(state: *gs.GameState) void {
-    if (state.player.ammo > 0 and state.frame_counter % 3 == 0) {
+    if (state.player.ammo > 0 and @mod(state.frame_counter,3) == 0) {
         state.player.ammo -= 1;
     }
 
@@ -141,7 +147,7 @@ fn shiftBgLayers(state: *gs.GameState) void {
 }
 
 fn reload_ammo(state: *gs.GameState) void {
-    if (state.player.ammo < state.player.max_ammo and state.frame_counter % 120 == 0) {
+    if (state.player.ammo < state.player.max_ammo and @mod(state.frame_counter,120) == 0) {
         state.player.ammo += 5;
         if (state.player.ammo > state.player.max_ammo) {
             state.player.ammo = state.player.max_ammo;
