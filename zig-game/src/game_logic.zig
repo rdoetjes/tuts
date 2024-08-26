@@ -14,7 +14,7 @@ pub fn update(state: *gs.GameState) void {
 
     if (state.screen == .playing ){
         gamePlay(state);
-        rl.updateMusicStream(state.snd_music);
+        rl.updateMusicStream(state.sound.music);
     }
 
     gi.handleInput(state);
@@ -45,8 +45,8 @@ fn processCollisions(state: *gs.GameState) void {
         if (rl.checkCollisionRecs(state.player.collision_box, enemy.collision_box)) {
             state.player.health -= 1;
             enemy.health -= 1;
-            if (!rl.isSoundPlaying(state.snd_hit)) {
-                rl.playSound(state.snd_hit);
+            if (!rl.isSoundPlaying(state.sound.hit)) {
+                rl.playSound(state.sound.hit);
             }
         }
 
@@ -59,7 +59,7 @@ fn processCollisions(state: *gs.GameState) void {
 // An alarm is sounded as warning when we move a stage up
 fn progressStage(state: *gs.GameState, current_stage: u8) void {           
     if (state.stage == current_stage) {
-        rl.playSound(state.snd_alert);
+        rl.playSound(state.sound.alert);
         state.stage += 1;
     }
 }
@@ -153,19 +153,19 @@ pub fn player_fire(state: *gs.GameState) void {
         state.player.ammo -= 1;
     }
 
-    if (!rl.isSoundPlaying(state.snd_gun) and state.player.ammo > 0) {
-        rl.playSound(state.snd_gun);
+    if (!rl.isSoundPlaying(state.sound.gun) and state.player.ammo > 0) {
+        rl.playSound(state.sound.gun);
     }
 
-    if (rl.isSoundPlaying(state.snd_gun) and state.player.ammo == 0) {
-        rl.stopSound(state.snd_gun);
+    if (rl.isSoundPlaying(state.sound.gun) and state.player.ammo == 0) {
+        rl.stopSound(state.sound.gun);
     }
 }
 
 // when fire butten is released stop playing machine gun sound
 pub fn player_fire_release(state: *gs.GameState) void {
-    if (rl.isSoundPlaying(state.snd_gun)) {
-         rl.stopSound(state.snd_gun);
+    if (rl.isSoundPlaying(state.sound.gun)) {
+         rl.stopSound(state.sound.gun);
     }
 }
 
