@@ -4,6 +4,7 @@ const gi = @import("game_input.zig");
 const rl = @import("raylib");
 const std = @import("std");
 
+// this is called every frame and controls the game's behaviour
 pub fn update(state: *gs.GameState) bool {
     state.frame_counter += 1;
     processCollisions(state);
@@ -27,6 +28,7 @@ pub fn update(state: *gs.GameState) bool {
     return false;
 }
 
+// check the collision boxes between player and enemies. When collision happened deduct 1 point of health from enemy and player
 fn processCollisions(state: *gs.GameState) void {
     for (state.enemies.items) |*enemy| {
         if (rl.checkCollisionRecs(state.player.collision_box, enemy.collision_box)) {
@@ -43,6 +45,7 @@ fn processCollisions(state: *gs.GameState) void {
     }
 }
 
+// An alarm is sounded as warning when we move a stage up
 fn progressStage(state: *gs.GameState, current_stage: u8) void {           
     if (state.stage == current_stage) {
         rl.playSound(state.snd_alert);
@@ -50,7 +53,7 @@ fn progressStage(state: *gs.GameState, current_stage: u8) void {
     }
 }
 
-
+// progress the enemies forwards, at certain scores enemy behavour speeds up and a sin movement is added
 fn moveEnemies(state: *gs.GameState) void {
     const sin_offset_y: i32 = @intFromFloat(std.math.sin( state.frame_counter / 20)*10);
 
@@ -87,18 +90,21 @@ fn moveEnemies(state: *gs.GameState) void {
     }
 }
 
+// when button is pressed speed up plane (move to the right) but keep level
 pub fn player_right(state: *gs.GameState) void {
     if (state.player.pos.x < config.SCREEN_WIDTH-state.player.sprite.width) { 
         state.player.moveToXY( state.player.pos.x + state.player.speed, state.player.pos.y, 0);
     }
 }
 
+// when button is pressed slow down plane but keep level
 pub fn player_left(state: *gs.GameState) void {
     if (state.player.pos.x > 0) { 
         state.player.moveToXY(state.player.pos.x - state.player.speed, state.player.pos.y, 0);
     }
 }
 
+// when button is pressed tilt plane 20 degrees move up and slighly backwards (from air resistance)
 pub fn player_up(state: *gs.GameState) void {
     if (state.player.pos.y > 0 ) {
 
@@ -113,20 +119,24 @@ pub fn player_up(state: *gs.GameState) void {
     }
 }
 
+// when up button is pressed tilt plane 10 degrees from 20 degrees as an intermediate animation frame
 pub fn player_up_release(state: *gs.GameState) void {
         state.player.moveToXY(state.player.pos.x, state.player.pos.y, -10);
 }
 
+// when down button is pressed tilt plane 20 degrees and move plane down and forwards (airspeed going down pushes plane forwards faster)
 pub fn player_down(state: *gs.GameState) void {
     if (state.player.pos.y < config.SCREEN_HEIGHT-state.player.sprite.height and state.player.pos.x < config.SCREEN_WIDTH-state.player.sprite.width) { 
-        state.player.moveToXY(state.player.pos.x + state.player.speed, state.player.pos.y + state.player.speed, 10);
+        state.player.moveToXY(state.player.pos.x + state.player.speed, state.player.pos.y + state.player.speed, 20);
     }
 }
 
+// when down button is released tilt plane 10 degrees from 20 degrees as an intermediate animation frame
 pub fn player_down_release(state: *gs.GameState) void {
     state.player.moveToXY(state.player.pos.x, state.player.pos.y, 10);
 }
 
+// when fire butten is pressed sound bullets ever 3 frames and play the sound
 pub fn player_fire(state: *gs.GameState) void {
     if (state.player.ammo > 0 and @mod(state.frame_counter,3) == 0) {
         state.player.ammo -= 1;
@@ -141,12 +151,14 @@ pub fn player_fire(state: *gs.GameState) void {
     }
 }
 
+// when fire butten is released stop playing machine gun sound
 pub fn player_fire_release(state: *gs.GameState) void {
     if (rl.isSoundPlaying(state.snd_gun)) {
          rl.stopSound(state.snd_gun);
     }
 }
 
+//scroll the background layers at different speeds for parallex effect
 fn shiftBgLayers(state: *gs.GameState) void {
     // shift the layers layer 0 with the sun and clouds remains stationary
     state.l1[1] += -0.1;
@@ -163,6 +175,7 @@ fn shiftBgLayers(state: *gs.GameState) void {
     }
 }
 
+//every 120 frames 5 bullets are reloaded
 fn reload_ammo(state: *gs.GameState) void {
     if (state.player.ammo < state.player.max_ammo and @mod(state.frame_counter,120) == 0) {
         state.player.ammo += 5;
