@@ -13,8 +13,8 @@ pub fn draw(state: gs.GameState) !void {
 
         // this is the layer with the action
         if (layer_nr == config.PLAYFIELD_LAYER) {
-            try drawHud(state);
             drawGameItems(state);
+            try drawHud(state);
         }
     }
     rl.endDrawing();
