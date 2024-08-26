@@ -13,7 +13,7 @@ pub fn update(state: *gs.GameState) bool {
     }
 
     if (state.frame_counter % 10 == 0) {
-        state.score += 10;
+        state.score += 30;
     }
 
     state.player.rot = 0;
@@ -46,7 +46,10 @@ fn moveEnemies(state: *gs.GameState) void {
 
         if (enemy.pos.x < -64) {
 
-            if (state.score > 10000 and state.score < 20000){
+            if (state.score > 5000 and state.score < 10000){
+                enemy.max_speed = 7;
+            }
+            else if (state.score > 10000 and state.score < 20000){
                 enemy.max_speed = 10;
             }
             else if (state.score > 20000 and state.score < 30000){
