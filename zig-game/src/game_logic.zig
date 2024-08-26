@@ -32,6 +32,9 @@ fn processCollisions(state: *gs.GameState) void {
         if (rl.checkCollisionRecs(state.player.collision_box, enemy.collision_box)) {
             state.player.health -= 1;
             enemy.health -= 1;
+            if (!rl.isSoundPlaying(state.snd_hit)) {
+                rl.playSound(state.snd_hit);
+            }
         }
 
         if (enemy.health == 0) {

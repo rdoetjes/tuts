@@ -19,6 +19,7 @@ pub const GameState = struct {
     player: game_player.Player,
     frame_counter: f32,
     snd_gun: rl.Sound,
+    snd_hit: rl.Sound,
     snd_music: rl.Music,
     font: rl.Font,
 
@@ -33,6 +34,7 @@ pub const GameState = struct {
         }
 
         const snd_gun = rl.loadSound("resources/sounds/gun.wav");
+        const snd_hit = rl.loadSound("resources/sounds/hit.wav");
         const snd_music = rl.loadMusicStream("resources/sounds/music.wav");
         
         var layers = ArrayList(rl.Texture2D).init(allocator);
@@ -57,6 +59,7 @@ pub const GameState = struct {
             .frame_counter = 0,
             .snd_gun = snd_gun,
             .snd_music = snd_music,
+            .snd_hit = snd_hit,
             .font = font,
         };
     }
@@ -66,6 +69,7 @@ pub const GameState = struct {
         rl.unloadTexture(sprite_player_1);
         rl.unloadTexture(sprite_enemy_1);
         rl.unloadSound(self.snd_gun);
+        rl.unloadSound(self.snd_hit);
         rl.unloadMusicStream(self.snd_music);
     }
 };
