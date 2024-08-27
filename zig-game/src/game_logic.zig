@@ -1,11 +1,12 @@
 const config = @import("config.zig");
 const gs = @import("game_state.zig");
 const gi = @import("game_input.zig");
+const game_bullet = @import("bullet.zig");
 const rl = @import("raylib");
 const std = @import("std");
 
 // this is called every frame and controls the game's behaviour
-pub fn update(state: *gs.GameState) void {
+pub fn update(state: *gs.GameState) !void {
     state.frame_counter += 1;
 
     if (state.screen == .playing ){
@@ -20,7 +21,7 @@ pub fn update(state: *gs.GameState) void {
         gamePlay(state);
     }
 
-    gi.handleInput(state);
+    try gi.handleInput(state);
 }
 
 fn gamePlay(state: *gs.GameState) void {
@@ -35,11 +36,12 @@ fn gamePlay(state: *gs.GameState) void {
         state.player.score += 30;
     }
 
-    state.player.moveToXY(state.player.pos.x, state.player.pos.y, 0);
-
+    deleteBullets(state);
+    
     reload_ammo(state);
     shiftBgLayers(state);
     moveEnemies(state);
+    moveBullets(state);
 }
 
 // check the collision boxes between player and enemies. When collision happened deduct 1 point of health from enemy and player
@@ -64,6 +66,22 @@ fn progressStage(state: *gs.GameState, current_stage: u8) void {
     if (state.stage == current_stage) {
         rl.playSound(state.sound.alert);
         state.stage += 1;
+    }
+}
+
+//move the bullets in the list
+fn moveBullets(state: *gs.GameState) void {
+    state.player.moveToXY(state.player.pos.x, state.player.pos.y, 0);
+    for(state.bullets.items) |*bullet| {
+        bullet.move();
+    }
+}
+
+fn deleteBullets(state: *gs.GameState) void {
+    for (state.bullets.items, 0..) |*bullet, i| {
+        if (bullet.pos.x < 0 or bullet.pos.x > config.SCREEN_WIDTH or bullet.pos.y < 0 or bullet.pos.y > config.SCREEN_HEIGHT or bullet.health <= 0) {
+            _ = state.bullets.swapRemove(i);
+        }
     }
 }
 
@@ -151,9 +169,12 @@ pub fn player_down_release(state: *gs.GameState) void {
 }
 
 // when fire butten is pressed sound bullets ever 3 frames and play the sound
-pub fn player_fire(state: *gs.GameState) void {
+pub fn player_fire(state: *gs.GameState) !void {
     if (state.player.ammo > 0 and @mod(state.frame_counter,3) == 0) {
         state.player.ammo -= 1;
+        const b = game_bullet.Bullet.init(state.player.pos.x+64, state.player.pos.y+16, 1, 0);
+        try state.bullets.append(b);
+
     }
 
     if (!rl.isSoundPlaying(state.sound.gun) and state.player.ammo > 0) {

@@ -38,6 +38,9 @@ fn drawGameItems(state: gs.GameState) void {
     for(state.enemies.items) |enemy| {
         enemy.draw();
     }
+    for(state.bullets.items) |bullet| {
+        bullet.draw();
+    }
 }
 
 fn drawHud(state: gs.GameState) !void {

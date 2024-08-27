@@ -4,7 +4,7 @@ const gl = @import("game_logic.zig");
 const config = @import("config.zig");
 const std = @import("std");
 
-pub fn handleInput(state: *gs.GameState) void {
+pub fn handleInput(state: *gs.GameState) !void {
 
      if (rl.isKeyDown(rl.KeyboardKey.key_up)) {
           gl.player_up(state);
@@ -25,7 +25,7 @@ pub fn handleInput(state: *gs.GameState) void {
      if (rl.isKeyDown(rl.KeyboardKey.key_space)) {
           // avoids the game to fire when in splash screen or gameover screen
           if (state.screen == .playing) {
-               gl.player_fire(state);
+               try gl.player_fire(state);
           }
      }
 

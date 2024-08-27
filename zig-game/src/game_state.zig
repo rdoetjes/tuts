@@ -5,6 +5,7 @@ const text_scroller = @import("game_text_scroller.zig");
 const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
 const game_enemy = @import("enemy.zig");
+const game_bullet = @import("bullet.zig");
 const ArrayList = std.ArrayList;
 const screen = enum { splash, playing, gameover };
 var sprite_enemy_1: rl.Texture2D = undefined;
@@ -29,6 +30,7 @@ pub const GameState = struct {
     gameover_image: rl.Texture2D,
     splash_image: rl.Texture2D,
     enemies: ArrayList(game_enemy.Enemy),
+    bullets: ArrayList(game_bullet.Bullet),
     sound: Sound,
     allocator: std.mem.Allocator,
     background_layer_speed: [config.NR_BG_LAYERS]f32,
@@ -47,6 +49,9 @@ pub const GameState = struct {
         for (0..config.NR_ENEMIES) |_| {
             try enemies.append(try game_enemy.Enemy.init(&sprite_enemy_1));
         }
+
+        const bullets = ArrayList(game_bullet.Bullet).init(allocator);
+
 
         const sound = Sound{.gun = rl.loadSound("resources/sounds/gun.wav"),
                             .hit = rl.loadSound("resources/sounds/hit.wav"),
@@ -80,6 +85,7 @@ pub const GameState = struct {
             .screen = screen.splash,
             .gameover_image = gameover_image,
             .splash_image = splash_image,
+            .bullets = bullets,
         };
     }
 
@@ -92,6 +98,7 @@ pub const GameState = struct {
         for (self.enemies.items) |*enemy| {
             enemy.* = try game_enemy.Enemy.init(&sprite_enemy_1);
         }
+        self.bullets.clearRetainingCapacity();
         self.screen = screen.playing;
     }
 
@@ -99,6 +106,7 @@ pub const GameState = struct {
         for (self.layers.items) |layer| {
             rl.unloadTexture(layer);
         }
+        self.bullets.deinit();
         rl.unloadTexture(self.gameover_image);
         rl.unloadTexture(self.splash_image);
         self.layers.deinit();
