@@ -9,14 +9,14 @@ pub fn draw(state: gs.GameState) !void {
 
 
     if (state.screen == .gameover) {
-        rl.drawTexture(state.gameover_screen, 0, 0, rl.Color.white);
+        rl.drawTexture(state.gameover_image, 0, 0, rl.Color.white);
         const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{state.score});
         defer state.allocator.free(score);
-        rl.drawTextEx(state.font, score,  (rl.Vector2.init(@floatFromInt( ((config.SCREEN_WIDTH-100)/2) ), @floatFromInt( (config.SCREEN_HEIGHT-40)))), 30, 2, rl.Color.white);
+        rl.drawTextEx(state.font, score,  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH/2)-96 ), @floatFromInt( (config.SCREEN_HEIGHT-40)))), 50, 2, rl.Color.white);
     }
 
     if (state.screen == .splash) {
-        rl.drawTexture(state.splash_screen, 0, 0, rl.Color.white);
+        rl.drawTexture(state.splash_image, 0, 0, rl.Color.white);
     }
 
     if (state.screen == .playing) {
@@ -64,11 +64,6 @@ fn drawHud(state: gs.GameState) !void {
     rl.drawTextEx(state.font, score, (rl.Vector2.init(10, 10)), 30, 2, rl.Color.black);
     rl.drawTextEx(state.font, ammo,  (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH/2)-(ammo.len/2*11)), 10)), 30, 2, rl.Color.black);
     rl.drawTextEx(state.font, health,  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH-10)-(health.len*11)), 10)), 30, 2, rl.Color.black);
-
-  
-    // if (state.screen == .splash) {
-    //     rl.drawTextEx(state.font, "PUSH SPACE TO START",  (rl.Vector2.init(@floatFromInt( ((config.SCREEN_WIDTH-200)/2) ), @floatFromInt( (config.SCREEN_HEIGHT/2)))), 30, 2, rl.Color.black);
-    // }
 
     rl.drawFPS(10, 30);
 }
