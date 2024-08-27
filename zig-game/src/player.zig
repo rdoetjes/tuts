@@ -8,7 +8,7 @@ const col_y_offset = 22;
 // using a box is the easieast way to do collision detection, not very accurate but good enough
 pub const Player = struct {
    pos: pos.Position,
-   health: i32,
+   health: f32,
    speed: u8,
    ammo: u8,
    max_ammo: u8,
