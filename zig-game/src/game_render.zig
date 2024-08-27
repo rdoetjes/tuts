@@ -7,7 +7,6 @@ pub fn draw(state: gs.GameState) !void {
     rl.beginDrawing();
     rl.clearBackground(rl.Color.white);
 
-
     if (state.screen == .gameover) {
         rl.drawTexture(state.gameover_image, 0, 0, rl.Color.white);
         const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{state.player.score});

@@ -5,19 +5,6 @@ const config = @import("config.zig");
 const std = @import("std");
 
 pub fn handleInput(state: *gs.GameState) void {
-     if (state.screen == .splash) {
-          if (rl.isKeyPressed(rl.KeyboardKey.key_space)) {
-               state.reset();
-          }
-          return;
-     }
-
-     if (state.screen == .gameover) {
-          if (rl.isKeyPressed(rl.KeyboardKey.key_space)){
-               state.screen = .splash;
-          }
-          return;
-     }
 
      if (rl.isKeyDown(rl.KeyboardKey.key_up)) {
           gl.player_up(state);
@@ -36,10 +23,25 @@ pub fn handleInput(state: *gs.GameState) void {
      }
 
      if (rl.isKeyDown(rl.KeyboardKey.key_space)) {
-          gl.player_fire(state);
+          if (state.screen == .playing) {
+               gl.player_fire(state);
+          }
      }
 
      if (rl.isKeyReleased(rl.KeyboardKey.key_space)) {
+
+          if (state.screen == .splash) {
+               state.reset();
+               state.screen = .playing;
+               return;
+          }
+
+          if (state.screen == .gameover) {
+               state.screen = .splash;
+               return;
+          }
+
+
           gl.player_fire_release(state);
      }
 
@@ -47,7 +49,8 @@ pub fn handleInput(state: *gs.GameState) void {
           gl.player_down_release(state);
      }
 
+
      if (rl.isKeyReleased(rl.KeyboardKey.key_up)) {
           gl.player_up_release(state);
      }
-     }
+}

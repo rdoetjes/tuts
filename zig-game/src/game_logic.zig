@@ -9,8 +9,15 @@ pub fn update(state: *gs.GameState) void {
     state.frame_counter += 1;
 
     if (state.screen == .playing ){
-        gamePlay(state);
         rl.updateMusicStream(state.sound.music);
+    }
+
+    if (state.screen == .gameover ){
+        rl.updateMusicStream(state.sound.music);
+    }
+
+    if (state.screen == .playing) {
+        gamePlay(state);
     }
 
     gi.handleInput(state);
