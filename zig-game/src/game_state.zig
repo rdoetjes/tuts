@@ -15,11 +15,13 @@ pub const Sound = struct {
     hit: rl.Sound,
     alert: rl.Sound,
     music: rl.Music,
+    engine: rl.Sound,
 
     pub fn deinit(self: *Sound) void {
         rl.unloadSound(self.gun);
         rl.unloadSound(self.hit);
         rl.unloadSound(self.alert);
+        rl.unloadSound(self.engine);
         rl.unloadMusicStream(self.music);
     }
 };
@@ -56,6 +58,7 @@ pub const GameState = struct {
                             .hit = rl.loadSound("resources/sounds/hit.wav"),
                             .alert = rl.loadSound("resources/sounds/alert.wav"),
                             .music = rl.loadMusicStream("resources/sounds/music.wav"),
+                            .engine = rl.loadSound("resources/sounds/engine.wav"),
         };
 
         var layers = ArrayList(rl.Texture2D).init(allocator);

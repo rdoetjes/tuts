@@ -14,6 +14,9 @@ pub fn update(state: *gs.GameState) !void {
     }
 
     if (state.screen == .gameover ){
+        if (rl.isSoundPlaying(state.sound.engine)) {
+            rl.stopSound(state.sound.engine);
+        }
         rl.updateMusicStream(state.sound.music);
     }
 
@@ -26,6 +29,10 @@ pub fn update(state: *gs.GameState) !void {
 
 fn gamePlay(state: *gs.GameState) void {
     processCollisions(state);
+
+    if (!rl.isSoundPlaying(state.sound.engine)) {
+        rl.playSound(state.sound.engine);
+    }
 
     if (state.player.health <= 0) {
         state.screen = .gameover;
