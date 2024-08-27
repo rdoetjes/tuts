@@ -29,7 +29,7 @@ pub fn handleInput(state: *gs.GameState) !void {
           }
      }
 
-     if (rl.isKeyDown(rl.KeyboardKey.key_s)) {
+     if (rl.isKeyReleased(rl.KeyboardKey.key_s)) {
           if (state.screen == .splash) {
                state.reset();
                state.screen = .playing;

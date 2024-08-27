@@ -35,11 +35,14 @@ pub fn draw(state: gs.GameState) !void {
 
 fn drawGameItems(state: gs.GameState) void {
     state.player.draw();
-    for(state.enemies.items) |enemy| {
-        enemy.draw();
-    }
+
+    // bullets go behind the enemies as to suggest a hit
     for(state.bullets.items) |bullet| {
         bullet.draw();
+    }
+
+    for(state.enemies.items) |enemy| {
+        enemy.draw();
     }
 }
 
