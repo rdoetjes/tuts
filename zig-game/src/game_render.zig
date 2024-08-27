@@ -50,8 +50,6 @@ fn drawGameItems(state: gs.GameState) void {
 
 //draw the text HUD
 fn drawHud(state: gs.GameState) !void {
-    //const fps = rl.getFPS();
-    
     const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{
         state.player.score,
     });
@@ -63,5 +61,5 @@ fn drawHud(state: gs.GameState) !void {
     rl.drawTextEx(state.font, "  AMMO  ",  (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH/2)-50), 10)), 30, 2, rl.Color.black);
     rl.drawTextEx(state.font, " HEALTH ",  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH/2)+185), 10)), 30, 2, rl.Color.black);
 
-    rl.drawFPS(10, 30);
+    //rl.drawFPS(10, 30);
 }
