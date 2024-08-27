@@ -27,7 +27,7 @@ pub fn update(state: *gs.GameState) !void {
 fn gamePlay(state: *gs.GameState) void {
     processCollisions(state);
 
-    if (state.player.health == 0) {
+    if (state.player.health <= 0) {
         state.screen = .gameover;
         return;
     }
@@ -55,8 +55,17 @@ fn processCollisions(state: *gs.GameState) void {
             }
         }
 
-        if (enemy.health == 0) {
+        if (enemy.health <= 0) {
             enemy.respawn();
+        }
+    }
+
+    for(state.bullets.items) |*bullet| {
+        for(state.enemies.items) |*enemy| {
+            if (rl.checkCollisionRecs(bullet.collision_box, enemy.collision_box)) {
+                bullet.health -= 1;
+                enemy.health -= 1;
+            }
         }
     }
 }

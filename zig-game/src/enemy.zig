@@ -10,8 +10,8 @@ const rand = prng.random();
 
 pub const Enemy = struct {
     pos: pos.Position,
-    health: u8,
-    max_health: u8,
+    health: i32,
+    max_health: i32,
     speed: u8,
     max_speed: u8,
     sprite: *const rl.Texture2D,

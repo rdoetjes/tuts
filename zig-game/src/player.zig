@@ -6,7 +6,7 @@ const col_y_offset = 22;
 
 pub const Player = struct {
    pos: pos.Position,
-   health: u8,
+   health: i32,
    speed: u8,
    ammo: u8,
    max_ammo: u8,

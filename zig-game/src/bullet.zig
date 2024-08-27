@@ -7,7 +7,7 @@ pub const Bullet = struct {
     pos: pos.Position,
     direction: pos.Position,
     speed: i32,
-    health: u32,
+    health: i32,
     collision_box: rl.Rectangle,
     
     pub fn init(x: i32, y: i32, xd: i32, xy: i32) Bullet {
