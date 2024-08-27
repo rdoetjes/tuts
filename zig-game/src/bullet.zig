@@ -16,7 +16,7 @@ pub const Bullet = struct {
             .pos = .{ .x = x, .y = y },
             .direction = .{ .x = xd, .y = xy },
             .health = 1,
-            .speed = 3,
+            .speed = 4,
             .collision_box = collision_box,
         };
     }
