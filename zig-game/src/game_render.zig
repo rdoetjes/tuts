@@ -10,7 +10,7 @@ pub fn draw(state: gs.GameState) !void {
 
     if (state.screen == .gameover) {
         rl.drawTexture(state.gameover_image, 0, 0, rl.Color.white);
-        const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{state.score});
+        const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{state.player.score});
         defer state.allocator.free(score);
         rl.drawTextEx(state.font, score,  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH/2)-96 ), @floatFromInt( (config.SCREEN_HEIGHT-40)))), 50, 2, rl.Color.white);
     }
@@ -45,7 +45,7 @@ fn drawHud(state: gs.GameState) !void {
     //const fps = rl.getFPS();
     
     const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{
-        state.score,
+        state.player.score,
     });
     defer state.allocator.free(score);
 

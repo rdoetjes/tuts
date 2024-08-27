@@ -25,7 +25,7 @@ fn gamePlay(state: *gs.GameState) void {
     }
 
     if (@mod(state.frame_counter, 10) == 0) {
-        state.score += 30;
+        state.player.score += 30;
     }
 
     state.player.moveToXY(state.player.pos.x, state.player.pos.y, 0);
@@ -65,7 +65,7 @@ fn moveEnemies(state: *gs.GameState) void {
     const sin_offset_y: i32 = @intFromFloat(std.math.sin( state.frame_counter / 20)*10);
 
     for (state.enemies.items) |*enemy| {
-        switch(state.score){
+        switch(state.player.score){
             5000...9999 => {
                 progressStage(state, 0);
                 enemy.max_speed = 7;

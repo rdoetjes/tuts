@@ -11,6 +11,7 @@ pub const Player = struct {
    ammo: u8,
    max_ammo: u8,
    rot: f32,
+   score: u32,
    sprite: *const rl.Texture2D,
    collision_box: rl.Rectangle,
 
@@ -27,6 +28,7 @@ pub const Player = struct {
          .ammo = start_ammo,
          .sprite = sprite,
          .rot = 0,
+         .score = 0,
          .collision_box = collision_box,
       };
    }

@@ -30,7 +30,6 @@ pub const GameState = struct {
     splash_image: rl.Texture2D,
     enemies: ArrayList(game_enemy.Enemy),
     sound: Sound,
-    score: u32,
     allocator: std.mem.Allocator,
     l1: [config.NR_BG_LAYERS]f32,
     player: game_player.Player,
@@ -73,7 +72,6 @@ pub const GameState = struct {
             .layers = layers,
             .l1 = l1,
             .allocator = allocator,
-            .score = 0,
             .player = player,
             .enemies = enemies,
             .frame_counter = 0,
@@ -88,7 +86,7 @@ pub const GameState = struct {
 
     pub fn reset(self: *GameState) void {
         self.frame_counter = 0;
-        self.score = 0;
+        self.player.score = 0;
         self.stage = 0;
         rl.seekMusicStream(self.sound.music, 0.0);
         self.player = try game_player.Player.init(&sprite_player_1);
