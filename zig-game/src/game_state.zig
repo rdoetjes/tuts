@@ -26,6 +26,8 @@ pub const Sound = struct {
 
 pub const GameState = struct {
     layers: ArrayList(rl.Texture2D),
+    gameover_screen: rl.Texture2D,
+    splash_screen: rl.Texture2D,
     enemies: ArrayList(game_enemy.Enemy),
     sound: Sound,
     score: u32,
@@ -62,6 +64,9 @@ pub const GameState = struct {
             try layers.append(rl.loadTexture(layer_name));
             l1[i] = 0.0;
         }
+        const gameover_screen = rl.loadTexture("resources/layers/gameover.png");
+        const splash_screen = rl.loadTexture("resources/layers/splash.png");
+
 
         const font = rl.loadFontEx("resources/fonts/Blankenburg.ttf", 20, null);
         rl.playMusicStream(sound.music);
@@ -78,6 +83,8 @@ pub const GameState = struct {
             .font = font,
             .stage = 0,
             .screen = screen.splash,
+            .gameover_screen = gameover_screen,
+            .splash_screen = splash_screen,
         };
     }
 

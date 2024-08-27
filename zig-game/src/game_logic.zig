@@ -8,10 +8,6 @@ const std = @import("std");
 pub fn update(state: *gs.GameState) void {
     state.frame_counter += 1;
 
-    if (state.screen == .gameover) {
-        rl.drawText("...GAME OVER...", config.SCREEN_WIDTH/2, config.SCREEN_HEIGHT/2, 40, rl.Color.red);
-    }
-
     if (state.screen == .playing ){
         gamePlay(state);
         rl.updateMusicStream(state.sound.music);
