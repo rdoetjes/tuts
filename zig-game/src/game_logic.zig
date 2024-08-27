@@ -78,10 +78,14 @@ fn moveBullets(state: *gs.GameState) void {
 }
 
 fn deleteBullets(state: *gs.GameState) void {
-    for (state.bullets.items, 0..) |*bullet, i| {
-        if (bullet.pos.x < 0 or bullet.pos.x > config.SCREEN_WIDTH or bullet.pos.y < 0 or bullet.pos.y > config.SCREEN_HEIGHT or bullet.health <= 0) {
+  var i: usize = state.bullets.items.len;
+    while (i > 0) {
+        i -= 1;
+        const bullet = &state.bullets.items[i];
+        if (bullet.pos.x < 0 or bullet.pos.x > config.SCREEN_WIDTH or 
+            bullet.pos.y < 0 or bullet.pos.y > config.SCREEN_HEIGHT or 
+            bullet.health <= 0) {
             _ = state.bullets.swapRemove(i);
-            std.debug.print("{} {}", .{state.bullets.items.len, i,});
         }
     }
 }
