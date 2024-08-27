@@ -29,7 +29,6 @@ pub fn handleInput(state: *gs.GameState) void {
      }
 
      if (rl.isKeyReleased(rl.KeyboardKey.key_space)) {
-
           if (state.screen == .splash) {
                state.reset();
                state.screen = .playing;
@@ -40,7 +39,6 @@ pub fn handleInput(state: *gs.GameState) void {
                state.screen = .splash;
                return;
           }
-
 
           gl.player_fire_release(state);
      }
