@@ -23,6 +23,7 @@ pub fn handleInput(state: *gs.GameState) void {
      }
 
      if (rl.isKeyDown(rl.KeyboardKey.key_space)) {
+          // avoids the game to fire when in splash screen or gameover screen
           if (state.screen == .playing) {
                gl.player_fire(state);
           }
