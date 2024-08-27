@@ -41,7 +41,7 @@ pub const Player = struct {
          self.collision_box.x = @floatFromInt(x + col_x_offset);
          self.collision_box.y = @floatFromInt(y + col_y_offset);
       } else {
-         self.collision_box.x = @floatFromInt(x + col_x_offset + 9); // this compensates from some weird rotation offset because of sprite
+         self.collision_box.x = @floatFromInt(x + col_x_offset + 9); // this compensates from some weird rotation offset because of asym sprite size
       }
    }
 
