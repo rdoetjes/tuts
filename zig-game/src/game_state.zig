@@ -31,7 +31,7 @@ pub const GameState = struct {
     enemies: ArrayList(game_enemy.Enemy),
     sound: Sound,
     allocator: std.mem.Allocator,
-    l1: [config.NR_BG_LAYERS]f32,
+    background_layer_speed: [config.NR_BG_LAYERS]f32,
     player: game_player.Player,
     frame_counter: f32,
     stage: u32,
@@ -55,12 +55,12 @@ pub const GameState = struct {
         };
 
         var layers = ArrayList(rl.Texture2D).init(allocator);
-        var l1: [6]f32 = undefined;
+        var background_layer_speed: [6]f32 = undefined;
         for (0..6) |i| {
             const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{i + 1}) catch return error.OutOfMemory;
             defer allocator.free(layer_name);
             try layers.append(rl.loadTexture(layer_name));
-            l1[i] = 0.0;
+            background_layer_speed[i] = 0.0;
         }
         const gameover_image = rl.loadTexture("resources/layers/gameover.png");
         const splash_image= rl.loadTexture("resources/layers/splash.png");
@@ -69,7 +69,7 @@ pub const GameState = struct {
 
         return GameState{
             .layers = layers,
-            .l1 = l1,
+            .background_layer_speed = background_layer_speed,
             .allocator = allocator,
             .player = player,
             .enemies = enemies,

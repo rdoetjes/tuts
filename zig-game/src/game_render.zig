@@ -21,8 +21,8 @@ pub fn draw(state: gs.GameState) !void {
 
     if (state.screen == .playing) {
         for (0..state.layers.items.len) |layer_nr| {
-            rl.drawTextureEx(state.layers.items[layer_nr], rl.Vector2.init(state.l1[layer_nr], 0), 0.0, config.SCREEN_WIDTH / config.BG_IMAGE_WIDTH, rl.Color.white);
-            rl.drawTextureEx(state.layers.items[layer_nr], rl.Vector2.init(state.l1[layer_nr] - config.SCREEN_WIDTH, 0), 0.0, config.SCREEN_WIDTH / config.BG_IMAGE_WIDTH, rl.Color.white);
+            rl.drawTextureEx(state.layers.items[layer_nr], rl.Vector2.init(state.background_layer_speed[layer_nr], 0), 0.0, config.SCREEN_WIDTH / config.BG_IMAGE_WIDTH, rl.Color.white);
+            rl.drawTextureEx(state.layers.items[layer_nr], rl.Vector2.init(state.background_layer_speed[layer_nr] - config.SCREEN_WIDTH, 0), 0.0, config.SCREEN_WIDTH / config.BG_IMAGE_WIDTH, rl.Color.white);
 
             // this is the layer with the action
             if (layer_nr == config.PLAYFIELD_LAYER) {
