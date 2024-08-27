@@ -45,6 +45,7 @@ pub const GameState = struct {
     screen: screen,
     font: rl.Font,
     ammo_bar: bar_graph.BarCauge,
+    health_bar: bar_graph.BarCauge,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         sprite_player_1 = rl.loadTexture("resources/sprites/player.png");
@@ -76,7 +77,10 @@ pub const GameState = struct {
         }
         const gameover_image = rl.loadTexture("resources/layers/gameover.png");
         const splash_image= rl.loadTexture("resources/layers/splash.png");
+        
         const ammo_bar = bar_graph.BarCauge.init(270, 10, 100, 100, 100, 30);
+        const health_bar = bar_graph.BarCauge.init(500, 10, 100, 100, 100, 30);
+
         const font = rl.loadFontEx("resources/fonts/Blankenburg.ttf", 20, null);
         rl.playMusicStream(sound.music);
 
@@ -95,6 +99,7 @@ pub const GameState = struct {
             .splash_image = splash_image,
             .bullets = bullets,
             .ammo_bar = ammo_bar,
+            .health_bar = health_bar,
         };
     }
 
