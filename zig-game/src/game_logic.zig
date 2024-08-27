@@ -65,6 +65,10 @@ fn processCollisions(state: *gs.GameState) void {
             if (rl.checkCollisionRecs(bullet.collision_box, enemy.collision_box)) {
                 bullet.health -= 1;
                 enemy.health -= 1;
+                state.player.score += 10;  //for every hit add 10 points to the score
+                if (enemy.health <= 0) {
+                    state.player.score += 100;  //for every downed enemy add 1an extra 00 points to the score
+                }
             }
         }
     }
