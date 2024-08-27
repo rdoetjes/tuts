@@ -1,7 +1,6 @@
 const config = @import("config.zig");
 const rl = @import("raylib");
 const std = @import("std");
-const text_scroller = @import("game_text_scroller.zig");
 const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
 const game_enemy = @import("enemy.zig");
