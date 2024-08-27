@@ -34,7 +34,6 @@ pub const GameState = struct {
     l1: [config.NR_BG_LAYERS]f32,
     player: game_player.Player,
     frame_counter: f32,
-  
     stage: u32,
     screen: screen,
     font: rl.Font,
