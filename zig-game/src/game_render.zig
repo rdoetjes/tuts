@@ -3,6 +3,7 @@ const std = @import("std");
 const rl = @import("raylib");
 const gs = @import("game_state.zig");
 
+// draw the game every frame
 pub fn draw(state: gs.GameState) !void {
     rl.beginDrawing();
     rl.clearBackground(rl.Color.white);
@@ -33,6 +34,7 @@ pub fn draw(state: gs.GameState) !void {
     rl.endDrawing();
 }
 
+// draw the in game items
 fn drawGameItems(state: gs.GameState) void {
     state.player.draw();
 
@@ -46,6 +48,7 @@ fn drawGameItems(state: gs.GameState) void {
     }
 }
 
+//draw the text HUD
 fn drawHud(state: gs.GameState) !void {
     //const fps = rl.getFPS();
     

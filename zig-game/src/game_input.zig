@@ -4,6 +4,7 @@ const gl = @import("game_logic.zig");
 const config = @import("config.zig");
 const std = @import("std");
 
+// handle all input and map accordingly to the right method in game_logic.zig
 pub fn handleInput(state: *gs.GameState) !void {
 
      if (rl.isKeyDown(rl.KeyboardKey.key_up)) {

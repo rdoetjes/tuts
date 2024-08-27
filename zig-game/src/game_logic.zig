@@ -27,6 +27,7 @@ pub fn update(state: *gs.GameState) !void {
     try gi.handleInput(state);
 }
 
+//this is called every frame and controls the game's behaviour
 fn gamePlay(state: *gs.GameState) void {
     processCollisions(state);
 

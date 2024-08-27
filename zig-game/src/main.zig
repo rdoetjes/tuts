@@ -11,7 +11,7 @@ const pl = @import("player.zig");
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
-    rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "Simple Game");
+    rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "BLIMP ATTACK!");
     defer rl.closeWindow();
 
     rl.initAudioDevice();

@@ -10,6 +10,7 @@ const screen = enum { splash, playing, gameover };
 var sprite_enemy_1: rl.Texture2D = undefined;
 var sprite_player_1: rl.Texture2D = undefined;
 
+//Structure that holds all sounds (just convenience)
 pub const Sound = struct {
     gun: rl.Sound,
     hit: rl.Sound,
@@ -26,6 +27,8 @@ pub const Sound = struct {
     }
 };
 
+//GameState holds all the variables that are needed to run the game
+//It initializes and resets them
 pub const GameState = struct {
     layers: ArrayList(rl.Texture2D),
     gameover_image: rl.Texture2D,

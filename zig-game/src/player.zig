@@ -4,6 +4,8 @@ const pos = @import("position.zig");
 const col_x_offset = 0;
 const col_y_offset = 22;
 
+// The player is a rectangle with a collision box that is smaller than the sprite to make collision detection fairer
+// using a box is the easieast way to do collision detection, not very accurate but good enough
 pub const Player = struct {
    pos: pos.Position,
    health: i32,
@@ -33,6 +35,7 @@ pub const Player = struct {
       };
    }
 
+   //position player and it's collision(with offset) box on XY
    pub fn moveToXY(self: *Player, x: i32, y: i32, rot: f32)  void {
       self.pos.x = x;
       self.pos.y = y;
@@ -45,6 +48,7 @@ pub const Player = struct {
       }
    }
 
+   //draw the player bit not it's collision box
    pub fn draw(self: Player) void {
       //rl.drawRectanglePro(self.collision_box, (rl.Vector2.init(@floatFromInt(col_x_offset/2), @floatFromInt(col_y_offset/2))), self.rot, rl.Color.blue);
       rl.drawTextureEx(self.sprite.*, (rl.Vector2.init(@floatFromInt(self.pos.x), @floatFromInt(self.pos.y))), self.rot, 1, rl.Color.white);

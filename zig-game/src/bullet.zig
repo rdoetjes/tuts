@@ -2,7 +2,7 @@ const config = @import("config.zig");
 const rl = @import("raylib");
 const pos = @import("position.zig");
 
-
+//Bullets are simply a rectangle with a direction and a speed
 pub const Bullet = struct {
     pos: pos.Position,
     direction: pos.Position,

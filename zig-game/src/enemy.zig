@@ -8,6 +8,8 @@ const col_x_offset = 13;
 var prng = std.rand.DefaultPrng.init(666);
 const rand = prng.random();
 
+//The enemy has a collision box that is rectangle and is smaller than the sprite to make collision detection fairer
+//using a box is the easieast way to do collision detection, not very accurate but good enough
 pub const Enemy = struct {
     pos: pos.Position,
     health: i32,
@@ -32,8 +34,10 @@ pub const Enemy = struct {
             .sprite = sprite,
             .collision_box = collision_box,
          };
-     }
+    }
 
+    //when a enemy is dead or off screen, it is moved offscreen to a new random height
+    //this way we don't need to waste time instatiating new enemies
     pub fn respawn(self: *Enemy) void {
         self.speed = rand.intRangeAtMost(u8, 3, self.max_speed);
         self.pos.x = rand.intRangeAtMost(i32, config.SCREEN_WIDTH+64, config.SCREEN_WIDTH*2);
@@ -41,6 +45,7 @@ pub const Enemy = struct {
         self.health = self.max_health;
     }
 
+    //position enemey and it's collision(with offset) box on XY 
     pub fn moveToXY(self: *Enemy, x: i32, y: i32)  void {
       self.pos.x = x;
       self.pos.y = y;
@@ -48,6 +53,7 @@ pub const Enemy = struct {
       self.collision_box.y = @floatFromInt(y+col_y_offset);
     }
 
+    //draw the enemy sprite (not the collision box)
     pub fn draw(self: Enemy) void {
         rl.drawTexture(self.sprite.*, self.pos.x, self.pos.y, rl.Color.white);
         //rl.drawRectangleRec(self.collision_box, rl.Color.red);
