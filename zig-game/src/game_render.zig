@@ -57,20 +57,14 @@ fn drawHud(state: gs.GameState) !void {
     });
     defer state.allocator.free(score);
 
-    const ammo = try std.fmt.allocPrintZ(state.allocator, "AMMO: {d:0>3}", .{
-        state.player.ammo,
-    });
-    defer state.allocator.free(ammo);
-
-
     const health = try std.fmt.allocPrintZ(state.allocator, "HEALTH: {d:0>2}", .{
         state.player.health,
     });
     defer state.allocator.free(health);
 
-
+    state.gun_temp.draw(@floatFromInt(state.player.ammo));
     rl.drawTextEx(state.font, score, (rl.Vector2.init(10, 10)), 30, 2, rl.Color.black);
-    rl.drawTextEx(state.font, ammo,  (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH/2)-(ammo.len/2*11)), 10)), 30, 2, rl.Color.black);
+    rl.drawTextEx(state.font, "  AMMO  ",  (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH/2)-50), 10)), 30, 2, rl.Color.black);
     rl.drawTextEx(state.font, health,  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH-10)-(health.len*11)), 10)), 30, 2, rl.Color.black);
 
     rl.drawFPS(10, 30);

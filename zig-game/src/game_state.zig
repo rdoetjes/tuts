@@ -5,6 +5,7 @@ const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
 const game_enemy = @import("enemy.zig");
 const game_bullet = @import("bullet.zig");
+const bar_graph = @import("bar_cauge.zig");
 const ArrayList = std.ArrayList;
 const screen = enum { splash, playing, gameover };
 var sprite_enemy_1: rl.Texture2D = undefined;
@@ -43,6 +44,7 @@ pub const GameState = struct {
     stage: u32,
     screen: screen,
     font: rl.Font,
+    gun_temp: bar_graph.BarCauge,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
         sprite_player_1 = rl.loadTexture("resources/sprites/player.png");
@@ -74,6 +76,7 @@ pub const GameState = struct {
         }
         const gameover_image = rl.loadTexture("resources/layers/gameover.png");
         const splash_image= rl.loadTexture("resources/layers/splash.png");
+        const gun_temp = bar_graph.BarCauge.init(270, 10, 100, 100, 100, 30);
         const font = rl.loadFontEx("resources/fonts/Blankenburg.ttf", 20, null);
         rl.playMusicStream(sound.music);
 
@@ -91,6 +94,7 @@ pub const GameState = struct {
             .gameover_image = gameover_image,
             .splash_image = splash_image,
             .bullets = bullets,
+            .gun_temp = gun_temp,
         };
     }
 
