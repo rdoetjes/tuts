@@ -41,7 +41,7 @@ fn gamePlay(state: *gs.GameState) void {
     }
 
     if (@mod(state.frame_counter, 10) == 0) {
-        state.player.score += 30;
+        state.player.score += 20;
     }
 
     deleteBullets(state);
@@ -56,7 +56,7 @@ fn gamePlay(state: *gs.GameState) void {
 fn processCollisions(state: *gs.GameState) void {
     for (state.enemies.items) |*enemy| {
         if (rl.checkCollisionRecs(state.player.collision_box, enemy.collision_box)) {
-            state.player.health -= 1;
+            state.player.health -= 3;
             enemy.health -= 1;
             if (!rl.isSoundPlaying(state.sound.hit)) {
                 rl.playSound(state.sound.hit);
