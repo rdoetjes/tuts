@@ -20,12 +20,15 @@ pub const Enemy = struct {
     collision_box: rl.Rectangle,
     health_bar: bcauge.BarCauge,
 
-     pub fn init(sprite: *const rl.Texture2D) !Enemy {
-        const position: pos.Position = .{ .x = rand.intRangeAtMost(i32, config.SCREEN_HEIGHT, config.SCREEN_HEIGHT*2), .y = rand.intRangeAtMost(i32, 0, config.SCREEN_HEIGHT-64), };
+    pub fn init(sprite: *const rl.Texture2D) !Enemy {
+        const position: pos.Position = .{
+            .x = rand.intRangeAtMost(i32, config.SCREEN_HEIGHT, config.SCREEN_HEIGHT * 2),
+            .y = rand.intRangeAtMost(i32, 0, config.SCREEN_HEIGHT - 64),
+        };
         const max_speed = 3;
         const max_health = 5;
-        const collision_box = rl.Rectangle.init(@floatFromInt(position.x+col_x_offset), @floatFromInt(position.y+col_y_offset), 44, 30);
-        const health_bar = bcauge.BarCauge.init(position.x+40, position.y+20, max_health, max_health, 20, 4);
+        const collision_box = rl.Rectangle.init(@floatFromInt(position.x + col_x_offset), @floatFromInt(position.y + col_y_offset), 44, 30);
+        const health_bar = bcauge.BarCauge.init(position.x + 40, position.y + 20, max_health, max_health, 20, 4);
 
         return .{
             .pos = position,
@@ -36,25 +39,27 @@ pub const Enemy = struct {
             .sprite = sprite,
             .collision_box = collision_box,
             .health_bar = health_bar,
-         };
+        };
     }
 
     //when a enemy is dead or off screen, it is moved offscreen to a new random height
     //this way we don't need to waste time instatiating new enemies
     pub fn respawn(self: *Enemy) void {
         self.speed = rand.intRangeAtMost(u8, 3, self.max_speed);
-        self.pos.x = rand.intRangeAtMost(i32, config.SCREEN_WIDTH+64, config.SCREEN_WIDTH*2);
+        self.pos.x = rand.intRangeAtMost(i32, config.SCREEN_WIDTH + 64, config.SCREEN_WIDTH * 2);
         self.pos.y = rand.intRangeAtMost(i32, 0, config.SCREEN_HEIGHT);
         self.health = self.max_health;
     }
 
-    //position enemey and it's collision(with offset) box on XY 
-    pub fn moveToXY(self: *Enemy, x: i32, y: i32)  void {
-      self.pos.x = x;
-      self.pos.y = y;
-      self.collision_box.x = @floatFromInt(x+col_x_offset);
-      self.collision_box.y = @floatFromInt(y+col_y_offset);
-      self.health_bar.moveToXY(x+20, y+40);
+    //position enemey and it's collision(with offset) box on XY
+    pub fn moveToXY(self: *Enemy, x: i32, y: i32) void {
+        const x_offset = 20;
+        const y_offset = 40;
+        self.pos.x = x;
+        self.pos.y = y;
+        self.collision_box.x = @floatFromInt(x + col_x_offset);
+        self.collision_box.y = @floatFromInt(y + col_y_offset);
+        self.health_bar.moveToXY(x + x_offset, y + y_offset);
     }
 
     //draw the enemy sprite (not the collision box)
