@@ -46,10 +46,8 @@ pub const EnemyBlimp = struct {
     //this way we don't need to waste time instatiating new enemies
     pub fn respawn(self: *EnemyBlimp) void {
         self.speed = rand.intRangeAtMost(u8, 3, self.max_speed);
-        self.pos.x = rand.intRangeAtMost(i32, config.SCREEN_WIDTH + 64, config.SCREEN_WIDTH * 2);
-        self.pos.y = rand.intRangeAtMost(i32, 0, config.SCREEN_HEIGHT);
         self.health = self.max_health;
-        self.move_to_xy(self.pos.x, self.pos.y);
+        self.move_to_xy(rand.intRangeAtMost(i32, config.SCREEN_WIDTH + 64, config.SCREEN_WIDTH * 2), rand.intRangeAtMost(i32, 0, config.SCREEN_HEIGHT));
     }
 
     //position enemey and it's collision(with offset) box on XY
