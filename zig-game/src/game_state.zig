@@ -3,7 +3,7 @@ const rl = @import("raylib");
 const std = @import("std");
 const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
-const game_enemy = @import("enemy.zig");
+const game_enemy = @import("enemy_blimp.zig");
 const game_bullet = @import("bullet.zig");
 const bar_graph = @import("bar_cauge.zig");
 const ArrayList = std.ArrayList;
@@ -34,7 +34,7 @@ pub const GameState = struct {
     layers: ArrayList(rl.Texture2D),
     gameover_image: rl.Texture2D,
     splash_image: rl.Texture2D,
-    enemies: ArrayList(game_enemy.Enemy),
+    enemies: ArrayList(game_enemy.EnemyBlimp),
     bullets: ArrayList(game_bullet.Bullet),
     sound: Sound,
     allocator: std.mem.Allocator,
@@ -52,19 +52,19 @@ pub const GameState = struct {
         const player = try game_player.Player.init(&sprite_player_1);
 
         sprite_enemy_1 = rl.loadTexture("resources/sprites/blimp.png");
-        var enemies = ArrayList(game_enemy.Enemy).init(allocator);
+        var enemies = ArrayList(game_enemy.EnemyBlimp).init(allocator);
         for (0..config.NR_ENEMIES) |_| {
-            try enemies.append(try game_enemy.Enemy.init(&sprite_enemy_1));
+            try enemies.append(try game_enemy.EnemyBlimp.init(&sprite_enemy_1));
         }
 
         const bullets = ArrayList(game_bullet.Bullet).init(allocator);
 
-
-        const sound = Sound{.gun = rl.loadSound("resources/sounds/gun.wav"),
-                            .hit = rl.loadSound("resources/sounds/hit.wav"),
-                            .alert = rl.loadSound("resources/sounds/alert.wav"),
-                            .music = rl.loadMusicStream("resources/sounds/music.wav"),
-                            .engine = rl.loadSound("resources/sounds/engine.wav"),
+        const sound = Sound{
+            .gun = rl.loadSound("resources/sounds/gun.wav"),
+            .hit = rl.loadSound("resources/sounds/hit.wav"),
+            .alert = rl.loadSound("resources/sounds/alert.wav"),
+            .music = rl.loadMusicStream("resources/sounds/music.wav"),
+            .engine = rl.loadSound("resources/sounds/engine.wav"),
         };
 
         var layers = ArrayList(rl.Texture2D).init(allocator);
@@ -76,8 +76,8 @@ pub const GameState = struct {
             background_layer_speed[i] = 0.0;
         }
         const gameover_image = rl.loadTexture("resources/layers/gameover.png");
-        const splash_image= rl.loadTexture("resources/layers/splash.png");
-        
+        const splash_image = rl.loadTexture("resources/layers/splash.png");
+
         const ammo_bar = bar_graph.BarCauge.init(270, 10, 100, 100, 100, 30);
         const health_bar = bar_graph.BarCauge.init(500, 10, 100, 100, 100, 30);
 
@@ -110,7 +110,7 @@ pub const GameState = struct {
         rl.seekMusicStream(self.sound.music, 0.0);
         self.player = try game_player.Player.init(&sprite_player_1);
         for (self.enemies.items) |*enemy| {
-            enemy.* = try game_enemy.Enemy.init(&sprite_enemy_1);
+            enemy.* = try game_enemy.EnemyBlimp.init(&sprite_enemy_1);
         }
         self.bullets.clearRetainingCapacity();
         self.screen = screen.playing;
