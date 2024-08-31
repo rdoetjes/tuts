@@ -49,6 +49,7 @@ pub const EnemyBlimp = struct {
         self.pos.x = rand.intRangeAtMost(i32, config.SCREEN_WIDTH + 64, config.SCREEN_WIDTH * 2);
         self.pos.y = rand.intRangeAtMost(i32, 0, config.SCREEN_HEIGHT);
         self.health = self.max_health;
+        self.move_to_xy(self.pos.x, self.pos.y);
     }
 
     //position enemey and it's collision(with offset) box on XY
