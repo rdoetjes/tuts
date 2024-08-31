@@ -12,7 +12,7 @@ pub fn draw(state: gs.GameState) !void {
         rl.drawTexture(state.gameover_image, 0, 0, rl.Color.white);
         const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{state.player.score});
         defer state.allocator.free(score);
-        rl.drawTextEx(state.font, score,  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH/2)-96 ), @floatFromInt( (config.SCREEN_HEIGHT-40)))), 50, 2, rl.Color.white);
+        rl.drawTextEx(state.font, score, (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH / 2) - 96), @floatFromInt((config.SCREEN_HEIGHT - 40)))), 50, 2, rl.Color.white);
     }
 
     if (state.screen == .splash) {
@@ -26,8 +26,8 @@ pub fn draw(state: gs.GameState) !void {
 
             // this is the layer with the action
             if (layer_nr == config.PLAYFIELD_LAYER) {
-                drawGameItems(state);
-                try drawHud(state);
+                draw_foreground_game_items(state);
+                try draw_hud(state);
             }
         }
     }
@@ -35,21 +35,21 @@ pub fn draw(state: gs.GameState) !void {
 }
 
 // draw the in game items
-fn drawGameItems(state: gs.GameState) void {
+fn draw_foreground_game_items(state: gs.GameState) void {
     state.player.draw();
 
     // bullets go behind the enemies as to suggest a hit
-    for(state.bullets.items) |bullet| {
+    for (state.bullets.items) |bullet| {
         bullet.draw();
     }
 
-    for(state.enemies.items) |enemy| {
+    for (state.enemies.items) |enemy| {
         enemy.draw();
     }
 }
 
 //draw the text HUD
-fn drawHud(state: gs.GameState) !void {
+fn draw_hud(state: gs.GameState) !void {
     const score = try std.fmt.allocPrintZ(state.allocator, "SCORE: {d:0>6}", .{
         state.player.score,
     });
@@ -58,8 +58,8 @@ fn drawHud(state: gs.GameState) !void {
     state.ammo_bar.draw(@floatFromInt(state.player.ammo));
     state.health_bar.draw(state.player.health);
     rl.drawTextEx(state.font, score, (rl.Vector2.init(10, 10)), 30, 2, rl.Color.black);
-    rl.drawTextEx(state.font, "  AMMO  ",  (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH/2)-50), 10)), 30, 2, rl.Color.black);
-    rl.drawTextEx(state.font, " HEALTH ",  (rl.Vector2.init(@floatFromInt( (config.SCREEN_WIDTH/2)+185), 10)), 30, 2, rl.Color.black);
+    rl.drawTextEx(state.font, "  AMMO  ", (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH / 2) - 50), 10)), 30, 2, rl.Color.black);
+    rl.drawTextEx(state.font, " HEALTH ", (rl.Vector2.init(@floatFromInt((config.SCREEN_WIDTH / 2) + 185), 10)), 30, 2, rl.Color.black);
 
     //rl.drawFPS(10, 30);
 }

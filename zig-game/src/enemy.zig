@@ -52,14 +52,14 @@ pub const Enemy = struct {
     }
 
     //position enemey and it's collision(with offset) box on XY
-    pub fn moveToXY(self: *Enemy, x: i32, y: i32) void {
+    pub fn move_to_xy(self: *Enemy, x: i32, y: i32) void {
         const x_offset = 20;
         const y_offset = 40;
         self.pos.x = x;
         self.pos.y = y;
         self.collision_box.x = @floatFromInt(x + col_x_offset);
         self.collision_box.y = @floatFromInt(y + col_y_offset);
-        self.health_bar.moveToXY(x + x_offset, y + y_offset);
+        self.health_bar.move_to_xy(x + x_offset, y + y_offset);
     }
 
     //draw the enemy sprite (not the collision box)
