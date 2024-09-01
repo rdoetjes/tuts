@@ -9,6 +9,9 @@ const std = @import("std");
 pub fn update(state: *gs.GameState) !void {
     state.frame_counter += 1;
 
+    //always start with plane in straight flight position as release up or down key is used for an intermediate frame ;)
+    state.player.move_to_xy(state.player.pos.x, state.player.pos.y, 0);
+
     if (state.screen == .playing) {
         rl.updateMusicStream(state.sound.music);
     }
@@ -92,7 +95,6 @@ fn progress_stage(state: *gs.GameState, current_stage: u8) void {
 
 //move the bullets in the list
 fn move_bullets(state: *gs.GameState) void {
-    state.player.move_to_xy(state.player.pos.x, state.player.pos.y, 0);
     for (state.bullets.items) |*bullet| {
         bullet.move();
     }
@@ -168,7 +170,7 @@ pub fn player_up(state: *gs.GameState) void {
     if (state.player.pos.y > 0) {
         state.player.move_to_xy(state.player.pos.x, state.player.pos.y - state.player.speed, state.player.rot);
         if (state.player.pos.x > 0) {
-            state.player.move_to_xy(state.player.pos.x - state.player.speed / 2, state.player.pos.y, state.player.rot);
+            state.player.move_to_xy(state.player.pos.x - @divFloor(state.player.speed, 2), state.player.pos.y, state.player.rot);
         } else {
             state.player.move_to_xy(0, state.player.pos.y, state.player.rot);
         }
@@ -197,7 +199,7 @@ pub fn player_down_release(state: *gs.GameState) void {
 pub fn player_fire(state: *gs.GameState) !void {
     if (state.player.ammo > 0 and @mod(state.frame_counter, 3) == 0) {
         state.player.ammo -= 1;
-        const bullet_speed = state.player.speed + 2;
+        const bullet_speed: i32 = @intCast(state.player.speed + 2);
         var b: game_bullet.Bullet = undefined;
         if (state.player.rot == -20) {
             b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 5, 1, -1, bullet_speed);
