@@ -36,6 +36,7 @@ pub fn draw(state: gs.GameState) !void {
 
 // draw the in game items
 fn draw_foreground_game_items(state: gs.GameState) void {
+    //draw the player first so it gets behind the enemies and bullets (making it look like the bullets come from the plane)
     state.player.draw();
 
     // bullets go behind the enemies as to suggest a hit
@@ -43,6 +44,7 @@ fn draw_foreground_game_items(state: gs.GameState) void {
         bullet.draw();
     }
 
+    // enemies go behind over the bullets as to look as though the bullets entered the enemy blimp
     for (state.enemies.items) |enemy| {
         enemy.draw();
     }
