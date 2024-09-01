@@ -197,14 +197,14 @@ pub fn player_down_release(state: *gs.GameState) void {
 pub fn player_fire(state: *gs.GameState) !void {
     if (state.player.ammo > 0 and @mod(state.frame_counter, 3) == 0) {
         state.player.ammo -= 1;
-
+        const bullet_speed = state.player.speed + 2;
         var b: game_bullet.Bullet = undefined;
         if (state.player.rot == -20) {
-            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 5, 1, -1);
+            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 5, 1, -1, bullet_speed);
         } else if (state.player.rot == 20) {
-            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 40, 2, 1);
+            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 40, 2, 1, bullet_speed);
         } else {
-            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 16, 1, 0);
+            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 16, 1, 0, bullet_speed);
         }
         try state.bullets.append(b);
     }

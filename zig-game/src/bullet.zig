@@ -9,14 +9,14 @@ pub const Bullet = struct {
     speed: i32,
     health: i32,
     collision_box: rl.Rectangle,
-    
-    pub fn init(x: i32, y: i32, xd: i32, xy: i32) Bullet {
+
+    pub fn init(x: i32, y: i32, xd: i32, xy: i32, speed: i32) Bullet {
         const collision_box = rl.Rectangle.init(@floatFromInt(x), @floatFromInt(y), 2, 2);
         return .{
             .pos = .{ .x = x, .y = y },
             .direction = .{ .x = xd, .y = xy },
             .health = 1,
-            .speed = 4,
+            .speed = speed,
             .collision_box = collision_box,
         };
     }
@@ -24,8 +24,8 @@ pub const Bullet = struct {
     pub fn move(self: *Bullet) void {
         self.pos.x += self.direction.x * self.speed;
         self.pos.y += self.direction.y * self.speed;
-        self.collision_box.x=@floatFromInt(self.pos.x); 
-        self.collision_box.y=@floatFromInt(self.pos.y);
+        self.collision_box.x = @floatFromInt(self.pos.x);
+        self.collision_box.y = @floatFromInt(self.pos.y);
     }
 
     pub fn draw(self: Bullet) void {
