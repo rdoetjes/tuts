@@ -170,13 +170,9 @@ pub fn player_up(state: *gs.GameState) void {
     if (state.player.pos.y > 0) {
         state.player.move_to_xy(state.player.pos.x, state.player.pos.y - state.player.speed, config.ROTATION_UP);
 
-        var x: i32 = state.player.pos.x;
-        var y: i32 = state.player.pos.y;
         if (state.player.pos.x > 0) {
-            x = state.player.pos.x - @divFloor(state.player.speed, 2);
-            y = state.player.pos.y;
+            state.player.move_to_xy(state.player.pos.x - @divFloor(state.player.speed, 2), state.player.pos.y, config.ROTATION_UP);
         }
-        state.player.move_to_xy(x, y, config.ROTATION_UP);
     }
 }
 
