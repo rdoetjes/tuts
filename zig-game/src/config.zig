@@ -5,3 +5,5 @@ pub const GLSL_VERSION = 330;
 pub const PLAYFIELD_LAYER = 4;
 pub const NR_BG_LAYERS = 6;
 pub const NR_ENEMIES = 10;
+pub const ROTATION_UP = -20;
+pub const ROTATION_DOWN = 20;

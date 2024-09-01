@@ -174,32 +174,32 @@ pub fn player_up(state: *gs.GameState) void {
         } else {
             state.player.move_to_xy(0, state.player.pos.y, state.player.rot);
         }
-        state.player.move_to_xy(state.player.pos.x, state.player.pos.y, -20);
+        state.player.move_to_xy(state.player.pos.x, state.player.pos.y, config.ROTATION_UP);
     }
 }
 
 // when up button is pressed tilt plane 10 degrees from 20 degrees as an intermediate animation frame
 pub fn player_up_release(state: *gs.GameState) void {
-    state.player.move_to_xy(state.player.pos.x, state.player.pos.y, -10);
+    state.player.move_to_xy(state.player.pos.x, state.player.pos.y, @divFloor(config.ROTATION_UP, 2));
 }
 
 // when down button is pressed tilt plane 20 degrees and move plane down and forwards (airspeed going down pushes plane forwards faster)
 pub fn player_down(state: *gs.GameState) void {
     if (state.player.pos.y < config.SCREEN_HEIGHT - state.player.sprite.height and state.player.pos.x < config.SCREEN_WIDTH - state.player.sprite.width) {
-        state.player.move_to_xy(state.player.pos.x + state.player.speed, state.player.pos.y + state.player.speed, 20);
+        state.player.move_to_xy(state.player.pos.x + state.player.speed, state.player.pos.y + state.player.speed, config.ROTATION_DOWN);
     }
 }
 
 // when down button is released tilt plane 10 degrees from 20 degrees as an intermediate animation frame
 pub fn player_down_release(state: *gs.GameState) void {
-    state.player.move_to_xy(state.player.pos.x, state.player.pos.y, 10);
+    state.player.move_to_xy(state.player.pos.x, state.player.pos.y, @divFloor(config.ROTATION_DOWN, 2));
 }
 
 fn create_bullet(state: *gs.GameState, bullet_speed: i32) game_bullet.Bullet {
     const player = &state.player;
-    if (player.rot == -20.0) {
+    if (player.rot == config.ROTATION_UP) {
         return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 5, 1, -1, bullet_speed);
-    } else if (player.rot == 20.0) {
+    } else if (player.rot == config.ROTATION_DOWN) {
         return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 40, 2, 1, bullet_speed);
     } else {
         return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 16, 1, 0, bullet_speed);
