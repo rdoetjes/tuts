@@ -1,7 +1,7 @@
 const config = @import("config.zig");
 const gs = @import("game_state.zig");
 const gi = @import("game_input.zig");
-const game_bullet = @import("bullet.zig");
+const gb = @import("bullet.zig");
 const rl = @import("raylib");
 const std = @import("std");
 
@@ -194,14 +194,14 @@ pub fn player_down_release(state: *gs.GameState) void {
 }
 
 //spwan a bullet from the player sprite on the right location
-fn create_bullet(state: *gs.GameState, bullet_speed: i32) !game_bullet.Bullet {
+fn create_bullet(state: *gs.GameState, bullet_speed: i32) !gb.Bullet {
     const player = &state.player;
     if (player.rot == config.ROTATION_UP) {
-        return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 5, 1, -1, bullet_speed);
+        return gb.Bullet.init(player.pos.x + 64, player.pos.y + 5, 1, -1, bullet_speed);
     } else if (player.rot == config.ROTATION_DOWN) {
-        return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 40, 2, 1, bullet_speed);
+        return gb.Bullet.init(player.pos.x + 64, player.pos.y + 40, 2, 1, bullet_speed);
     } else {
-        return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 16, 1, 0, bullet_speed);
+        return gb.Bullet.init(player.pos.x + 64, player.pos.y + 16, 1, 0, bullet_speed);
     }
 }
 

@@ -4,7 +4,7 @@ const std = @import("std");
 const game_logic = @import("game_logic.zig");
 const game_player = @import("player.zig");
 const game_enemy = @import("enemy_blimp.zig");
-const game_bullet = @import("bullet.zig");
+const gb = @import("bullet.zig");
 const bar_graph = @import("bar_cauge.zig");
 const ArrayList = std.ArrayList;
 const screen = enum { splash, playing, gameover };
@@ -35,7 +35,7 @@ pub const GameState = struct {
     gameover_image: rl.Texture2D,
     splash_image: rl.Texture2D,
     enemies: ArrayList(game_enemy.EnemyBlimp),
-    bullets: ArrayList(game_bullet.Bullet),
+    bullets: ArrayList(gb.Bullet),
     sound: Sound,
     allocator: std.mem.Allocator,
     background_layer_speed: [config.NR_BG_LAYERS]f32,
@@ -57,7 +57,7 @@ pub const GameState = struct {
             try enemies.append(try game_enemy.EnemyBlimp.init(&sprite_enemy_1));
         }
 
-        const bullets = ArrayList(game_bullet.Bullet).init(allocator);
+        const bullets = ArrayList(gb.Bullet).init(allocator);
 
         const sound = Sound{
             .gun = rl.loadSound("resources/sounds/gun.wav"),
