@@ -195,19 +195,23 @@ pub fn player_down_release(state: *gs.GameState) void {
     state.player.move_to_xy(state.player.pos.x, state.player.pos.y, 10);
 }
 
+fn create_bullet(state: *gs.GameState, bullet_speed: i32) game_bullet.Bullet {
+    const player = &state.player;
+    if (player.rot == -20.0) {
+        return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 5, 1, -1, bullet_speed);
+    } else if (player.rot == 20.0) {
+        return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 40, 2, 1, bullet_speed);
+    } else {
+        return game_bullet.Bullet.init(player.pos.x + 64, player.pos.y + 16, 1, 0, bullet_speed);
+    }
+}
+
 // when fire butten is pressed sound bullets ever 3 frames and play the sound
 pub fn player_fire(state: *gs.GameState) !void {
     if (state.player.ammo > 0 and @mod(state.frame_counter, 3) == 0) {
         state.player.ammo -= 1;
         const bullet_speed: i32 = @intCast(state.player.speed + 2);
-        var b: game_bullet.Bullet = undefined;
-        if (state.player.rot == -20) {
-            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 5, 1, -1, bullet_speed);
-        } else if (state.player.rot == 20) {
-            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 40, 2, 1, bullet_speed);
-        } else {
-            b = game_bullet.Bullet.init(state.player.pos.x + 64, state.player.pos.y + 16, 1, 0, bullet_speed);
-        }
+        const b = create_bullet(state, bullet_speed);
         try state.bullets.append(b);
     }
 
