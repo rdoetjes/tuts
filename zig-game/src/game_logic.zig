@@ -195,6 +195,7 @@ pub fn player_down_release(state: *gs.GameState) void {
     state.player.move_to_xy(state.player.pos.x, state.player.pos.y, @divFloor(config.ROTATION_DOWN, 2));
 }
 
+//spwan a bullet from the player sprite on the right location
 fn create_bullet(state: *gs.GameState, bullet_speed: i32) !game_bullet.Bullet {
     const player = &state.player;
     if (player.rot == config.ROTATION_UP) {

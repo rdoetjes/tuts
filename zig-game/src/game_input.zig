@@ -6,19 +6,19 @@ const std = @import("std");
 
 // handle all input and map accordingly to the right method in game_logic.zig
 pub fn handle_input(state: *gs.GameState) !void {
-    if (rl.isKeyDown(rl.KeyboardKey.key_up) and !rl.isKeyDown(rl.KeyboardKey.key_left) and !rl.isKeyDown(rl.KeyboardKey.key_right)) {
+    if (rl.isKeyDown(rl.KeyboardKey.key_up)) {
         gl.player_up(state);
     }
 
-    if (rl.isKeyDown(rl.KeyboardKey.key_down) and !rl.isKeyDown(rl.KeyboardKey.key_left) and !rl.isKeyDown(rl.KeyboardKey.key_right)) {
+    if (rl.isKeyDown(rl.KeyboardKey.key_down)) {
         gl.player_down(state);
     }
 
-    if (rl.isKeyDown(rl.KeyboardKey.key_right) and !rl.isKeyDown(rl.KeyboardKey.key_down) and !rl.isKeyDown(rl.KeyboardKey.key_up)) {
+    if (rl.isKeyDown(rl.KeyboardKey.key_right)) {
         gl.player_right(state);
     }
 
-    if (rl.isKeyDown(rl.KeyboardKey.key_left) and !rl.isKeyDown(rl.KeyboardKey.key_down) and !rl.isKeyDown(rl.KeyboardKey.key_up)) {
+    if (rl.isKeyDown(rl.KeyboardKey.key_left)) {
         gl.player_left(state);
     }
 
