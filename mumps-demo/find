@@ -1,0 +1,16 @@
+Saved by %RS from [MGR,TST] on 02 Nov 2024 at 03:56:17 PM
+find code depends on ^print
+find
+find ; New routine
+  R "NAME|LASTNAME: ",NAME,!
+  S ID=""
+  S FOUND=0
+  F  S ID=$O(^USERS(ID)) Q:ID=""  D
+  .I ^USERS(ID,"name")=NAME D
+  ..W ID,!
+  ..D ^print(ID)
+  ..S FOUND=FOUND+1
+  W !,"# RECORDS FOUND :"_FOUND,!
+;---
+
+

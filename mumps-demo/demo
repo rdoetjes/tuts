@@ -1,0 +1,22 @@
+Saved by %RS from [MGR,TST] on 02 Nov 2024 at 09:14:10 AM
+demo code
+demo
+demo ; Demo routine
+  s fnames="Roy|Maurice|Jeffrey|Ray|Vincent|Rob|Wilco|Wim|Rajesh|Julia|Enid|Edith|Archie|Robert|Cynthia|Clare|Karin|Tony|Anthony|Mick|Keith|Juliet|Daisy"
+  s lnames="Jagger|Woods|Johnson|DeVille|Williams|Richarson|van de Oort|Beckham|Robbinson|Vega|de Lange|Orbinson|Richards|Meijer|Romer|Duke|Coltrane|Ford|Cooper"
+  s agep=67
+  s agew=15
+  s year=$PIECE($H,",",1)\365.25+1841
+  r "Number of users to add:",AMOUNT
+  f i=1:1:AMOUNT do
+  . s id=$i(^USERS)
+  . s fname=$P(fnames,"|",$R($L(fnames,"|")-1)+1)
+  . s lname=$P(lnames,"|",$R($L(lnames,"|")-1)+1)
+  . s byear=(year-agep)+($R(agep-agew))
+  . s ^USERS(id,"name")=fname_"|"_lname
+  . s ^USERS(id,"age")=byear
+  . w:(i#10=0) "."
+  quit
+;---
+
+

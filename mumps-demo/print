@@ -1,0 +1,19 @@
+Saved by %RS from [MGR,TST] on 02 Nov 2024 at 04:01:22 PM
+print code user by find
+print
+print(USERID) ; Entry point for printing user information
+  NEW NODE
+  S Y=$P($H,",",1)/365.25+1841
+  I '$DATA(^USERS(USERID))  DO
+  .W "User ID "_USERID_" does not exist.",!
+  E  DO
+  .W "________________________________________________________________________________",!
+  .W "User ID: ",USERID,!
+  .S NODE=""
+  .F  S NODE=$O(^USERS(USERID,NODE)) Q:NODE=""  DO
+  ..I NODE="name" W "Firstname: "_$P(^USERS(USERID,NODE),"|",1)_" Lastname: "_$P(^USERS(USERID,NODE),"|",2)_" age : "_(Y-^USERS(USERID,"age")\1),!
+  .W "________________________________________________________________________________",!
+  QUIT
+;---
+
+
