@@ -1,20 +1,20 @@
-Saved by %RS from [MGR,TST] on 02 Nov 2024 at 09:14:10 AM
-demo code
+Saved by %RS from [MGR,DEV] on 03 Nov 2024 at 12:03:17 PM
+demo code that generates test data
 demo
-demo ; Demo routine
-  s fnames="Roy|Maurice|Jeffrey|Ray|Vincent|Rob|Wilco|Wim|Rajesh|Julia|Enid|Edith|Archie|Robert|Cynthia|Clare|Karin|Tony|Anthony|Mick|Keith|Juliet|Daisy"
-  s lnames="Jagger|Woods|Johnson|DeVille|Williams|Richarson|van de Oort|Beckham|Robbinson|Vega|de Lange|Orbinson|Richards|Meijer|Romer|Duke|Coltrane|Ford|Cooper"
+demo ; New routine
+  s fnames="Roy|Maurice|Jeffrey|Ray|Vincent|Rob|Wilco|Wim|Rajesh|Julia|Enid|Edith|Archie|Robert|Cynthia|Clare|Karin|Tony|Anthony|Mick|Keith|Juliet|Daisy|Marc"
+  s lnames="Jagger|Woods|Johnson|DeVille|Williams|Richardson|van der Oort|Beckham|Robinsson|Vega|de Lange|Orbinson|Richards|Meijer|Roner|Duke|Coltrane|Ford|Cooper"
   s agep=67
   s agew=15
-  s year=$PIECE($H,",",1)\365.25+1841
-  r "Number of users to add:",AMOUNT
-  f i=1:1:AMOUNT do
+  s year=$P($H,",",1)\365.25+1841
+  r "Numer of users to add: ",AMOUNT
+  f i=1:1:AMOUNT d
   . s id=$i(^USERS)
-  . s fname=$P(fnames,"|",$R($L(fnames,"|")-1)+1)
-  . s lname=$P(lnames,"|",$R($L(lnames,"|")-1)+1)
+  . s fname=$P(fnames,"|",$R($L(fnames,"|"))+1)
+  . s lname=$P(lnames,"|",$R($L(lnames,"|"))+1)
   . s byear=(year-agep)+($R(agep-agew))
   . s ^USERS(id,"name")=fname_"|"_lname
-  . s ^USERS(id,"age")=byear
+  . s ^USERS(id,"byear")=byear
   . w:(i#10=0) "."
   quit
 ;---
