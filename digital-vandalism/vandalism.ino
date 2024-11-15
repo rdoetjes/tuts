@@ -1,12 +1,22 @@
 #include <ESP8266WiFi.h>
 #include <EEPROM.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
 
-extern "C" {
-  #include "user_interface.h"
-}
+/* Put your SSID & Password */
+const char* ssid = "hacker";  // Enter SSID here
+const char* password = "hacker1234";  //Enter Password here
+
+/* Put IP Address details */
+IPAddress local_ip(192,168,1,1);
+IPAddress gateway(192,168,1,1);
+IPAddress subnet(255,255,255,0);
+
+ESP8266WebServer server(80);
 
 byte channel;
-String ssid="I❤️PUSSY!";
+String spoof_ssid="I❤️PUSSY!";
+bool spamming=false;
 
 uint8_t packet[128] = { 0x80, 0x00, 0x00, 0x00, 
                         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -23,21 +33,26 @@ uint8_t packet[128] = { 0x80, 0x00, 0x00, 0x00,
                         0x04
 };                       
 
+extern "C" {
+  #include "user_interface.h"
+}
+
 void setup() {
   Serial.begin(115200);
   delay(500);
-  Serial.println("YOUR SSID?!");
-  Serial.setTimeout(20*1000);
-  String t=Serial.readString();
-  if (t.length()!=0) {
-    ssid=t;
-  } 
 
-  wifi_set_opmode(STATION_MODE);
-  wifi_promiscuous_enable(1); 
+  WiFi.softAP(ssid, password);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+  delay(100);
+  
+  server.on("/", handle_OnConnect);
+  server.on("/spam", handle_Spam);
+  server.on("/stop", handle_Spam);
+
+  server.begin();
 }
 
-void set_ssid(const char *ssid, uint8_t *packet){
+void set_ssid(const char *ssid, uint8_t *packet, int channel){
   static int nr_spaces=0;
 
   //set mac address to random values
@@ -48,8 +63,14 @@ void set_ssid(const char *ssid, uint8_t *packet){
   packet[14] = packet[20] = random(256);
   packet[15] = packet[21] = random(256);
 
+  // set WPA2
+  packet[34] = 0x31;
+
   //set lentgh of the SSID
   packet[37]=strlen(ssid)+2;
+
+  //set channel
+  packet[82] = channel;
 
   //clean SSID
   for (int i=0; i<32; i++){
@@ -71,17 +92,57 @@ void set_ssid(const char *ssid, uint8_t *packet){
   }
 }
 
-void loop() { 
-    channel = random(1,12); 
-    wifi_set_channel(channel);
-
-    set_ssid(ssid.c_str(), (uint8_t *)&packet);
-    
-    packet[82] = channel;
-    
-    wifi_send_pkt_freedom(packet, 57, 0);
-    wifi_send_pkt_freedom(packet, 57, 0);
-    wifi_send_pkt_freedom(packet, 57, 0);
-    delay(1);
+void handle_Spam(){
+    spoof_ssid = server.arg("ssid");
+    server.send(200, "text/html", "SPAMMING "+spoof_ssid);
+    //wifi_set_opmode(STATION_MODE);
+    //wifi_promiscuous_enable(1); 
+    spamming=true;
 }
 
+void handle_OnConnect() { 
+ String html = "<!DOCTYPE html>"
+              "<html>"
+              "<head>"
+              "<title>SSID Sender</title>"
+              "<style>"
+              "body { font-size: 24px; }"
+              "input { font-size: 24px; padding: 10px; width: 80%; margin: 20px; }"
+              "button { font-size: 24px; padding: 10px 20px; margin: 20px; }"
+              "</style>"
+              "</head>"
+              "<body>"
+              "<input type='text' id='ssidInput' placeholder='Enter SSID'>"
+              "<button onclick='sendSSID()'>Send SSID</button>"
+              "<script>"
+              "function sendSSID() {"
+              "const ssid = document.getElementById('ssidInput').value;"
+              "const baseUrl = window.location.origin;"
+              "window.location.href = baseUrl + '/spam?ssid=' + encodeURIComponent(ssid);"
+              "}"
+              "</script>"
+              "</body>"
+              "</html>";
+    server.send(200, "text/html", html);
+}
+
+void handle_Stop() {
+    server.send(200, "text/html", "STOPPED SPAMMING");
+    spamming=false;
+}
+
+void loop(){
+  server.handleClient();
+
+   if(spamming){
+      channel = random(1,12); 
+      wifi_set_channel(channel);
+
+      set_ssid(spoof_ssid.c_str(), (uint8_t *)&packet, channel);
+          
+      wifi_send_pkt_freedom(packet, 57, 0);
+      wifi_send_pkt_freedom(packet, 57, 0);
+      wifi_send_pkt_freedom(packet, 57, 0);
+      delay(1);
+    }
+}
