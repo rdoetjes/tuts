@@ -47,7 +47,7 @@ void setup() {
   
   server.on("/", handle_OnConnect);
   server.on("/spam", handle_Spam);
-  server.on("/stop", handle_Spam);
+  server.on("/stop", handle_Stop);
 
   server.begin();
 }
