@@ -91,7 +91,22 @@ void set_ssid(const char *ssid, uint8_t *packet, int channel){
 
 void handle_Spam(){
     spoof_ssid = server.arg("ssid");
-    server.send(200, "text/html", "SPAMMING "+spoof_ssid);
+    String html = "<!DOCTYPE html>"
+              "<html>"
+              "<head>"
+              "<meta charset=\"UTF-8\">"
+              "<title>SSID Sender</title>"
+              "<style>"
+              "body { font-size: 24px; }"
+              "input { font-size: 24px; padding: 10px; width: 80%; margin: 20px; }"
+              "button { font-size: 24px; padding: 10px 20px; margin: 20px; }"
+              "</style>"
+              "</head>"
+              "<body>"
+              "SENDING BEACON WITH SSID"+spoof_ssid+
+              "</body>"
+              "</html>";
+    server.send(200, "text/html", html);
     //wifi_set_opmode(STATION_MODE);
     //wifi_promiscuous_enable(1); 
     spamming=true;
