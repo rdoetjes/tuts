@@ -81,13 +81,10 @@ void set_ssid(const char *ssid, uint8_t *packet, int channel){
     packet[38+i]=ssid[i];
   }
 
-  packet[38+strlen(ssid)+1]=0xC2;
-  packet[38+strlen(ssid)+2]=0xA0;
-
   if (strlen(ssid)+nr_spaces>=30) nr_spaces = 0;
   nr_spaces++;
 
-  for(int i=0; i<nr_spaces; i++){
+  for(int i=0; i<2; i++){
       packet[38+strlen(ssid)+i]=random(31);
   }
 }
@@ -112,7 +109,7 @@ void handle_OnConnect() {
               "</style>"
               "</head>"
               "<body>"
-              "<input type='text' id='ssidInput' placeholder='Enter SSID'>"
+              "<input type='text' maxlength='17' id='ssidInput' placeholder='Enter SSID'>"
               "<button onclick='sendSSID()'>Send SSID</button>"
               "<script>"
               "function sendSSID() {"
