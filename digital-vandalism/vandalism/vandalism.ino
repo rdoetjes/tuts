@@ -150,7 +150,7 @@ void handle_OnConnect() {
               "</style>"
               "</head>"
               "<body>"
-              "<input type='text' maxlength='30' id='ssidInput' placeholder='Enter SSID'>"
+              "<input type='text' maxlength='17' id='ssidInput' placeholder='Enter SSID'>"
               "<button onclick='sendSSID()'>Send SSID</button>"
               "<script>"
               "function sendSSID() {"
