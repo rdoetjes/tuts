@@ -33,7 +33,7 @@ bool spamming=false;
 //                         0x04
 // };                       
 
-uint8_t packet[79] = {
+uint8_t packet[83] = {
     // Frame Control
     0x80, 0x00,
     // Duration
@@ -54,7 +54,7 @@ uint8_t packet[79] = {
     0x01, 0x04,
     // SSID Tag
     0x00, 0x20, 'M', 'y', 'A', 'w', 'e', 's', 'o', 'm', 'e', 'W', 'i', 'F', 'i', 
-    'N', 'e', 't', 'w', 'o', 'r', 'k', '_', '3', '2', 'C', 'h', 'a', 'r', 's',
+    'N', 'e', 't', 'w', 'o', 'r', 'k', '_', '3', '2', 'C', 'h', 'a', 'r', 's','1','2','3','4',
     // Supported Rates Tag
     0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c,
     // DS Parameter Set Tag
