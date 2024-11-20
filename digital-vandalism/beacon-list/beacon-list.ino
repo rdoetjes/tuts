@@ -3,6 +3,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
+#define MAX_SSID 12
+
 /* Put your SSID & Password */
 const char* ssid = "hacker";  // Enter SSID here
 const char* password = "hacker1234";  //Enter Password here
@@ -33,7 +35,7 @@ bool spamming=false;
 //                         0x04
 // };                       
 
-uint8_t packet[83] = {
+uint8_t packet[] = {
     // Frame Control
     0x80, 0x00,
     // Duration
@@ -53,8 +55,8 @@ uint8_t packet[83] = {
     // Capability Info
     0x01, 0x04,
     // SSID Tag
-    0x00, 0x20, 'M', 'y', 'A', 'w', 'e', 's', 'o', 'm', 'e', 'W', 'i', 'F', 'i', 
-    'N', 'e', 't', 'w', 'o', 'r', 'k', '_', '3', '2', 'C', 'h', 'a', 'r', 's','1','2','3','4',
+    0x00, 0x14, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 
+    ' ', ' ', ' ', ' ', ' ', ' ', ' ',
     // Supported Rates Tag
     0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c,
     // DS Parameter Set Tag
@@ -81,8 +83,6 @@ void setup() {
 }
 
 void set_ssid(const char *ssid, uint8_t *packet, int channel){
-  static int nr_spaces=0;
-
   //set mac address to random values
   packet[10] = packet[16] = random(256);
   packet[11] = packet[17] = random(256);
@@ -96,27 +96,25 @@ void set_ssid(const char *ssid, uint8_t *packet, int channel){
 
   //set lentgh of the SSID
   int ssid_len = strlen(ssid);
-  if (ssid_len > 30) ssid_len = 30; // Reserve space for 2 random bytes
-  packet[37] = ssid_len + 2;
+  if (ssid_len > 19) ssid_len = 19;
+  packet[37] = 19;
 
   //set channel
   packet[82] = channel;
 
   //clean SSID
-  for (int i=0; i<32; i++){
-    packet[38+i]=0;
+  for (int i=0; i<19; i++){
+    packet[38+i]=' ';
   }
 
   for (int i=0; i<strlen(ssid); i++){
     packet[38+i]=ssid[i];
   }
-
-  packet[38 + ssid_len] = random(31);
-  packet[38 + ssid_len+1] = random(31);
 }
 
 void handle_Spam(){
     spoof_ssid = server.arg("ssid");
+    spoof_ssid = spoof_ssid.substring(0,spoof_ssid.length()-1); 
     String html = "<!DOCTYPE html>"
               "<html>"
               "<head>"
@@ -124,8 +122,6 @@ void handle_Spam(){
               "<title>SSID Sender</title>"
               "<style>"
               "body { font-size: 24px; }"
-              "input { font-size: 24px; padding: 10px; width: 80%; margin: 20px; }"
-              "button { font-size: 24px; padding: 10px 20px; margin: 20px; }"
               "</style>"
               "</head>"
               "<body>"
@@ -139,7 +135,17 @@ void handle_Spam(){
 }
 
 void handle_OnConnect() { 
- String html = "<!DOCTYPE html>"
+  String ssids = "";
+  for (int i=0; i < MAX_SSID; i++){
+    ssids+="<input type='text' maxlength='19' id='" + String(i) + "' placeholder='Enter SSID'><br/>";
+  }
+
+  String f;
+  for (int i=0; i < MAX_SSID; i++){
+    f +="ssid += document.getElementById("+String(i)+").value; ssid+=\"|\";";
+  }
+
+  String html = "<!DOCTYPE html>"
               "<html>"
               "<head>"
               "<title>SSID Sender</title>"
@@ -149,12 +155,10 @@ void handle_OnConnect() {
               "button { font-size: 24px; padding: 10px 20px; margin: 20px; }"
               "</style>"
               "</head>"
-              "<body>"
-              "<input type='text' maxlength='17' id='ssidInput' placeholder='Enter SSID'>"
+              "<body>" + ssids +
               "<button onclick='sendSSID()'>Send SSID</button>"
               "<script>"
-              "function sendSSID() {"
-              "const ssid = document.getElementById('ssidInput').value;"
+              "function sendSSID() { var ssid=\"\";" + f +
               "const baseUrl = window.location.origin;"
               "window.location.href = baseUrl + '/spam?ssid=' + encodeURIComponent(ssid);"
               "}"
@@ -173,14 +177,23 @@ void loop(){
   server.handleClient();
 
    if(spamming){
+    char * pch;
+    String temp = spoof_ssid.c_str();
+    pch = strtok ((char *)temp.c_str() ,"|");
+    while (pch != NULL)
+    {
       channel = random(1,12); 
       wifi_set_channel(channel);
 
-      set_ssid(spoof_ssid.c_str(), (uint8_t *)&packet, channel);
+      set_ssid(pch, (uint8_t *)&packet, channel);
           
       wifi_send_pkt_freedom(packet, 57, 0);
       wifi_send_pkt_freedom(packet, 57, 0);
       wifi_send_pkt_freedom(packet, 57, 0);
       delay(1);
+
+      pch = strtok (NULL, "|");     
     }
+  }
 }
+
