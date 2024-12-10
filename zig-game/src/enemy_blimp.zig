@@ -5,7 +5,7 @@ const std = @import("std");
 const bcauge = @import("bar_cauge.zig");
 const col_y_offset = 20;
 const col_x_offset = 13;
-var prng = std.rand.DefaultPrng.init(666);
+var prng = std.Random.DefaultPrng.init(666);
 const rand = prng.random();
 
 //The enemy has a collision box that is rectangle and is smaller than the sprite to make collision detection fairer
