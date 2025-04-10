@@ -6,34 +6,34 @@ const std = @import("std");
 
 // handle all input and map accordingly to the right method in game_logic.zig
 pub fn handle_input(state: *gs.GameState) !void {
-    if (rl.isKeyDown(rl.KeyboardKey.key_up)) {
+    if (rl.isKeyDown(rl.KeyboardKey.up)) {
         gl.player_up(state);
     }
 
-    if (rl.isKeyDown(rl.KeyboardKey.key_down)) {
+    if (rl.isKeyDown(rl.KeyboardKey.down)) {
         gl.player_down(state);
     }
 
-    if (rl.isKeyDown(rl.KeyboardKey.key_right)) {
+    if (rl.isKeyDown(rl.KeyboardKey.right)) {
         gl.player_right(state);
     }
 
-    if (rl.isKeyDown(rl.KeyboardKey.key_left)) {
+    if (rl.isKeyDown(rl.KeyboardKey.left)) {
         gl.player_left(state);
     }
 
-    if (rl.isKeyDown(rl.KeyboardKey.key_space)) {
+    if (rl.isKeyDown(rl.KeyboardKey.space)) {
         // avoids the game to fire when in splash screen or gameover screen
         if (state.screen == .playing) {
             try gl.player_fire(state);
         }
     }
 
-    if (rl.isKeyReleased(rl.KeyboardKey.key_space)) {
+    if (rl.isKeyReleased(rl.KeyboardKey.space)) {
         gl.player_fire_release(state);
     }
 
-    if (rl.isKeyReleased(rl.KeyboardKey.key_s)) {
+    if (rl.isKeyReleased(rl.KeyboardKey.s)) {
         if (state.screen == .splash) {
             state.reset();
             state.screen = .playing;
@@ -46,11 +46,11 @@ pub fn handle_input(state: *gs.GameState) !void {
         }
     }
 
-    if (rl.isKeyReleased(rl.KeyboardKey.key_down)) {
+    if (rl.isKeyReleased(rl.KeyboardKey.down)) {
         gl.player_down_release(state);
     }
 
-    if (rl.isKeyReleased(rl.KeyboardKey.key_up)) {
+    if (rl.isKeyReleased(rl.KeyboardKey.up)) {
         gl.player_up_release(state);
     }
 }

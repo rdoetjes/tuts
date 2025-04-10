@@ -48,10 +48,10 @@ pub const GameState = struct {
     health_bar: bar_graph.BarCauge,
 
     pub fn init(allocator: std.mem.Allocator) !GameState {
-        sprite_player_1 = rl.loadTexture("resources/sprites/player.png");
+        sprite_player_1 = try rl.loadTexture("resources/sprites/player.png");
         const player = try game_player.Player.init(&sprite_player_1);
 
-        sprite_enemy_1 = rl.loadTexture("resources/sprites/blimp.png");
+        sprite_enemy_1 = try rl.loadTexture("resources/sprites/blimp.png");
         var enemies = ArrayList(game_enemy.EnemyBlimp).init(allocator);
         for (0..config.NR_ENEMIES) |_| {
             try enemies.append(try game_enemy.EnemyBlimp.init(&sprite_enemy_1));
@@ -60,11 +60,11 @@ pub const GameState = struct {
         const bullets = ArrayList(gb.Bullet).init(allocator);
 
         const sound = Sound{
-            .gun = rl.loadSound("resources/sounds/gun.wav"),
-            .hit = rl.loadSound("resources/sounds/hit.wav"),
-            .alert = rl.loadSound("resources/sounds/alert.wav"),
-            .music = rl.loadMusicStream("resources/sounds/music.wav"),
-            .engine = rl.loadSound("resources/sounds/engine.wav"),
+            .gun = try rl.loadSound("resources/sounds/gun.wav"),
+            .hit = try rl.loadSound("resources/sounds/hit.wav"),
+            .alert = try rl.loadSound("resources/sounds/alert.wav"),
+            .music = try rl.loadMusicStream("resources/sounds/music.wav"),
+            .engine = try rl.loadSound("resources/sounds/engine.wav"),
         };
 
         var layers = ArrayList(rl.Texture2D).init(allocator);
@@ -72,16 +72,16 @@ pub const GameState = struct {
         for (0..6) |i| {
             const layer_name = std.fmt.allocPrintZ(allocator, "resources/layers/l{}.png", .{i + 1}) catch return error.OutOfMemory;
             defer allocator.free(layer_name);
-            try layers.append(rl.loadTexture(layer_name));
+            try layers.append(try rl.loadTexture(layer_name));
             background_layer_speed[i] = 0.0;
         }
-        const gameover_image = rl.loadTexture("resources/layers/gameover.png");
-        const splash_image = rl.loadTexture("resources/layers/splash.png");
+        const gameover_image = try rl.loadTexture("resources/layers/gameover.png");
+        const splash_image = try rl.loadTexture("resources/layers/splash.png");
 
         const ammo_bar = bar_graph.BarCauge.init(270, 10, 100, 100, 100, 30);
         const health_bar = bar_graph.BarCauge.init(500, 10, 100, 100, 100, 30);
 
-        const font = rl.loadFontEx("resources/fonts/Blankenburg.ttf", 20, null);
+        const font = try rl.loadFontEx("resources/fonts/Blankenburg.ttf", 20, null);
         rl.playMusicStream(sound.music);
 
         return GameState{
