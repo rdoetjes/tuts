@@ -23,7 +23,6 @@ pub fn main() !void {
     v1.set_model("gpt-3.5-turbo"); // I am cheap, so I use the cheaper model
 
     while (true) {
-
         // ask openai a question
         const response = try v1.ask("Tell me a joke about germans In the style of Hans Landa from Ingolorius Bastards no introduction no preludes, the audience knows it is a joke!");
 
