@@ -27,7 +27,7 @@ pub fn main() !void {
     while (true) {
         try stdout.print("\n\x1b[31mAsk me anything: \x1b[0m", .{});
         const question = try std.io.getStdIn().reader().readUntilDelimiterAlloc(allocator, '\n', 4096);
-        // ask openai a questionte
+        // ask openai a questione
         var response = try v1.ask(question);
 
         if (response.status == .not_acceptable) {
