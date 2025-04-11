@@ -60,7 +60,7 @@ pub const OpenAI_v1 = struct {
             .payload = payload,
             .response_storage = .{ .dynamic = &response_body },
         }) catch {
-            return std.http.Client.FetchResult{ .status = .not_acceptable };
+            return std.http.Client.FetchResult{ .status = .gone };
         };
 
         if (response.status == .ok) {

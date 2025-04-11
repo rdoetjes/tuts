@@ -30,7 +30,7 @@ pub fn main() !void {
         // ask openai a questione
         var response = try v1.ask(question);
 
-        if (response.status == .not_acceptable) {
+        if (response.status == .gone) {
             response = try v1.ask(question);
         }
 
