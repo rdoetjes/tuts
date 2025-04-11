@@ -31,7 +31,6 @@ pub fn main() !void {
         var response = try v1.ask(question);
 
         if (response.status == .not_acceptable) {
-            std.debug.print("Failed to fetch response, retrying ...\n", .{});
             response = try v1.ask(question);
         }
 
