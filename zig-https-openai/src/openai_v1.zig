@@ -12,13 +12,13 @@ pub const OpenAI_v1 = struct {
 
     pub fn init(allocator: std.mem.Allocator, api_key: []const u8) !*OpenAI_v1 {
         const instance = try allocator.create(OpenAI_v1);
-        errdefer allocator.destroy(instance); // This line is crucial it removes the instance when error occurs!
+        errdefer allocator.destroy(instance);
 
         const auth_header = try std.fmt.allocPrint(allocator, "Bearer {s}", .{api_key});
         const model = try std.mem.Allocator.dupe(allocator, u8, "gpt-4o");
 
         var headers = std.ArrayList(std.http.Header).init(allocator);
-        errdefer headers.deinit(); // Clean up in case header appends fail
+        errdefer headers.deinit();
 
         try headers.append(.{ .name = try allocator.dupe(u8, "Authorization"), .value = auth_header });
         try headers.append(.{ .name = try allocator.dupe(u8, "Content-Type"), .value = try allocator.dupe(u8, "application/json") });
