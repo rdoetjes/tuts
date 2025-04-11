@@ -50,28 +50,17 @@ pub fn main() !void {
     var resp_body = std.ArrayList(u8).init(allocator);
     defer resp_body.deinit();
 
-    const status = try get("https://api.openai.com/v1/chat/completions", headers, body, &client, &resp_body);
-
-    if (status == .ok) {
-        std.debug.print("Response Body: {s}\n", .{resp_body.items});
-    } else {
-        std.debug.print("Request failed with status: {any}\n", .{status});
-    }
-}
-
-fn get(
-    url: []const u8,
-    headers: []const std.http.Header,
-    body: []const u8,
-    client: *std.http.Client,
-    resp_body: *std.ArrayList(u8),
-) !std.http.Status {
     const response = try client.fetch(.{
         .method = .POST,
-        .location = .{ .url = url },
+        .location = .{ .url = "https://api.openai.com/v1/chat/completions" },
         .extra_headers = headers,
         .payload = body,
-        .response_storage = .{ .dynamic = resp_body },
+        .response_storage = .{ .dynamic = &resp_body },
     });
-    return response.status;
+
+    if (response.status == .ok) {
+        std.debug.print("Response Body: {s}\n", .{resp_body.items});
+    } else {
+        std.debug.print("Request failed with status: {any}\n", .{response});
+    }
 }
