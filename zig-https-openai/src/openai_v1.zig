@@ -11,7 +11,10 @@ pub const OpenAI_v1 = struct {
 
     pub fn set_model(self: *OpenAI_v1, model: []const u8) void {
         if (self.model.len > 0) self.allocator.free(self.model);
-        self.model = std.mem.Allocator.dupe(self.allocator, u8, model) catch unreachable;
+        self.model = std.mem.Allocator.dupe(self.allocator, u8, model) catch |err| {
+            std.debug.print("ABORT! Failed to duplicate model name: {}\n", .{err});
+            std.os.linux.exit(1);
+        };
     }
 
     pub fn init(allocator: std.mem.Allocator, api_key: []const u8) !*OpenAI_v1 {
@@ -34,7 +37,7 @@ pub const OpenAI_v1 = struct {
         return instance;
     }
 
-    fn make_body(allocator: std.mem.Allocator, question: []const u8) ![]u8 {
+    fn make_body(self: *OpenAI_v1, allocator: std.mem.Allocator, question: []const u8) ![]u8 {
         const Message = struct {
             role: []const u8,
             content: []const u8,
@@ -46,7 +49,7 @@ pub const OpenAI_v1 = struct {
         };
 
         const body = Body{
-            .model = "gpt-4o",
+            .model = self.model,
             .messages = [_]Message{
                 .{ .role = "user", .content = question },
             },
@@ -60,7 +63,7 @@ pub const OpenAI_v1 = struct {
         question: []const u8,
         response_body: *std.ArrayList(u8),
     ) !std.http.Client.FetchResult {
-        const payload = try make_body(self.client.allocator, question);
+        const payload = try make_body(self, self.client.allocator, question);
         defer self.client.allocator.free(payload);
 
         const response = try self.client.fetch(.{

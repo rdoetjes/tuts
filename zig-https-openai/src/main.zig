@@ -21,7 +21,7 @@ pub fn main() !void {
     };
     defer v1.deinit();
 
-    v1.set_model("gpt-4-5-turbo");
+    v1.set_model("gpt-3.5-turbo");
 
     while (true) {
         var frame_gpa = std.heap.GeneralPurposeAllocator(.{}){};
