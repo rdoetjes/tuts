@@ -8,6 +8,7 @@ pub const OpenAI_v1 = struct {
     client: std.http.Client,
     headers: std.ArrayList(std.http.Header),
     allocator: std.mem.Allocator,
+    answer: []const u8,
 
     pub fn set_model(self: *OpenAI_v1, model: []const u8) void {
         if (self.model.len > 0) self.allocator.free(self.model);
@@ -19,13 +20,19 @@ pub const OpenAI_v1 = struct {
 
     pub fn init(allocator: std.mem.Allocator, api_key: []const u8) !*OpenAI_v1 {
         const instance = try allocator.create(OpenAI_v1);
+        errdefer allocator.destroy(instance); // This line is crucial it removes the instance when error occurs!
 
         const auth_header = try std.fmt.allocPrint(allocator, "Bearer {s}", .{api_key});
         const model = try std.mem.Allocator.dupe(allocator, u8, "gpt-4o");
+
         var headers = std.ArrayList(std.http.Header).init(allocator);
-        try headers.append(.{ .name = "Authorization", .value = auth_header });
-        try headers.append(.{ .name = "Content-Type", .value = "application/json" });
+        errdefer headers.deinit(); // Clean up in case header appends fail
+
+        try headers.append(.{ .name = try allocator.dupe(u8, "Authorization"), .value = auth_header });
+        try headers.append(.{ .name = try allocator.dupe(u8, "Content-Type"), .value = try allocator.dupe(u8, "application/json") });
+
         const client = std.http.Client{ .allocator = allocator };
+        const answer = try std.mem.Allocator.dupe(allocator, u8, "");
 
         instance.* = .{
             .model = model,
@@ -33,7 +40,9 @@ pub const OpenAI_v1 = struct {
             .client = client,
             .auth_header = auth_header,
             .headers = headers,
+            .answer = answer,
         };
+
         return instance;
     }
 
@@ -61,25 +70,43 @@ pub const OpenAI_v1 = struct {
     pub fn ask(
         self: *OpenAI_v1,
         question: []const u8,
-        response_body: *std.ArrayList(u8),
     ) !std.http.Client.FetchResult {
-        const payload = try make_body(self, self.client.allocator, question);
-        defer self.client.allocator.free(payload);
+        const payload = try make_body(self, self.allocator, question);
+        defer self.allocator.free(payload);
+
+        var response_body = std.ArrayList(u8).init(self.allocator);
+        defer response_body.deinit();
 
         const response = try self.client.fetch(.{
             .method = .POST,
             .location = .{ .url = self.url },
             .extra_headers = self.headers.items,
             .payload = payload,
-            .response_storage = .{ .dynamic = response_body },
+            .response_storage = .{ .dynamic = &response_body },
         });
+
+        if (response.status == .ok) {
+            const parsed = try std.json.parseFromSlice(std.json.Value, self.allocator, response_body.items, .{});
+            defer parsed.deinit();
+
+            self.allocator.free(self.answer);
+            const answer = parsed.value.object.get("choices").?.array.items[0].object.get("message").?.object.get("content").?.string;
+            self.answer = try std.fmt.allocPrint(self.allocator, "{s}", .{answer});
+        }
 
         return response;
     }
 
     pub fn deinit(self: *OpenAI_v1) void {
         self.allocator.free(self.model);
+        self.allocator.free(self.answer);
+
+        for (self.headers.items) |header| {
+            self.allocator.free(header.name);
+            self.allocator.free(header.value);
+        }
         self.allocator.free(self.auth_header);
+
         self.headers.deinit();
         self.client.deinit();
     }
