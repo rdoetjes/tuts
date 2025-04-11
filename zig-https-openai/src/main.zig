@@ -1,5 +1,4 @@
 const std = @import("std");
-const Url = std.Uri;
 const mem = std.mem;
 const json = std.json;
 
