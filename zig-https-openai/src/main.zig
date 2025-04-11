@@ -20,7 +20,7 @@ pub fn main() !void {
     };
     defer v1.deinit();
 
-    v1.set_model("gpt-3.5-turbo");
+    v1.set_model("gpt-3.5-turbo"); // I am cheap, so I use the cheaper model
 
     while (true) {
 
