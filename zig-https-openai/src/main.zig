@@ -24,14 +24,14 @@ pub fn main() !void {
     v1.set_model("gpt-3.5-turbo"); // I am cheap, so I use the cheaper model
 
     while (true) {
-        try stdout.print("Ask me anything: ", .{});
+        try stdout.print("\n\x1b[31mAsk me anything: \x1b[0m", .{});
         const question = try std.io.getStdIn().reader().readUntilDelimiterAlloc(allocator, '\n', 4096);
         // ask openai a question
         const response = try v1.ask(question);
 
         //print the content of the JSON response body if http status is ok
         if (response.status == .ok and std.mem.containsAtLeast(u8, v1.answer, 0, "ERROR:")) {
-            try stdout.print("\x1b[31mMy answer:\x1b[0m\n \x1b[32m{s}\x1b[0m\n", .{v1.answer});
+            try stdout.print("\n\x1b[31mMy answer:\x1b[0m \x1b[32m{s}\x1b[0m\n", .{v1.answer});
         } else {
             std.debug.print("Request failed with status: {any}\n", .{response});
         }

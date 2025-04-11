@@ -53,13 +53,16 @@ pub const OpenAI_v1 = struct {
         var response_body = std.ArrayList(u8).init(self.allocator);
         defer response_body.deinit();
 
-        const response = try self.client.fetch(.{
+        const response = self.client.fetch(.{
             .method = .POST,
             .location = .{ .url = self.url },
             .extra_headers = self.headers.items,
             .payload = payload,
             .response_storage = .{ .dynamic = &response_body },
-        });
+        }) catch |err| {
+            std.debug.print("ABORT! Failed to fetch response: {}\n", .{err});
+            return std.http.Client.FetchResult{ .status = .not_acceptable };
+        };
 
         if (response.status == .ok) {
             parse_response(self, response_body.items) catch |err| {
@@ -102,8 +105,8 @@ pub const OpenAI_v1 = struct {
     }
 
     pub fn deinit(self: *OpenAI_v1) void {
-        self.allocator.free(self.model);
-        self.allocator.free(self.answer);
+        if (self.model.len > 0) self.allocator.free(self.model);
+        if (self.answer.len > 0) self.allocator.free(self.answer);
 
         for (self.headers.items) |header| {
             self.allocator.free(header.name);
