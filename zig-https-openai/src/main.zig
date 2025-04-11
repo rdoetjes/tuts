@@ -6,6 +6,7 @@ pub fn main() !void {
     // Initialize allocator
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
+    var retry: u8 = 0;
 
     // fetch my OpenAI API key from environment variable OPENAI_API_KEY (std.os.getenv no longer works it seems)
     const openai_api_key = std.process.getEnvVarOwned(allocator, "OPENAI_API_KEY") catch {
@@ -26,12 +27,18 @@ pub fn main() !void {
     while (true) {
         try stdout.print("\n\x1b[31mAsk me anything: \x1b[0m", .{});
         const question = try std.io.getStdIn().reader().readUntilDelimiterAlloc(allocator, '\n', 4096);
-        // ask openai a question
-        const response = try v1.ask(question);
+        // ask openai a questionte
+        var response = try v1.ask(question);
+
+        if (response.status == .not_acceptable) {
+            std.debug.print("Failed to fetch response, retrying ...\n", .{});
+            response = try v1.ask(question);
+        }
 
         //print the content of the JSON response body if http status is ok
         if (response.status == .ok and std.mem.containsAtLeast(u8, v1.answer, 0, "ERROR:")) {
             try stdout.print("\n\x1b[31mMy answer:\x1b[0m \x1b[32m{s}\x1b[0m\n", .{v1.answer});
+            retry = 0;
         } else {
             std.debug.print("Request failed with status: {any}\n", .{response});
         }

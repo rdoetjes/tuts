@@ -59,8 +59,7 @@ pub const OpenAI_v1 = struct {
             .extra_headers = self.headers.items,
             .payload = payload,
             .response_storage = .{ .dynamic = &response_body },
-        }) catch |err| {
-            std.debug.print("Failed to fetch response, retry connection: {}\n", .{err});
+        }) catch {
             return std.http.Client.FetchResult{ .status = .not_acceptable };
         };
 
