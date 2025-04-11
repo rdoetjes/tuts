@@ -17,11 +17,11 @@ pub fn main() !void {
 
     // Request body
     const body = try std.json.stringifyAlloc(allocator, .{
-        .model = "gpt-3.5-turbo",
+        .model = "gpt-4o",
         .messages = .{
             .{
                 .role = "user",
-                .content = "Hello, how are you?",
+                .content = "Tell me a joke about germans",
             },
         },
     }, .{});
