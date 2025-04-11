@@ -46,27 +46,6 @@ pub const OpenAI_v1 = struct {
         };
     }
 
-    fn make_body(self: *OpenAI_v1, allocator: std.mem.Allocator, question: []const u8) ![]u8 {
-        const Message = struct {
-            role: []const u8,
-            content: []const u8,
-        };
-
-        const Body = struct {
-            model: []const u8,
-            messages: [1]Message,
-        };
-
-        const body = Body{
-            .model = self.model,
-            .messages = [_]Message{
-                .{ .role = "user", .content = question },
-            },
-        };
-
-        return try json.stringifyAlloc(allocator, body, .{});
-    }
-
     pub fn ask(
         self: *OpenAI_v1,
         question: []const u8,
@@ -95,6 +74,27 @@ pub const OpenAI_v1 = struct {
         }
 
         return response;
+    }
+
+    fn make_body(self: *OpenAI_v1, allocator: std.mem.Allocator, question: []const u8) ![]u8 {
+        const Message = struct {
+            role: []const u8,
+            content: []const u8,
+        };
+
+        const Body = struct {
+            model: []const u8,
+            messages: [1]Message,
+        };
+
+        const body = Body{
+            .model = self.model,
+            .messages = [_]Message{
+                .{ .role = "user", .content = question },
+            },
+        };
+
+        return try json.stringifyAlloc(allocator, body, .{});
     }
 
     pub fn deinit(self: *OpenAI_v1) void {
