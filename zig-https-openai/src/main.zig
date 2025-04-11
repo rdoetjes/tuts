@@ -21,7 +21,7 @@ pub fn main() !void {
         .messages = .{
             .{
                 .role = "user",
-                .content = "Tell me a joke about germans",
+                .content = "Tell me a joke about germans and just start directly with the joke, no introduction",
             },
         },
     }, .{});
@@ -59,13 +59,12 @@ pub fn main() !void {
     });
 
     if (response.status == .ok) {
-        std.debug.print("The whole Response Body: {s}\n", .{resp_body.items});
-
+        //std.debug.print("The whole Response Body: {s}\n", .{resp_body.items});
         const parsed = try std.json.parseFromSlice(std.json.Value, allocator, resp_body.items, .{});
         defer parsed.deinit();
 
         const message = parsed.value.object.get("choices").?.array.items[0].object.get("message").?.object.get("content").?.string;
-        std.debug.print("Just the Message #0: {s}\n", .{message});
+        std.debug.print("Zee joke about zee Germans:\n {s}\n", .{message});
     } else {
         std.debug.print("Request failed with status: {any}\n", .{response});
     }
