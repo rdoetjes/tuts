@@ -21,7 +21,7 @@ pub fn main() !void {
         .messages = .{
             .{
                 .role = "user",
-                .content = "Tell me a joke about germans and just start directly with the joke, no introduction",
+                .content = "Tell me a joke about germans In the style of Hans Lander from Ingolorius Bastards no introduction no preludes, the audience knows it is a joke!",
             },
         },
     }, .{});
@@ -64,7 +64,7 @@ pub fn main() !void {
         defer parsed.deinit();
 
         const message = parsed.value.object.get("choices").?.array.items[0].object.get("message").?.object.get("content").?.string;
-        std.debug.print("Zee joke about zee Germans:\n {s}\n", .{message});
+        std.debug.print("\x1b[31mZee joke about zee Germans:\x1b[0m\n \x1b[32m{s}\x1b[0m\n", .{message});
     } else {
         std.debug.print("Request failed with status: {any}\n", .{response});
     }
