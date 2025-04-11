@@ -62,15 +62,22 @@ pub const OpenAI_v1 = struct {
         });
 
         if (response.status == .ok) {
-            const parsed = try std.json.parseFromSlice(std.json.Value, self.allocator, response_body.items, .{});
-            defer parsed.deinit();
-
-            self.allocator.free(self.answer);
-            const answer = parsed.value.object.get("choices").?.array.items[0].object.get("message").?.object.get("content").?.string;
-            self.answer = try std.fmt.allocPrint(self.allocator, "{s}", .{answer});
+            parse_response(self, response_body.items) catch |err| {
+                self.answer = try std.fmt.allocPrint(self.allocator, "{s}", .{"ERROR: DURING PARSING JSON"});
+                std.debug.print("ERROR: Failed to parse response: {}\n", .{err});
+            };
         }
 
         return response;
+    }
+
+    fn parse_response(self: *OpenAI_v1, response_body: []const u8) !void {
+        const parsed = try std.json.parseFromSlice(std.json.Value, self.allocator, response_body, .{});
+        defer parsed.deinit();
+
+        self.allocator.free(self.answer);
+        const answer = parsed.value.object.get("choices").?.array.items[0].object.get("message").?.object.get("content").?.string;
+        self.answer = try std.fmt.allocPrint(self.allocator, "{s}", .{answer});
     }
 
     fn make_body(self: *OpenAI_v1, allocator: std.mem.Allocator, question: []const u8) ![]u8 {
