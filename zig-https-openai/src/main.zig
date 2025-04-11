@@ -1,6 +1,5 @@
 const std = @import("std");
 const openai = @import("openai_v1.zig");
-const mem = std.mem;
 
 pub fn main() !void {
     // Initialize allocator
