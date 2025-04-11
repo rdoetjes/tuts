@@ -27,7 +27,7 @@ pub fn main() !void {
         const response = try v1.ask("Tell me a joke about germans In the style of Hans Landa from Ingolorius Bastards no introduction no preludes, the audience knows it is a joke!");
 
         //print the content of the JSON response body if http status is ok
-        if (response.status == .ok) {
+        if (response.status == .ok and std.mem.containsAtLeast(u8, v1.answer, 0, "ERROR:")) {
             std.debug.print("\x1b[31mZee joke about zee Germans:\x1b[0m\n \x1b[32m{s}\x1b[0m\n", .{v1.answer});
         } else {
             std.debug.print("Request failed with status: {any}\n", .{response});
