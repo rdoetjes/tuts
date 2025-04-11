@@ -21,7 +21,7 @@ pub fn main() !void {
         .messages = .{
             .{
                 .role = "user",
-                .content = "Tell me a joke about germans In the style of Hans Lander from Ingolorius Bastards no introduction no preludes, the audience knows it is a joke!",
+                .content = "Tell me a joke about germans In the style of Hans Landa from Ingolorius Bastards no introduction no preludes, the audience knows it is a joke!",
             },
         },
     }, .{});
