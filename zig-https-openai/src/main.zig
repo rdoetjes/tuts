@@ -63,6 +63,7 @@ pub fn main() !void {
 
         const parsed = try std.json.parseFromSlice(std.json.Value, allocator, resp_body.items, .{});
         defer parsed.deinit();
+
         const message = parsed.value.object.get("choices").?.array.items[0].object.get("message").?.object.get("content").?.string;
         std.debug.print("Just the Message #0: {s}\n", .{message});
     } else {
