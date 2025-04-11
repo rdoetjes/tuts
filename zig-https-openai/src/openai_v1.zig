@@ -21,7 +21,7 @@ pub const OpenAI_v1 = struct {
         const instance = try allocator.create(OpenAI_v1);
 
         const auth_header = try std.fmt.allocPrint(allocator, "Bearer {s}", .{api_key});
-        const model = try std.fmt.allocPrint(allocator, "gpt-4o", .{});
+        const model = try std.mem.Allocator.dupe(allocator, u8, "gpt-4o");
         var headers = std.ArrayList(std.http.Header).init(allocator);
         try headers.append(.{ .name = "Authorization", .value = auth_header });
         try headers.append(.{ .name = "Content-Type", .value = "application/json" });
