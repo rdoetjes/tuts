@@ -46,10 +46,7 @@ pub const OpenAI_v1 = struct {
         };
     }
 
-    pub fn ask(
-        self: *OpenAI_v1,
-        question: []const u8,
-    ) !std.http.Client.FetchResult {
+    pub fn ask(self: *OpenAI_v1, question: []const u8) !std.http.Client.FetchResult {
         const payload = try make_body(self, self.allocator, question);
         defer self.allocator.free(payload);
 
