@@ -10,14 +10,6 @@ pub const OpenAI_v1 = struct {
     allocator: std.mem.Allocator,
     answer: []const u8,
 
-    pub fn set_model(self: *OpenAI_v1, model: []const u8) void {
-        if (self.model.len > 0) self.allocator.free(self.model);
-        self.model = std.mem.Allocator.dupe(self.allocator, u8, model) catch |err| {
-            std.debug.print("ABORT! Failed to duplicate model name: {}\n", .{err});
-            std.os.linux.exit(1);
-        };
-    }
-
     pub fn init(allocator: std.mem.Allocator, api_key: []const u8) !*OpenAI_v1 {
         const instance = try allocator.create(OpenAI_v1);
         errdefer allocator.destroy(instance); // This line is crucial it removes the instance when error occurs!
@@ -44,6 +36,14 @@ pub const OpenAI_v1 = struct {
         };
 
         return instance;
+    }
+
+    pub fn set_model(self: *OpenAI_v1, model: []const u8) void {
+        if (self.model.len > 0) self.allocator.free(self.model);
+        self.model = std.mem.Allocator.dupe(self.allocator, u8, model) catch |err| {
+            std.debug.print("ABORT! Failed to duplicate model name: {}\n", .{err});
+            std.os.linux.exit(1);
+        };
     }
 
     fn make_body(self: *OpenAI_v1, allocator: std.mem.Allocator, question: []const u8) ![]u8 {
