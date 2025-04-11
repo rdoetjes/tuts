@@ -1,0 +1,10 @@
+.label sine_table_255=$979
+.label wait_for_vblank=$858
+.label sine_table_16=$865
+.label frame_count=$ad7
+.label start=$80e
+.label fill_screen=$817
+.label do_plasma=$82b
+.label main_loop=$826
+.label framee_count_2=$ad8
+.label row_count=$ad9
