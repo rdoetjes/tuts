@@ -27,6 +27,8 @@ pub fn main() !void {
     while (true) {
         try stdout.print("\n\x1b[31mAsk me anything: \x1b[0m", .{});
         const question = try std.io.getStdIn().reader().readUntilDelimiterAlloc(allocator, '\n', 4096);
+        defer allocator.free(question);
+
         // ask openai a questione
         var response = try v1.ask(question);
 
@@ -40,6 +42,7 @@ pub fn main() !void {
             retry = 0;
         } else {
             std.debug.print("Request failed with status: {any}\n", .{response});
+            std.os.linux.exit(1);
         }
         std.time.sleep(2 * 1e9);
     }
