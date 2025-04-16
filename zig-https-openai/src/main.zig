@@ -44,6 +44,6 @@ pub fn main() !void {
             std.debug.print("Request failed with status: {any}\n", .{response});
             std.os.linux.exit(1);
         }
-        std.time.sleep(2 * 1e9);
+        std.time.sleep(2 * 1e9); // avoid spamming and consuming your prepaid api fee ;)
     }
 }
