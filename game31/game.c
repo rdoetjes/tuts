@@ -171,7 +171,7 @@ int main()
 
   if (total < 31)
   {
-    printf("No moves left. Game ends with no winner.\n");
+    printf("I have no valid moves left.\n");
   }
 
   return 0;
