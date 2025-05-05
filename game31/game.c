@@ -88,7 +88,7 @@ int computer_move()
       available[i]--;
       int win =
           can_force_win(total + numbers[i], available, 0); // Player's turn next
-      available[i]++;
+      available[i]++; //backtrack
 
       if (win)
       {
