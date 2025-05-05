@@ -6,7 +6,7 @@
 #define NUM_CHOICES 6
 #define X_NUMBER 4
 
-int numbers[] = {1, 2, 3, 4, 5, 6, 7};
+int numbers[] = {1, 2, 3, 4, 5, 6};
 int available[NUM_CHOICES] = {X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER}; // 4 of each number
 int total = 0;
 
