@@ -6,7 +6,7 @@
 #define NUM_CHOICES 6
 #define X_NUMBER 4
 
-int numbers[] = {1, 2, 3, 4, 5, 6};
+int numbers[] = {1, 2, 3, 4, 5, 6, 7};
 int available[NUM_CHOICES] = {X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER}; // 4 of each number
 int total = 0;
 
@@ -17,13 +17,10 @@ void show_available()
   printf("Available numbers:\n");
   for (int j = X_NUMBER; j != 0; j--)
   {
-    printf("%s %s %s %s %s %s\n", 
-      available[0] >= j ? "1" : " ", 
-      available[1] >= j ? "2" : " ", 
-      available[2] >= j ? "3" : " ", 
-      available[3] >= j ? "4" : " ", 
-      available[4] >= j ? "5" : " ", 
-      available[5] >= j ? "6" : " ");
+    for (int i = 0; i < NUM_CHOICES; i++){
+      available[i] >= j ? printf("%d ", i+1) : printf("  ");
+    }
+    printf("\n");
   }
   printf("\n\n");
 }
