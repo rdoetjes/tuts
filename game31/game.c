@@ -165,7 +165,7 @@ int main()
   srand(time(NULL));
   int player_turn = rand() & 1;
 
-  printf("Welcome to the 31 Game!\nFirst to reach exactly 31 wins.\n");
+  printf("Welcome to the 31 Game! Inspried by Robin from 8Bit Show And Tell\nFirst to reach exactly 31 wins.\n");
 
   while (total < 31)
   {
