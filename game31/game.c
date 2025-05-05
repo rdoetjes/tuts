@@ -13,6 +13,7 @@ int total = 0;
 void show_available()
 {
   printf("\033[2J\033[H");
+  printf("Welcome to the 31 Game! Inspried by Robin from 8Bit Show And Tell\nFirst to reach exactly 31 wins.\n\n");
   printf("Available numbers:\n");
   for (int j = X_NUMBER; j != 0; j--)
   {
@@ -164,8 +165,6 @@ int main()
 {
   srand(time(NULL));
   int player_turn = rand() & 1;
-
-  printf("Welcome to the 31 Game! Inspried by Robin from 8Bit Show And Tell\nFirst to reach exactly 31 wins.\n");
 
   while (total < 31)
   {
