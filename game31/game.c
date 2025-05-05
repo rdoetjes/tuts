@@ -4,9 +4,10 @@
 #include <string.h>
 
 #define NUM_CHOICES 6
+#define X_NUMBER 4
 
 int numbers[] = {1, 2, 3, 4, 5, 6};
-int available[NUM_CHOICES] = {4, 4, 4, 4, 4, 4}; // 4 of each number
+int available[NUM_CHOICES] = {X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER}; // 4 of each number
 int total = 0;
 
 // Function to display available numbers
@@ -14,7 +15,7 @@ void show_available()
 {
   printf("\033[2J\033[H");
   printf("Available numbers:\n");
-  for (int j = 4; j != 0; j--)
+  for (int j = X_NUMBER; j != 0; j--)
   {
     printf("%s %s %s %s %s %s\n", 
       available[0] >= j ? "1" : " ", 
