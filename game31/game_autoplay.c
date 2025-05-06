@@ -44,6 +44,7 @@ void show_available(const GameState *game) {
         printf("%d ", i + 1);
     }
     printf("\n\n");
+    printf("Current total: %d\n", game->total);
 }
 
 // Check if a number is available
@@ -193,9 +194,11 @@ bool computer_turn_handler(GameState *game) {
 bool check_game_over(const GameState *game, bool is_player_turn) {
     if (game->total == TARGET_SUM) {
         if (is_player_turn) {
+            show_available(game);
             printf("You win!\n");
             player_wins++;
         } else {
+            show_available(game);
             printf("Computer wins!\n");
             computer_wins++;
         }
@@ -217,8 +220,6 @@ int main() {
       
       while (game.total < TARGET_SUM) {
           show_available(&game);
-          printf("Current total: %d\n", game.total);
-
           bool valid_move;
           if (player_turn) {
               valid_move = computer_turn_handler(&game);
@@ -228,6 +229,7 @@ int main() {
           } else {
               valid_move = computer_turn_handler(&game);
               if (!valid_move) {
+                  show_available(&game);
                   printf("You win!\n");
                   player_wins++;
                   break;
