@@ -105,7 +105,7 @@ int computer_move()
     {
       if (available[i] > 0 && total + numbers[i] <= 31)
       {
-        best_move = numbers[i];
+        best_move = numbers[i]; //guarantees to play the lowest number, which is the best move
         break;
       }
     }
