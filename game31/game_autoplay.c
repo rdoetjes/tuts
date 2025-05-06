@@ -60,8 +60,8 @@ void use_number(GameState *game, int n) {
 
 // Evaluate recursively with alpha-beta pruning: returns true if current player can force a win
 bool can_force_win(int current_total, int *available_pool, bool is_ai_turn, int depth) {
-    // Early termination for deep recursion (optimization)
-    if (depth > 10) return false;
+    // Early termination for deep recursion (optimization) -- removed for this brute force prove, to show that first player always wins
+    //if (depth > 10) return false;
     
     if (current_total == TARGET_SUM) {
         return !is_ai_turn; // Whoever just moved wins
