@@ -98,18 +98,28 @@ int computer_move()
     }
   }
 
-  // If no forced-win path, pick first valid move
-  if (best_move == -1)
-  {
-    for (int i = 0; i < NUM_CHOICES; i++)
+    // If no forced-win path, pick a random valid move
+    if (best_move == -1)
     {
-      if (available[i] > 0 && total + numbers[i] <= 31)
+      int valid_moves[NUM_CHOICES];
+      int valid_count = 0;
+      
+      // Collect all valid moves
+      for (int i = 0; i < NUM_CHOICES; i++)
       {
-        best_move = numbers[i]; //guarantees to play the lowest number, which is a solid move
-        break;
+        if (available[i] > 0 && total + numbers[i] <= 31)
+        {
+          valid_moves[valid_count] = numbers[i];
+          valid_count++;
+        }
       }
-    }
-  }
+      
+      // Pick a random move from valid moves
+      if (valid_count > 0)
+      {
+        best_move = valid_moves[rand() % valid_count];
+      }
+    }  
 
   return best_move;
 }
