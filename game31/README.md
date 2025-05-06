@@ -1,6 +1,6 @@
 # Game31: A Command-Line Game Implementation
 
-This project is a C implementation of a game, referred to here as "Game31." The concept and inspiration for this implementation come from a video by Robin of 8Bit Show and Tell.
+This project is a C implementation of a game, referred to here as "Game31." The concept and inspiration for this implementation came from a video by Robin of 8Bit Show and Tell.
 
 [![Game31 by 8Bit Show and Tell](https://img.youtube.com/vi/hyHeQgrvu4w/0.jpg)](https://www.youtube.com/watch?v=hyHeQgrvu4w)
 
