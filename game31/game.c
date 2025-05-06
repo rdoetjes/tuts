@@ -107,7 +107,7 @@ int computer_move()
       // Collect all valid moves
       for (int i = 0; i < NUM_CHOICES; i++)
       {
-        if (available[i] > 0 && total + numbers[i] <= 31)
+        if (available[i] > 0 && total + numbers[i] <   31)
         {
           valid_moves[valid_count] = numbers[i];
           valid_count++;
