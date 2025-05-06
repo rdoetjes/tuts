@@ -38,26 +38,15 @@ void show_available()
 // Check if a number is available
 int is_available(int n)
 {
-  for (int i = 0; i < NUM_CHOICES; i++)
-  {
-    if (numbers[i] == n && available[i] > 0)
-      return 1;
-  }
+  if (numbers[n-1] == n && available[n-1] > 0) return 1;
   return 0;
 }
 
 // Decrease availability
 void use_number(int n)
 {
-  for (int i = 0; i < NUM_CHOICES; i++)
-  {
-    if (numbers[i] == n)
-    {
-      available[i]--;
-      total += n;
-      break;
-    }
-  }
+    available[n-1]--;
+    total += n;
 }
 
 // Evaluate recursively: returns 1 if current player can force a win
@@ -117,7 +106,7 @@ int computer_move()
       // Collect all valid moves
       for (int i = 0; i < NUM_CHOICES; i++)
       {
-        if (available[i] > 0 && total + numbers[i] <   31)
+        if (available[i] > 0 && total + numbers[i] < 31)
         {
           valid_moves[valid_count] = numbers[i];
           valid_count++;
