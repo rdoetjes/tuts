@@ -50,7 +50,7 @@ This program is a "quickly bastardized" version of `game.c` designed for automat
 
 ## Key Finding: Game Balance
 
-The development and use of the `game_autoplay.c` simulation led to a significant observation regarding the balance of Game31:
+The development and use of the `game_autoplay.c` simulation led to a significant observation regarding the unbalance of Game31:
 
 **The game appears to be deterministic with an optimal strategy. Specifically, the player who starts first and employs a perfect game strategy will consistently win.**
 
