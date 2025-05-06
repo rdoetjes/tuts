@@ -30,7 +30,7 @@ This program allows a human user to play Game31 against a CPU opponent.
 
 ### 2. Automated Mode: CPU vs. CPU Simulation (`game_autoplay.c`)
 
-This program is a "quickly bastardized" version of `game.c` designed for automated gameplay where the computer plays against itself. It serves as a tool to prove that the game is unbalanced.
+This program is a "quickly bastardized" version of `game.c` designed for automated gameplay where the computer plays against itself. It serves as a tool to prove that the game is imbalanced.
 
 *   **Key Modifications:**
     *   User interaction (prompts, input) and detailed print statements have been removed to facilitate rapid, automated simulations.
@@ -50,7 +50,7 @@ This program is a "quickly bastardized" version of `game.c` designed for automat
 
 ## Key Finding: Game Balance
 
-The development and use of the `game_autoplay.c` simulation led to a significant observation regarding the unbalance of Game31:
+The development and use of the `game_autoplay.c` simulation led to a significant observation regarding the imbalance of Game31:
 
 **The game appears to be deterministic with an optimal strategy. Specifically, the player who starts first and employs a perfect game strategy will consistently win.**
 
