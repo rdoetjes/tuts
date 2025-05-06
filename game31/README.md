@@ -30,7 +30,7 @@ This program allows a human user to play Game31 against a CPU opponent.
 
 ### 2. Automated Mode: CPU vs. CPU Simulation (`game_autoplay.c`)
 
-This program is a "quickly bastardized" version of `game.c` designed for automated gameplay where the computer plays against itself. It serves as a tool for analyzing game mechanics and balance.
+This program is a "quickly bastardized" version of `game.c` designed for automated gameplay where the computer plays against itself. It serves as a tool to prove that the game is unbalanced.
 
 *   **Key Modifications:**
     *   User interaction (prompts, input) and detailed print statements have been removed to facilitate rapid, automated simulations.
