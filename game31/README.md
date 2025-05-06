@@ -4,7 +4,7 @@ This project is a C implementation of a game, referred to here as "Game31." The 
 
 [![Game31 by 8Bit Show and Tell](https://img.youtube.com/vi/hyHeQgrvu4w/0.jpg)](https://www.youtube.com/watch?v=hyHeQgrvu4w)
 
-*(**Developer Note:** You may want to add a brief 1-2 sentence description of the actual rules/objective of "Game31" here for clarity, e.g., "Players take turns adding 1, 2, or 3 to a running total, aiming to force the opponent to reach or exceed 31.")*
+*(**Developer Note:** You may want to add a brief 1-2 sentence description of the actual rules/objective of "Game31" here for clarity, e.g., "Players take turns adding a number, from the pool of available numners, to a running total, aiming to reach 31, without going over.")*
 
 ## Versions Included
 
@@ -30,7 +30,7 @@ This program allows a human user to play Game31 against a CPU opponent.
 
 ### 2. Automated Mode: CPU vs. CPU Simulation (`game_autoplay.c`)
 
-This program is a modified version of `game.c` designed for automated gameplay where the computer plays against itself. It serves as a tool for analyzing game mechanics and balance.
+This program is a "quickly bastardized" version of `game.c` designed for automated gameplay where the computer plays against itself. It serves as a tool for analyzing game mechanics and balance.
 
 *   **Key Modifications:**
     *   User interaction (prompts, input) and detailed print statements have been removed to facilitate rapid, automated simulations.
