@@ -14,6 +14,7 @@ typedef struct {
     int total;
 } GameState;
 
+// just added for proving that starting player always wins (in a perfect game)
 int player_wins = 0;
 int computer_wins = 0;
 
