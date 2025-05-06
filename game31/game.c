@@ -8,7 +8,17 @@
 int numbers[] = {1, 2, 3, 4, 5, 6};
 int available[NUM_CHOICES] = {X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER, X_NUMBER}; // 4 of each number
 int total = 0;
+int wins_comp = 0;
+int wins_player = 0;
 
+// Function to check if a move can force a win
+void reset_game(){
+  total = 0;
+  for (int i = 0; i < NUM_CHOICES; i++)
+  {
+    available[i] = X_NUMBER;
+  }
+}
 // Function to display available numbers
 void show_available()
 {
@@ -147,12 +157,13 @@ int computer_turn_handler()
 {
   int comp = computer_move();
   if (comp == -1) {
-    printf("You win!\n");
+    printf("You win!...\n");
+    wins_player++;
     return 0; // Computer has no valid moves
   }
   
   use_number(comp);
-  printf("Computer plays: %d → Total: %d\n", comp, total);
+  //printf("Computer plays: %d → Total: %d\n", comp, total);
   
   return 1; // Valid move
 }
@@ -163,8 +174,10 @@ int check_game_over(int is_player_turn)
   if (total == 31) {
     if (is_player_turn) {
       printf("You win!\n");
+      wins_player++;
     } else {
       printf("Computer wins!\n");
+      wins_comp++;
     }
     return 1; // Game over
   }
@@ -173,34 +186,36 @@ int check_game_over(int is_player_turn)
 
 int main()
 {
-  srand(time(NULL));
-  int player_turn = rand() & 1;
+  for (int i = 0; i < 1000; i++) {
+    srand(time(NULL));
+    int player_turn = 1;
+    printf(".");
+    while (total < 31)
+    {
+      //show_available();
+      //printf("Current total: %d\n", total);
 
-  while (total < 31)
-  {
-    show_available();
-    printf("Current total: %d\n", total);
-
-    int valid_move;
-    if (player_turn) {
-      valid_move = player_turn_handler();
-      if (!valid_move) continue;
+      int valid_move;
+      if (player_turn) {
+        valid_move = computer_turn_handler();
+        if (valid_move==0) break;
+        
+        if (check_game_over(1)) break ;
+      }
+      else {
+        valid_move = computer_turn_handler();
+        if (valid_move==0) break;
+        
+        if (check_game_over(0)) break;
+      }
       
-      if (check_game_over(1)) break;
+      player_turn = !player_turn;
     }
-    else {
-      valid_move = computer_turn_handler();
-      if (!valid_move) break;
-      
-      if (check_game_over(0)) break;
-    }
-    
-    player_turn = !player_turn;
-  }
 
-  if (total < 31) {
-    printf("I have no valid moves left.\n");
-  }
-
-  return 0;
+    if (total < 31) {
+      printf("I have no valid moves left.\n");
+    }    
+    reset_game(); 
+  } 
+  printf("Game over. Final score: You %d, Computer %d\n", wins_player, wins_comp);
 }
