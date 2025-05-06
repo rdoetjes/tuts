@@ -26,8 +26,8 @@ void init_game(GameState *game) {
 // Function to display available numbers
 void show_available(const GameState *game) {
     printf("\033[2J\033[H");  // Clear screen
-    printf("Welcome to the 31 Game! Inspired by Robin from 8Bit Show And Tell\n");
-    printf("First to reach exactly 31 wins.\n\n");
+    printf("Welcome to the %d Game! Inspired by Robin from 8Bit Show And Tell\n", TARGET_SUM);
+    printf("First to reach exactly %d wins.\n\n", TARGET_SUM);
     printf("Available numbers:\n");
     
     for (int j = X_NUMBER; j > 0; j--) {
@@ -41,6 +41,7 @@ void show_available(const GameState *game) {
         printf("%d ", i + 1);
     }
     printf("\n\n");
+    printf("Current total: %d\n", game->total);
 }
 
 // Check if a number is available
@@ -190,8 +191,10 @@ bool computer_turn_handler(GameState *game) {
 bool check_game_over(const GameState *game, bool is_player_turn) {
     if (game->total == TARGET_SUM) {
         if (is_player_turn) {
+            show_available(game);
             printf("You win!\n");
         } else {
+            show_available(game);
             printf("Computer wins!\n");
         }
         return true;
@@ -209,8 +212,6 @@ int main() {
     
     while (game.total < TARGET_SUM) {
         show_available(&game);
-        printf("Current total: %d\n", game.total);
-
         bool valid_move;
         if (player_turn) {
             valid_move = player_turn_handler(&game);
@@ -220,15 +221,14 @@ int main() {
         } else {
             valid_move = computer_turn_handler(&game);
             if (!valid_move) {
+                show_available(&game);
                 printf("You win!\n");
                 break;
             }
             
             if (check_game_over(&game, false)) break;
-        }
-        
+        }   
         player_turn = !player_turn;
     }
-
     return 0;
 }
