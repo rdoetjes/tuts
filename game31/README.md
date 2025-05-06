@@ -4,7 +4,7 @@ This project is a C implementation of a game, referred to here as "Game31." The 
 
 [![Game31 by 8Bit Show and Tell](https://img.youtube.com/vi/hyHeQgrvu4w/0.jpg)](https://www.youtube.com/watch?v=hyHeQgrvu4w)
 
-*(**Developer Note:** You may want to add a brief 1-2 sentence description of the actual rules/objective of "Game31" here for clarity, e.g., "Players take turns adding a number, from the pool of available numners, to a running total, aiming to reach 31, without going over.")*
+*"Players take turns adding a number, from the pool of available numners, to a running total, aiming to reach 31, without going over.")*
 
 ## Versions Included
 
