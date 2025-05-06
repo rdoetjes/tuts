@@ -208,7 +208,7 @@ int main() {
     srand((unsigned int)time(NULL));
     GameState game;
 
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < 10000; i++) {
       init_game(&game);
       
       bool player_turn = 1;
