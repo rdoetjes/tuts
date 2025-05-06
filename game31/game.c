@@ -184,7 +184,7 @@ int main()
     int valid_move;
     if (player_turn) {
       valid_move = player_turn_handler();
-      if (valid_move==0) break;
+      if (valid_move==0) continue; //invlaide move
       
       if (check_game_over(1)) break;
     }
