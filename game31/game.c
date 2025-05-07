@@ -24,12 +24,7 @@ void init_game(GameState *game) {
 }
 
 // Function to display available numbers
-void show_available(const GameState *game) {
-    printf("\033[2J\033[H");  // Clear screen
-    printf("Welcome to the %d Game! Inspired by Robin from 8Bit Show And Tell\n", TARGET_SUM);
-    printf("First to reach exactly %d wins.\n\n", TARGET_SUM);
-    printf("Available numbers:\n");
-    
+void show_available_moves(const GameState *game) {
     for (int j = X_NUMBER; j > 0; j--) {
         for (int i = 0; i < NUM_CHOICES; i++) {
             printf("%s", game->available[i] >= j ? "■ " : "□ ");
@@ -40,8 +35,19 @@ void show_available(const GameState *game) {
     for (int i = 0; i < NUM_CHOICES; i++) {
         printf("%d ", i + 1);
     }
-    printf("\n\n");
-    printf("Current total: %d\n", game->total);
+}
+
+//Show game screem
+void show_game_screen(const GameState *game) {
+  printf("\033[2J\033[H");  // Clear screen
+  printf("Welcome to the %d Game! Inspired by Robin from 8Bit Show And Tell\n", TARGET_SUM);
+  printf("First to reach exactly %d wins.\n\n", TARGET_SUM);
+  printf("Available numbers:\n");
+  
+  show_available_moves(game);
+  
+  printf("\n\n");
+  printf("Current total: %d\n", game->total);
 }
 
 // Check if a number is available
@@ -60,20 +66,14 @@ bool can_force_win(int current_total, int *available_pool, bool is_ai_turn, int 
     // Early termination for deep recursion (optimization)
     if (depth > 10) return false;
     
-    if (current_total == TARGET_SUM) {
-        return !is_ai_turn; // Whoever just moved wins
-    }
+    if (current_total == TARGET_SUM) return !is_ai_turn; // Whoever just moved wins
     
-    if (current_total > TARGET_SUM) {
-        return is_ai_turn; // Current player loses (exceeded target)
-    }
+    if (current_total > TARGET_SUM) return is_ai_turn; // Current player loses (exceeded target)
 
     // Check for winning move
     for (int i = 0; i < NUM_CHOICES; i++) {
         if (available_pool[i] > 0) {
-            if (current_total + (i+1) == TARGET_SUM) {
-                return is_ai_turn; // Current player can win immediately
-            }
+            if (current_total + (i+1) == TARGET_SUM) return is_ai_turn; // Current player can win immediately
         }
     }
 
@@ -85,12 +85,9 @@ bool can_force_win(int current_total, int *available_pool, bool is_ai_turn, int 
             bool win = can_force_win(current_total + (i+1), available_pool, !is_ai_turn, depth+1);
             available_pool[i]++;
 
-            if (is_ai_turn && win) {
-                return true; // AI found a winning path
-            }
-            if (!is_ai_turn && !win) {
-                return false; // Player has a forced win, bad for AI
-            }
+            if (is_ai_turn && win) return true; // AI found a winning path
+            
+            if (!is_ai_turn && !win) return false; // Player has a forced win, bad for AI
             
             // Update can_win based on current findings
             if (is_ai_turn) {
@@ -100,7 +97,6 @@ bool can_force_win(int current_total, int *available_pool, bool is_ai_turn, int 
             }
         }
     }
-
     return can_win;
 }
 
@@ -146,7 +142,6 @@ int computer_move(GameState *game) {
             best_move = valid_moves[rand() % valid_count];
         }
     }
-
     return best_move;
 }
 
@@ -191,10 +186,10 @@ bool computer_turn_handler(GameState *game) {
 bool check_game_over(const GameState *game, bool is_player_turn) {
     if (game->total == TARGET_SUM) {
         if (is_player_turn) {
-            show_available(game);
+            show_game_screen(game);
             printf("You win!\n");
         } else {
-            show_available(game);
+            show_game_screen(game);
             printf("Computer wins!\n");
         }
         return true;
@@ -211,7 +206,7 @@ int main() {
     printf("You %s first.\n", player_turn ? "go" : "go second");
     
     while (game.total < TARGET_SUM) {
-        show_available(&game);
+        show_game_screen(&game);
         bool valid_move;
         if (player_turn) {
             valid_move = player_turn_handler(&game);
@@ -221,7 +216,7 @@ int main() {
         } else {
             valid_move = computer_turn_handler(&game);
             if (!valid_move) {
-                show_available(&game);
+                show_game_screen(&game);
                 printf("You win!\n");
                 break;
             }
