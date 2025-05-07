@@ -138,7 +138,7 @@ int computer_move(GameState *game) {
         
         for (int i = 0; i < NUM_CHOICES; i++) {
             if (game->available[i] > 0 && game->total + (i+1) < TARGET_SUM) {
-                valid_moves[valid_count++] = i+1;
+                valid_moves[valid_count++] = i+1; // granted, this is a bit hacky but nice and short
             }
         }
         
