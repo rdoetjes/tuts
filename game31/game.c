@@ -202,9 +202,7 @@ int main() {
     GameState game;
     init_game(&game);
     
-    bool player_turn = rand() % 2 == 0;
-    printf("You %s first.\n", player_turn ? "go" : "go second");
-    
+    bool player_turn = rand() % 2 == 0;    
     while (game.total < TARGET_SUM) {
         show_game_screen(&game);
         bool valid_move;
