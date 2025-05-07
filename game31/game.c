@@ -186,11 +186,11 @@ bool computer_turn_handler(GameState *game) {
 bool check_game_over(const GameState *game, bool is_player_turn) {
     if (game->total == TARGET_SUM) {
         if (is_player_turn) {
-            show_game_screen(game);
+            show_game_screen(game); // shows the final move the plaayer made (if they won)
             printf("You win!\n");
         } else {
             show_game_screen(game);
-            printf("Computer wins!\n");
+            printf("Computer wins!\n"); //shows the final move the computer made (if they won)
         }
         return true;
     }
@@ -216,8 +216,7 @@ int main() {
         } else {
             valid_move = computer_turn_handler(&game);
             if (!valid_move) {
-                show_game_screen(&game);
-                printf("You win!\n");
+                printf("You win!\n");                
                 break;
             }
             
