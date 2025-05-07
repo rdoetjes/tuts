@@ -199,7 +199,7 @@ bool check_game_over(const GameState *game, bool is_player_turn) {
 
 int main() {
     srand((unsigned int)time(NULL));
-    GameState game;
+    static GameState game;
     init_game(&game);
     
     bool player_turn = rand() % 2 == 0;    
