@@ -221,10 +221,7 @@ int main() {
     for(int i = 0; i < 10000; i++) {
       init_game(&game);
       
-      bool player_turn = 1;
-      
-      printf("You %s first.\n", player_turn ? "go" : "go second");
-      
+      bool player_turn = 1;      
       while (game.total < TARGET_SUM) {
           show_game_screen(&game);
           bool valid_move;
