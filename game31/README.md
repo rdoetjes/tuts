@@ -20,7 +20,7 @@ This program allows a human user to play Game31 against a CPU opponent.
 *   **Compilation:**
     To compile the interactive game, use the following command:
     ```bash
-    gcc -O3 -o game31 game.c
+    gcc -O3 -Wall -Werror -o game31 game.c
     ```
 *   **Usage:**
     After successful compilation, run the game with:
@@ -39,7 +39,7 @@ This program is a "quickly bastardized" version of `game.c` designed for automat
 *   **Compilation:**
     To compile the automated simulation, use the following command:
     ```bash
-    gcc -O3 -o game_autoplay game_autoplay.c
+    gcc -O3 -Wall -Werror -o game_autoplay game_autoplay.c
     ```
 *   **Usage:**
     After successful compilation, run the simulation with:
