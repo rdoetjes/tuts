@@ -15,8 +15,8 @@ typedef struct {
 } GameState;
 
 // just added for proving that starting player always wins (in a perfect game)
-static int player_wins = 0;
-static int computer_wins = 0;
+int player_wins = 0;
+int computer_wins = 0;
 
 // Initialize game state
 void init_game(GameState *game) {
@@ -216,7 +216,7 @@ bool check_game_over(const GameState *game, bool is_player_turn) {
 
 int main() {
     srand((unsigned int)time(NULL));
-    static GameState game;
+    GameState game;
 
     for(int i = 0; i < 10000; i++) {
       init_game(&game);
