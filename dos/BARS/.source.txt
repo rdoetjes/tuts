@@ -1,0 +1,113 @@
+.model tiny
+
+.STACK 100h
+
+PALETTE_INDEX EQU 3c8h
+PALETTE_DATA EQU 3c9h
+INPUT_STATUS EQU 3dah
+HRETRACE EQU 01h
+VRETRACE EQU 08h
+BAR_WIDTH EQU 10
+
+.DATA
+	r db 00
+	g db 00
+	b db 00
+
+.CODE
+	;include is ued fro keypress
+	include STDFUNC.ASM
+
+MAIN PROC
+	;initialize the program
+	mov ax,SEG _DATA
+	mov ds, ax
+
+	;line where to start raster line
+	mov bx,100
+
+_loop:
+	call vertRetrace
+	mov cx, 0ffffh
+
+_wait4line:
+	call horizRetrace
+	inc cx	;increment line counter
+	cmp cx, bx	;if line counter equals to bar line
+	jne _wait4line
+
+	mov ah, BAR_WIDTH
+	mov al, 60
+	mov [r], al
+	call drawRasterline
+	mov al, 0
+	mov [r], al
+	call drawRasterline
+
+	sti
+
+	call KeyPressExit
+
+	jmp _loop
+
+MAIN ENDP
+
+drawRasterLine PROC
+	mov dx, PALETTE_INDEX
+	mov al, 00h
+	out dx, al
+
+	mov al, byte ptr [r]
+	mov dx, PALETTE_DATA
+	out dx, al
+
+	mov al, byte ptr [g]
+	mov dx, PALETTE_DATA
+	out dx, al
+
+	mov al, byte ptr [b]
+	mov dx, PALETTE_DATA
+	out dx, al
+
+	call horizRetrace
+	ret
+drawRasterLine ENDP
+
+horizRetrace PROC
+	;wait for horizretrace
+	cli
+	mov dx, INPUT_STATUS
+
+_h1:
+	in al, dx
+	and al, HRETRACE
+	jnz _h1
+
+_h2:
+	in al, dx
+	and al, HRETRACE
+	jz _h2
+
+	ret
+
+horizRetrace ENDP
+
+vertRetrace PROC
+	;wait for vertical retrace
+	cli
+	mov dx, INPUT_STATUS
+
+_v1:
+	in al, dx
+	and al, VRETRACE
+	jnz _v1
+
+_v2:
+	in al, dx
+	and al, VRETRACE
+	jz _v2
+
+	ret
+vertRetrace ENDP
+
+END MAIN

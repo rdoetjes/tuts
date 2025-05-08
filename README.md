@@ -1,7 +1,10 @@
 # Tutorial collection
 
-This is a collection of code for my YouTube tutorials.
-This varias from radom Assembly tutorials, to little titbits of Python and C++
+In the underlying directories, you will find software I have written for training videos and other tutorials.
+Many of these videos are on https://www.youtube.com/channel/CallousCoder 
+
+Many different languages are covered, ranging from MUMPS (M) to modern day languages like Zig (which I adore) and Rust.
+All these tutorials are based around small (private) projects, that I either created purposely for videos or have been created for small private projects.
 
 ## DOS Assembly coding vidos
 
