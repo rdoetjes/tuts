@@ -11,6 +11,7 @@
 typedef struct {
     int numbers[NUM_CHOICES];
     int available[NUM_CHOICES];
+    int move_played;
     int total;
 } GameState;
 
@@ -21,6 +22,7 @@ void init_game(GameState *game) {
         game->available[i] = X_NUMBER;
     }
     game->total = 0;
+    game->move_played = 0;
 }
 
 // Function to display available numbers
@@ -47,6 +49,10 @@ void show_game_screen(const GameState *game) {
   show_available_moves(game);
 
   printf("\n\n");
+  if (game->move_played>0)
+      printf("Move that was played: %d → Total: %d\n", game->move_played, game->total);
+  else
+      printf("Please start\n");
   printf("Current total: %d\n", game->total);
 }
 
@@ -163,7 +169,7 @@ bool player_turn_handler(GameState *game) {
     }
 
     use_number(game, move);
-    printf("You played: %d → Total: %d\n", move, game->total);
+    game->move_played=move;
     if (game->total > TARGET_SUM) printf("YOU OVERSHOT AND LOST!\n");
 
     return true;
@@ -178,7 +184,7 @@ bool computer_turn_handler(GameState *game) {
     }
 
     use_number(game, comp);
-    printf("Computer plays: %d → Total: %d\n", comp, game->total);
+    game->move_played=comp;
 
     return true;
 }
@@ -198,6 +204,28 @@ bool check_game_over(const GameState *game, bool is_player_turn) {
     return false;
 }
 
+void extra_game_dynamics(GameState *game){
+    //extra game dynamics that give player 2 a ~30% win average
+    if (game->total == 1){
+        if (game->available[NUM_CHOICES-1]>0) game->available[NUM_CHOICES-2]--;
+    }
+
+    if (game->total == 10){
+        if (game->available[0] < NUM_CHOICES) game->available[0]++;
+        if (game->available[NUM_CHOICES-1]>0) game->available[NUM_CHOICES-1]--;
+    }
+
+    if (game->total == 17){
+         if (game->available[0] > 0) game->available[0]--;
+         if (game->available[NUM_CHOICES-1]>0) game->available[NUM_CHOICES-1]--;
+    }
+
+    if (game->total == 24 && game->available[0] > 0){
+         if (game->available[0] > 0) game->available[0]--;
+         if (game->available[NUM_CHOICES-1]>0) game->available[NUM_CHOICES-1]--;
+    }
+}
+
 int main() {
     srand((unsigned int)time(NULL));
     GameState game;
@@ -207,15 +235,7 @@ int main() {
     while (game.total < TARGET_SUM) {
         show_game_screen(&game);
 
-        // //extra game dynamics that give player 2 a 15% win average
-        // if (game.total == 10 && game.available[0] < NUM_CHOICES){
-        //      game.available[0]++;
-        // }
-
-        // if (game.total == 24 && game.available[0] > 0){
-        //      game.available[0]--;
-        //      if (game.available[NUM_CHOICES-1]>0) game.available[NUM_CHOICES-1]--;
-        // }
+        //extra_game_dynamics(&game);
 
         bool valid_move;
         if (player_turn) {
