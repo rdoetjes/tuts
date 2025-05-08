@@ -178,8 +178,8 @@ bool player_turn_handler(GameState *game) {
     }
 
     use_number(game, move);
-    if (game->total < TARGET_SUM) printf("You played: %d → Total: %d\n", move, game->total);
-    if (game->total > TARGET_SUM) printf("You played: %d → Total: %d\nYOU LOST!", move, game->total);
+    printf("You played: %d → Total: %d\n", move, game->total);
+    if (game->total > TARGET_SUM) printf("YOU OVERSHOT AND LOST!\n");
 
     return true;
 }
