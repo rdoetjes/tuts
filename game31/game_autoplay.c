@@ -226,15 +226,15 @@ int main() {
       while (game.total < TARGET_SUM) {
           show_game_screen(&game);
 
-          // extra game dynamics that give player 2 a 15% win average
-          // if (game.total == 10 && game.available[0] < NUM_CHOICES){
-          //      game.available[0]++;
-          // }
+          //extra game dynamics that give player 2 a 15% win average
+          if (game.total == 10 && game.available[0] < NUM_CHOICES){
+               game.available[0]++;
+          }
 
-          // if (game.total == 24 && game.available[0] > 0){
-          //      game.available[0]--;
-          //      if (game.available[5]>0) game.available[5]--;
-          // }
+          if (game.total == 24 && game.available[0] > 0){
+               game.available[0]--;
+               if (game.available[NUM_CHOICES-1]>0) game.available[NUM_CHOICES-1]--;
+          }
 
           bool valid_move;
           if (player_turn) {
