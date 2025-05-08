@@ -206,6 +206,17 @@ int main() {
     bool player_turn = rand() % 2 == 0;
     while (game.total < TARGET_SUM) {
         show_game_screen(&game);
+
+        // // extra game dynamics that give player 2 a 15% win average
+        // if (game.total == 10 && game.available[0] < NUM_CHOICES){
+        //      game.available[0]++;
+        // }
+
+        // if (game.total == 24 && game.available[0] > 0){
+        //      game.available[0]--;
+        //      if (game.available[5]>0) game.available[5]--;
+        // }
+
         bool valid_move;
         if (player_turn) {
             valid_move = player_turn_handler(&game);
