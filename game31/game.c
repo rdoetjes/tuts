@@ -67,7 +67,7 @@ void use_number(GameState *game, int n) {
     game->total += n;
 }
 
-// Evaluate recursively with alpha-beta pruning: returns true if current player can force a win
+// Evaluate recursively with alpha-beta pruning: returns true if current player can force a win.
 bool can_force_win(int current_total, int *available_pool, bool is_ai_turn, int depth) {
     // Early termination for deep recursion (optimization)
     if (depth > 10) return false;
