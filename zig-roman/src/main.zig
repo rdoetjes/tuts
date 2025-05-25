@@ -31,7 +31,7 @@ fn to_roman(year: u32) []const u8 {
         } else {
             result = std.fmt.allocPrint(std.heap.page_allocator, "{s}{s}", .{ result, roman[i].roman }) catch |err| {
                 std.debug.print("Cannot allocate memory: {any}", .{err});
-                std.os.linux.exit(1);
+                std.posix.exit(1);
             };
             co -= roman[i].dec;
         }
