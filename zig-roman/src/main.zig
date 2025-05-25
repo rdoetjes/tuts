@@ -1,6 +1,6 @@
 const std = @import("std");
 
-fn to_roman(year: u32) []const u8 {
+fn to_roman(alloc: std.mem.Allocator, year: u32) []const u8 {
     const dec_roman = struct {
         roman: []const u8,
         dec: u16,
@@ -29,7 +29,7 @@ fn to_roman(year: u32) []const u8 {
         if (co < roman[i].dec) {
             i += 1;
         } else {
-            result = std.fmt.allocPrint(std.heap.page_allocator, "{s}{s}", .{ result, roman[i].roman }) catch |err| {
+            result = std.fmt.allocPrint(alloc, "{s}{s}", .{ result, roman[i].roman }) catch |err| {
                 std.debug.print("Cannot allocate memory: {any}", .{err});
                 std.posix.exit(1);
             };
@@ -58,7 +58,7 @@ pub fn main() !void {
         std.posix.exit(1);
     };
 
-    const result = to_roman(co);
+    const result = to_roman(alloc, co);
     defer alloc.free(result);
 
     try stdout.print("{s}\n", .{result});
