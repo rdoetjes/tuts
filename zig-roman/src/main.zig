@@ -1,27 +1,27 @@
 const std = @import("std");
 
-const dec_roman = struct {
-    roman: []const u8,
-    dec: u16,
-};
-
-const roman = [_]dec_roman{
-    dec_roman{ .roman = "M", .dec = 1000 },
-    dec_roman{ .roman = "CM", .dec = 900 },
-    dec_roman{ .roman = "D", .dec = 500 },
-    dec_roman{ .roman = "CD", .dec = 400 },
-    dec_roman{ .roman = "C", .dec = 100 },
-    dec_roman{ .roman = "XC", .dec = 90 },
-    dec_roman{ .roman = "L", .dec = 50 },
-    dec_roman{ .roman = "XL", .dec = 40 },
-    dec_roman{ .roman = "X", .dec = 10 },
-    dec_roman{ .roman = "IX", .dec = 9 },
-    dec_roman{ .roman = "V", .dec = 5 },
-    dec_roman{ .roman = "IV", .dec = 4 },
-    dec_roman{ .roman = "I", .dec = 1 },
-};
-
 fn to_roman(year: u32) []const u8 {
+    const dec_roman = struct {
+        roman: []const u8,
+        dec: u16,
+    };
+
+    const roman = [_]dec_roman{
+        dec_roman{ .roman = "M", .dec = 1000 },
+        dec_roman{ .roman = "CM", .dec = 900 },
+        dec_roman{ .roman = "D", .dec = 500 },
+        dec_roman{ .roman = "CD", .dec = 400 },
+        dec_roman{ .roman = "C", .dec = 100 },
+        dec_roman{ .roman = "XC", .dec = 90 },
+        dec_roman{ .roman = "L", .dec = 50 },
+        dec_roman{ .roman = "XL", .dec = 40 },
+        dec_roman{ .roman = "X", .dec = 10 },
+        dec_roman{ .roman = "IX", .dec = 9 },
+        dec_roman{ .roman = "V", .dec = 5 },
+        dec_roman{ .roman = "IV", .dec = 4 },
+        dec_roman{ .roman = "I", .dec = 1 },
+    };
+
     var i: usize = 0;
     var co = year;
     var result: []u8 = "";
