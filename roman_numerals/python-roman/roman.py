@@ -58,8 +58,7 @@ def main():
     except ValueError:
         write_error_and_exit("Invalid input\n")
 
-    roman = to_roman(year)
-    print(roman)
+    print(to_roman(year))
 
 if __name__ == "__main__":
     main()
