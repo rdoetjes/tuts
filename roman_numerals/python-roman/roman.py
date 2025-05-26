@@ -47,7 +47,7 @@ def read_stdin(size: int) -> str:
 
 def main():
     MAX_LENGTH = 6
-    input_str = read_stdin(MAX_LENGTH-1)
+    input_str = read_stdin(MAX_LENGTH)
 
     if len(input_str) >= MAX_LENGTH:
         write_error_and_exit("Input string too long\n")
