@@ -48,9 +48,8 @@ pub fn main() !void {
     const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch {
         std.debug.print("Input too long (max {d} chars).\n", .{MAX_LENGTH - 1});
         std.posix.exit(1);
-    } orelse {
-        std.posix.exit(1);
-    };
+    } orelse unreachable;
+
     defer alloc.free(line);
 
     // Convert input to number
