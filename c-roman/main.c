@@ -77,8 +77,7 @@ int main(){
     if (read_stdin((char *)&input, MAX_LENGTH-1) == 0){
         const char* msg = "Input string to long\n";
         write(STDERR_FILENO, msg, strlen(msg));
-        exit(1);
-    }
+        return 1;    }
 
     char *roman = to_roman(atoi(input));
     printf("%s\n", roman);
