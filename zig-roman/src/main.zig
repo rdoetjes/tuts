@@ -1,6 +1,6 @@
 const std = @import("std");
 
-fn to_roman(alloc: std.mem.Allocator, year: u32) []const u8 {
+fn to_roman(alloc: std.mem.Allocator, year: u32) ![]const u8 {
     const dec_roman = struct {
         roman: []const u8,
         dec: u16,
@@ -30,10 +30,7 @@ fn to_roman(alloc: std.mem.Allocator, year: u32) []const u8 {
             i += 1;
         } else {
             // not the most efficient but the least amount of code
-            result = std.fmt.allocPrint(alloc, "{s}{s}", .{ result, roman[i].roman }) catch |err| {
-                std.debug.print("Cannot allocate memory: {any}", .{err});
-                std.posix.exit(1);
-            };
+            result = try std.fmt.allocPrint(alloc, "{s}{s}", .{ result, roman[i].roman });
             co -= roman[i].dec;
         }
     }
@@ -59,7 +56,10 @@ pub fn main() !void {
         std.posix.exit(1);
     };
 
-    const result = to_roman(alloc, co);
+    const result = to_roman(alloc, co) catch |err| {
+        std.debug.print("Error trying to convert to roman: {any}", .{err});
+        std.posix.exit(1);
+    };
     defer alloc.free(result);
 
     try stdout.print("{s}\n", .{result});
