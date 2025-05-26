@@ -35,7 +35,7 @@ def to_roman(year: int) -> str:
 
     return result
 
-def write_error_and_exit(msg):
+def write_error_and_exit(msg: str):
     sys.stderr.write(msg);
     sys.exit(1)
 
