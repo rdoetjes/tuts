@@ -55,10 +55,8 @@ int read_stdin(char *buffer, size_t size)
     if(buffer == NULL || size <= 0)
         return 0;
 
-    while(read(STDIN_FILENO, &c, 1) == 1 && cnt <= size)
-    {
-        if(c == '\n')
-        {
+    while(read(STDIN_FILENO, &c, 1) == 1 && cnt <= size){
+        if(c == '\n') {
             buffer[cnt] = 0;
             return 1;
         }
