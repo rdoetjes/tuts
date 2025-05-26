@@ -1,37 +1,38 @@
 const std = @import("std");
 
 fn to_roman(alloc: std.mem.Allocator, year: u32) ![]const u8 {
-    const dec_roman = struct {
-        roman: []const u8,
-        dec: u16,
+    const RomanEntry = struct {
+        numeral: []const u8,
+        value: u16,
     };
 
-    const roman = [_]dec_roman{
-        dec_roman{ .roman = "M", .dec = 1000 },
-        dec_roman{ .roman = "CM", .dec = 900 },
-        dec_roman{ .roman = "D", .dec = 500 },
-        dec_roman{ .roman = "CD", .dec = 400 },
-        dec_roman{ .roman = "C", .dec = 100 },
-        dec_roman{ .roman = "XC", .dec = 90 },
-        dec_roman{ .roman = "L", .dec = 50 },
-        dec_roman{ .roman = "XL", .dec = 40 },
-        dec_roman{ .roman = "X", .dec = 10 },
-        dec_roman{ .roman = "IX", .dec = 9 },
-        dec_roman{ .roman = "V", .dec = 5 },
-        dec_roman{ .roman = "IV", .dec = 4 },
-        dec_roman{ .roman = "I", .dec = 1 },
+    const numerals = [_]RomanEntry{
+        .{ .numeral = "M", .value = 1000 },
+        .{ .numeral = "CM", .value = 900 },
+        .{ .numeral = "D", .value = 500 },
+        .{ .numeral = "CD", .value = 400 },
+        .{ .numeral = "C", .value = 100 },
+        .{ .numeral = "XC", .value = 90 },
+        .{ .numeral = "L", .value = 50 },
+        .{ .numeral = "XL", .value = 40 },
+        .{ .numeral = "X", .value = 10 },
+        .{ .numeral = "IX", .value = 9 },
+        .{ .numeral = "V", .value = 5 },
+        .{ .numeral = "IV", .value = 4 },
+        .{ .numeral = "I", .value = 1 },
     };
 
+    var result = try alloc.alloc(u8, 0); // start empty
+    var remainder = year;
     var i: usize = 0;
-    var co = year;
-    var result: []u8 = "";
-    while (co != 0) {
-        if (co < roman[i].dec) {
+
+    while (remainder != 0) {
+        if (remainder < numerals[i].value) {
             i += 1;
         } else {
-            // not the most efficient but the least amount of code
-            result = try std.fmt.allocPrint(alloc, "{s}{s}", .{ result, roman[i].roman });
-            co -= roman[i].dec;
+            // Append the numeral to result, not most effient but nice and short (no need to arraylist and flatten)
+            result = try std.fmt.allocPrint(alloc, "{s}{s}", .{ result, numerals[i].numeral });
+            remainder -= numerals[i].value;
         }
     }
     return result;
@@ -41,8 +42,10 @@ pub fn main() !void {
     const stdin = std.io.getStdIn().reader();
     const stdout = std.io.getStdOut().writer();
     const alloc = std.heap.page_allocator;
+
+    // Read input line
     const line_opt = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', 20) catch {
-        std.debug.print("string too long (no more than 20 chars)", .{});
+        std.debug.print("Input too long (max 20 chars).\n", .{});
         std.posix.exit(1);
     };
     defer if (line_opt) |line| alloc.free(line);
@@ -51,16 +54,18 @@ pub fn main() !void {
         std.posix.exit(1);
     };
 
-    const co = std.fmt.parseInt(u32, line, 10) catch |err| {
-        std.debug.print("Error trying to convert to int: {any}", .{err});
+    // Convert input to number
+    const year = std.fmt.parseInt(u32, line, 10) catch |err| {
+        std.debug.print("Error parsing input: {any}\n", .{err});
         std.posix.exit(1);
     };
 
-    const result = to_roman(alloc, co) catch |err| {
-        std.debug.print("Error trying to convert to roman: {any}", .{err});
+    // Convert to Roman numeral
+    const roman = to_roman(alloc, year) catch |err| {
+        std.debug.print("Error converting to Roman: {any}\n", .{err});
         std.posix.exit(1);
     };
-    defer alloc.free(result);
+    defer alloc.free(roman);
 
-    try stdout.print("{s}\n", .{result});
+    try stdout.print("{s}\n", .{roman});
 }
