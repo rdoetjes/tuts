@@ -30,7 +30,7 @@ fn to_roman(alloc: std.mem.Allocator, year: u32) ![]const u8 {
         if (remainder < numerals[i].value) {
             i += 1;
         } else {
-            // Append the numeral to result, not most effient but nice and short (no need to arraylist and flatten)
+            // Append the numeral to result, not most effient way but nice and short (no need to arraylist and flatten)
             result = try std.fmt.allocPrint(alloc, "{s}{s}", .{ result, numerals[i].numeral });
             remainder -= numerals[i].value;
         }
