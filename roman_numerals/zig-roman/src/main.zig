@@ -30,12 +30,16 @@ fn to_roman(alloc: std.mem.Allocator, year: u32) ![]const u8 {
         if (remainder < numerals[i].value) {
             i += 1;
         } else {
-            // Append the numeral to result, not most effient but nice and short (no need to arraylist and flatten)
-            result = try std.fmt.allocPrint(alloc, "{s}{s}", .{ result, numerals[i].numeral });
+            result = try std.fmt.allocPrint(alloc, "{s}{s}", .{ result, numerals[i].numeral }); // not most effient but nice and short (no need to arraylist and flatten)
             remainder -= numerals[i].value;
         }
     }
     return result;
+}
+
+fn write_error_and_exit(msg: []const u8, err: anyerror) void {
+    std.debug.print("{s}\n Error: {any}\n\n", .{ msg, err });
+    std.posix.exit(1);
 }
 
 pub fn main() !void {
@@ -44,20 +48,20 @@ pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
     const alloc = std.heap.page_allocator;
 
-    const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch {
-        std.debug.print("Input too long (max {d} chars).\n", .{MAX_LENGTH - 1});
-        std.posix.exit(1);
-    } orelse unreachable; //strip the option
+    const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch |err| {
+        write_error_and_exit("Input too long", err);
+        unreachable;
+    } orelse unreachable;
     defer alloc.free(line);
 
     const year = std.fmt.parseInt(u32, line, 10) catch |err| {
-        std.debug.print("Error parsing input: {any}\n", .{err});
-        std.posix.exit(1);
+        write_error_and_exit("Error parsing input.", err);
+        unreachable;
     };
 
     const roman = to_roman(alloc, year) catch |err| {
-        std.debug.print("Error converting to Roman: {any}\n", .{err});
-        std.posix.exit(1);
+        write_error_and_exit("Error converting Roman numeral.", err);
+        unreachable;
     };
     defer alloc.free(roman);
 
