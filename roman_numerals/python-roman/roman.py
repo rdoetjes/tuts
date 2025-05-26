@@ -35,6 +35,10 @@ def to_roman(year: int) -> str:
 
     return result
 
+def write_error_and_exit(msg):
+    sys.stderr.write(msg);
+    sys.exit(1)
+
 def read_stdin(size: int) -> str:
     data = sys.stdin.read(size)
     if '\n' in data:
@@ -46,14 +50,13 @@ def main():
     input_str = read_stdin(MAX_LENGTH-1)
 
     if len(input_str) >= MAX_LENGTH:
-        sys.stderr.write("Input string too long\n")
-        sys.exit(1)
+        write_error_and_exit("Input string too long\n")
 
+    year = 0
     try:
         year = int(input_str)
     except ValueError:
-        sys.stderr.write("Invalid input\n")
-        sys.exit(1)
+        write_error_and_exit("Invalid input\n")
 
     roman = to_roman(year)
     print(roman)
