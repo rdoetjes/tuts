@@ -75,7 +75,8 @@ int read_stdin(char *buffer, size_t size)
 int main(){
     char input[MAX_LENGTH]="";
     if (read_stdin((char *)&input, MAX_LENGTH-1) == 0){
-        perror("input string too long");
+        const char* msg = "Input string to long\n";
+        write(STDERR_FILENO, msg, strlen(msg));
         exit(1);
     }
 
