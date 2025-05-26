@@ -29,6 +29,7 @@ fn to_roman(alloc: std.mem.Allocator, year: u32) []const u8 {
         if (co < roman[i].dec) {
             i += 1;
         } else {
+            // not the most efficient but the least amount of code
             result = std.fmt.allocPrint(alloc, "{s}{s}", .{ result, roman[i].roman }) catch |err| {
                 std.debug.print("Cannot allocate memory: {any}", .{err});
                 std.posix.exit(1);
