@@ -39,13 +39,14 @@ fn to_roman(alloc: std.mem.Allocator, year: u32) ![]const u8 {
 }
 
 pub fn main() !void {
+    const MAX_LENGTH = 6;
     const stdin = std.io.getStdIn().reader();
     const stdout = std.io.getStdOut().writer();
     const alloc = std.heap.page_allocator;
 
     // Read input line
-    const line_opt = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', 20) catch {
-        std.debug.print("Input too long (max 20 chars).\n", .{});
+    const line_opt = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch {
+        std.debug.print("Input too long (max {d} chars).\n", .{MAX_LENGTH - 1});
         std.posix.exit(1);
     };
     defer if (line_opt) |line| alloc.free(line);
