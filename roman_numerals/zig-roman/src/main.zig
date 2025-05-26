@@ -48,7 +48,7 @@ pub fn main() !void {
     const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch {
         std.debug.print("Input too long (max {d} chars).\n", .{MAX_LENGTH - 1});
         std.posix.exit(1);
-    } orelse unreachable;
+    } orelse unreachable; //strip the option
 
     defer alloc.free(line);
 
