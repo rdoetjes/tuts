@@ -51,33 +51,30 @@ char* to_roman(const uint32_t year){
 
 int read_stdin(char *buffer, size_t size)
 {
-    //fgets(buffer, size, STDIN_FILENO);
     size_t cnt = 0;
     char c;
 
-    if(buffer == NULL || size == 0)
+    if(buffer == NULL || size <= 0)
         return 0;
 
-    while(read(STDIN_FILENO, &c, 1) == 1 && cnt < size - 1)
+    while(read(STDIN_FILENO, &c, 1) == 1 && cnt <= size)
     {
         if(c == '\n')
         {
-            printf("%lo\n", cnt);
             buffer[cnt] = 0;
             return 1;
         }
-
         buffer[cnt++] = c;
     }
-
+    buffer[cnt] = 0;
     return 0;
 }
 
-#define MAX_LENGTH 21
+#define MAX_LENGTH 6
 
 int main(){
-    char input[MAX_INPUT]= "";
-    if (read_stdin((char *)&input, MAX_LENGTH) == 0){
+    char input[MAX_LENGTH]="";
+    if (read_stdin((char *)&input, MAX_LENGTH-1) == 0){
         perror("input string too long");
         exit(1);
     }
