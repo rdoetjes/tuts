@@ -30,7 +30,7 @@ fn to_roman(alloc: std.mem.Allocator, year: u32) ![]const u8 {
         if (remainder < numerals[i].value) {
             i += 1;
         } else {
-            // Append the numeral to result, not most effient way but nice and short (no need to arraylist and flatten)
+            // Append the numeral to result, not most effient but nice and short (no need to arraylist and flatten)
             result = try std.fmt.allocPrint(alloc, "{s}{s}", .{ result, numerals[i].numeral });
             remainder -= numerals[i].value;
         }
@@ -44,21 +44,17 @@ pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
     const alloc = std.heap.page_allocator;
 
-    // Read input line
     const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch {
         std.debug.print("Input too long (max {d} chars).\n", .{MAX_LENGTH - 1});
         std.posix.exit(1);
     } orelse unreachable; //strip the option
-
     defer alloc.free(line);
 
-    // Convert input to number
     const year = std.fmt.parseInt(u32, line, 10) catch |err| {
         std.debug.print("Error parsing input: {any}\n", .{err});
         std.posix.exit(1);
     };
 
-    // Convert to Roman numeral
     const roman = to_roman(alloc, year) catch |err| {
         std.debug.print("Error converting to Roman: {any}\n", .{err});
         std.posix.exit(1);
