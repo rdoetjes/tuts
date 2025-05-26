@@ -45,15 +45,13 @@ pub fn main() !void {
     const alloc = std.heap.page_allocator;
 
     // Read input line
-    const line_opt = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch {
+    const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch {
         std.debug.print("Input too long (max {d} chars).\n", .{MAX_LENGTH - 1});
         std.posix.exit(1);
-    };
-    defer if (line_opt) |line| alloc.free(line);
-
-    const line = line_opt orelse {
+    } orelse {
         std.posix.exit(1);
     };
+    defer alloc.free(line);
 
     // Convert input to number
     const year = std.fmt.parseInt(u32, line, 10) catch |err| {
