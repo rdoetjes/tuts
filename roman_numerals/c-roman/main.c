@@ -72,12 +72,14 @@ int read_stdin(char *buffer, size_t size)
 
 #define MAX_LENGTH 6
 
+void write_error_and_exit(const char* error){
+    write(STDERR_FILENO, error, strlen(error));
+    exit(1);
+}
+
 int main(){
     char input[MAX_LENGTH]="";
-    if (read_stdin((char *)&input, MAX_LENGTH-1) == 0){
-        const char* msg = "Input string to long\n";
-        write(STDERR_FILENO, msg, strlen(msg));
-        return 1;    }
+    if (read_stdin((char *)&input, MAX_LENGTH-1) == 0) write_error_and_exit("ABORTED! Input to long\n");
 
     char *roman = to_roman(atoi(input));
     printf("%s\n", roman);
