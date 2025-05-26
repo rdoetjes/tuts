@@ -1,6 +1,4 @@
-#include <sys/syslimits.h>
 #include <unistd.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
