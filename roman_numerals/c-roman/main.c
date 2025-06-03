@@ -40,7 +40,7 @@ char* to_roman(const uint32_t year){
                 free(result);
                 return NULL;
             }
-            strcat(result, numerals[i].roman);
+            strncat(result, numerals[i].roman, strlen(numerals[i].roman));
             remainder -= numerals[i].dec;
         }
     }
