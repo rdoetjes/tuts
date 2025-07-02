@@ -76,7 +76,7 @@ process_dial:
         sta $0400,x
 
         sec
-        sbc #'0'         // Normalize ASCII digit chars to 0-9
+        sbc #'0'         // Normalize ASCII digit chars to 0-9 (subtract 48)
         cmp #10
         bcc !digit+      // If 0–9, go handle digit
         clc
