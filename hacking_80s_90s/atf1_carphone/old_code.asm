@@ -27,7 +27,7 @@ main:
 
         // process the dial
         jsr process_dial
-        // do it twice like a car phone does
+        // do it twice like a car phone does, we found out in the past that this increased the reliability
         jsr reset_var
         jsr process_dial
 
