@@ -3,7 +3,7 @@ BasicUpstart2(main)
         * = $1000
 
 number_to_convert:
-.text "s1234520717666e"
+.text "s1234520717666e"         // this can be overwritten in basic by poking from 4097 (overwrites the 1 after the S)
 .text "$"
 
 // --- Constants ---
