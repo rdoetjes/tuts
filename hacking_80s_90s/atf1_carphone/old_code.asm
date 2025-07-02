@@ -2,6 +2,10 @@ BasicUpstart2(main)
 
         * = $1000
 
+number_to_convert:
+.text "s1234520717666e"
+.text "$"
+
 // --- Constants ---
 .const CIA1_TIMER_A_LOW  = $dc04
 .const CIA1_TIMER_A_HIGH = $dc05
@@ -23,19 +27,28 @@ main:
 
         // process the dial
         jsr process_dial
+        // do it twice like a car phone does
+        jsr reset_var
+        jsr process_dial
 
 stop_loop:
         jsr hz0
         jmp ($A002)
 
-setup:
-        sei
+reset_var:
+        jsr $e544       //clr screen
+
         lda #$00
         sta timer_600ms_lapsed
         sta byte_count
         sta offset_table
         sta irq_counter
+        rts
 
+setup:
+        sei
+       
+        jsr reset_var
         jsr setup_sid
         jsr hz2070
 
@@ -283,7 +296,3 @@ c8:
 c9:
 .byte %01110000
 .byte %11011000
-
-number_to_convert:
-.text "s1234520717666e"
-.text "$"
