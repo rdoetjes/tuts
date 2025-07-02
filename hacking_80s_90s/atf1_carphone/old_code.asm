@@ -8,7 +8,7 @@ BasicUpstart2(main)
 .const CIA1_ICR          = $dc0d
 .const CIA1_CRA          = $dc0e
 .const IRQ_VECTOR        = $0314
-.const TIMER_10ms = $268C
+.const TIMER_10ms = $ffff //$268C
 .const TIMER_START_CONTINUOUS = %00010001
 
 // --- Main Program ---
@@ -19,16 +19,10 @@ main:
         lda timer_600ms_lapsed
 
         // send preeamble 600ms 2050hz
-        jsr ms600_preeamble
+        //jsr ms600_preeamble
 
         // process the dial
-!:
         jsr process_dial
-        inc byte_count
-        ldx byte_count
-        lda number_to_convert,x
-        cmp #'$'
-        bne !-
 
 stop_loop:
         jsr hz0
@@ -86,8 +80,9 @@ process_dial:
         beq !s+
         jmp !e+
 !s:
-        lda table+0
+        lda #0
         sta offset_table
+        lda table+0
         jmp !+
 
 !e:
@@ -95,8 +90,9 @@ process_dial:
         beq !e+
         jmp !c+
 !e:
-        lda table+2
+        lda #02
         sta offset_table
+        lda table+2
         jmp !+
 
 !c:
@@ -104,8 +100,9 @@ process_dial:
         beq !c+
         jmp !_0+
 !c:
-        lda table+4
+        lda 4
         sta offset_table
+        lda table+4
         jmp !+
 
 !_0:
@@ -113,17 +110,19 @@ process_dial:
         beq !_0+
         jmp !_1+
 !_0:
-        lda table+6
+        lda 6
         sta offset_table
+        lda table+6
         jmp !+
 
 !_1:
         cmp #'1'
         beq !_1+
-        jmp !+
+        jmp !_2+
 !_1:
-        lda table+8
+        lda 8
         sta offset_table
+        lda table+8
         jmp !_2+
 
 !_2:
@@ -131,8 +130,9 @@ process_dial:
         beq !_2+
         jmp !_3+
 !_2:
-        lda table+10
+        lda 10
         sta offset_table
+        lda table+10
         jmp !+
 
 !_3:
@@ -140,8 +140,9 @@ process_dial:
         beq !_3+
         jmp !_4+
 !_3:
-        lda table+12
+        lda 12
         sta offset_table
+        lda table+12
         jmp !+
 
 !_4:
@@ -149,8 +150,9 @@ process_dial:
         beq !_4+
         jmp !_5+
 !_4:
-        lda table+12
+        lda 14
         sta offset_table
+        lda table+14
         jmp !+
 
 !_5:
@@ -158,8 +160,9 @@ process_dial:
         beq !_5+
         jmp !_6+
 !_5:
-        lda table+14
+        lda 16
         sta offset_table
+        lda table+16
         jmp !+
 
 !_6:
@@ -167,8 +170,9 @@ process_dial:
         beq !_6+
         jmp !_7+
 !_6:
-        lda table+16
+        lda 18
         sta offset_table
+        lda table+18
         jmp !+
 
 !_7:
@@ -176,8 +180,9 @@ process_dial:
         beq !_7+
         jmp !_8+
 !_7:
-        lda table+18
+        lda 20
         sta offset_table
+        lda table+20
         jmp !+
 
 !_8:
@@ -185,8 +190,9 @@ process_dial:
         beq !_8+
         jmp !_9+
 !_8:
-        lda table+18
+        lda 22
         sta offset_table
+        lda table+22
         jmp !+
 
 !_9:
@@ -194,8 +200,9 @@ process_dial:
         beq !_9+
         jmp !end+
 !_9:
-        lda table+20
+        lda 24
         sta offset_table
+        lda table+24
         jmp !+
 
         //process bits
@@ -206,6 +213,10 @@ process_dial:
         ldx offset_table
         lda table,x
         jsr send_8bits
+
+        inc byte_count
+        jmp process_dial
+!end:
         rts
         
 send_8bits:
@@ -214,12 +225,20 @@ send_8bits:
         rol
         bcc !_0+
         jsr hz2070
+        pha
+        lda #'1'
+        sta $0500,y
+        pla
         jmp !_5ms+
 !_0:
+        pha
+        lda #'0'
+        sta $0500,y
+        pla
         jsr hz1950
 
 !_5ms:    
-        //wait 5 ms to next bit
+        //wait 5 ms (set by irq) to next bit
         ldx irq_counter
         cpx irq_counter
         beq *-3
@@ -276,17 +295,25 @@ hz0:
         rts
 
 hz2070:
+        pha
+
         lda #$ea
         sta $d400
         lda #$89
         sta $d401
+
+        pla
         rts
 
 hz1950:
+        pha
+        
         lda #$a0
         sta $d400
         lda #$81
         sta $d401
+
+        pla
         rts
 
 // --- Variables ---
@@ -304,7 +331,7 @@ stoptelegram:   //E in the string
 .byte %01110100
 .byte %00100001
 
-canceltelegram:
+canceltelegram: //C in the string
 .byte %01110101
 .byte %01010101
 
