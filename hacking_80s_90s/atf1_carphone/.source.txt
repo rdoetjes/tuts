@@ -142,10 +142,10 @@ send_8bits:
 !rol:
         rol
         bcc !_0+
-        jsr hz2070
+        jsr hz1950
         jmp !_5ms+
 !_0:
-        jsr hz1950
+        jsr hz2070
 
 !_5ms:    
         //wait 5 ms (set by irq) to next bit
