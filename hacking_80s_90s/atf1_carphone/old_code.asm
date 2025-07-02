@@ -176,7 +176,6 @@ dial_irq:
         sta irq_counter
 !:
         lda $dc0d
-        inc $d020
 
         pla
         tax
