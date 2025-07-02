@@ -8,7 +8,7 @@ BasicUpstart2(main)
 .const CIA1_ICR          = $dc0d
 .const CIA1_CRA          = $dc0e
 .const IRQ_VECTOR        = $0314
-.const TIMER_10ms = $ffff //$268C
+.const TIMER_10ms = $268C
 .const TIMER_START_CONTINUOUS = %00010001
 
 // --- Main Program ---
@@ -19,7 +19,7 @@ main:
         lda timer_600ms_lapsed
 
         // send preeamble 600ms 2050hz
-        //jsr ms600_preeamble
+        jsr ms600_preeamble
 
         // process the dial
         jsr process_dial
@@ -75,135 +75,53 @@ process_dial:
         lda number_to_convert,x
         sta $0400,x
 
-!s:
+        sec
+        sbc #'0'         // Normalize ASCII digit chars to 0-9
+        cmp #10
+        bcc !digit+      // If 0–9, go handle digit
+        clc
+        adc #'0'         // Restore A
+
         cmp #'s'
-        beq !s+
-        jmp !e+
-!s:
+        beq !set_s+
+        cmp #'e'
+        beq !set_e+
+        cmp #'c'
+        beq !set_c+
+        jmp !no_match+
+
+!digit:
+        clc
+        asl              // Multiply index by 2 (each entry = 2 bytes)
+        adc #6
+        tay
+        sty offset_table
+        lda table, y
+        jmp !done+
+
+!set_s:
         lda #0
         sta offset_table
         lda table+0
-        jmp !+
+        jmp !done+
 
-!e:
-        cmp #'e'
-        beq !e+
-        jmp !c+
-!e:
-        lda #02
+!set_e:
+        lda #2
         sta offset_table
         lda table+2
-        jmp !+
+        jmp !done+
 
-!c:
-        cmp #'c'
-        beq !c+
-        jmp !_0+
-!c:
-        lda 4
+!set_c:
+        lda #4
         sta offset_table
         lda table+4
-        jmp !+
+        jmp !done+
 
-!_0:
-        cmp #'0'
-        beq !_0+
-        jmp !_1+
-!_0:
-        lda 6
-        sta offset_table
-        lda table+6
-        jmp !+
+!no_match:
+    // No valid character matched. Do nothing or handle error
+        rts
 
-!_1:
-        cmp #'1'
-        beq !_1+
-        jmp !_2+
-!_1:
-        lda 8
-        sta offset_table
-        lda table+8
-        jmp !_2+
-
-!_2:
-        cmp #'2'
-        beq !_2+
-        jmp !_3+
-!_2:
-        lda 10
-        sta offset_table
-        lda table+10
-        jmp !+
-
-!_3:
-        cmp #'3'
-        beq !_3+
-        jmp !_4+
-!_3:
-        lda 12
-        sta offset_table
-        lda table+12
-        jmp !+
-
-!_4:
-        cmp #'4'
-        beq !_4+
-        jmp !_5+
-!_4:
-        lda 14
-        sta offset_table
-        lda table+14
-        jmp !+
-
-!_5:
-        cmp #'5'
-        beq !_5+
-        jmp !_6+
-!_5:
-        lda 16
-        sta offset_table
-        lda table+16
-        jmp !+
-
-!_6:
-        cmp #'6'
-        beq !_6+
-        jmp !_7+
-!_6:
-        lda 18
-        sta offset_table
-        lda table+18
-        jmp !+
-
-!_7:
-        cmp #'7'
-        beq !_7+
-        jmp !_8+
-!_7:
-        lda 20
-        sta offset_table
-        lda table+20
-        jmp !+
-
-!_8:
-        cmp #'8'
-        beq !_8+
-        jmp !_9+
-!_8:
-        lda 22
-        sta offset_table
-        lda table+22
-        jmp !+
-
-!_9:
-        cmp #'9'
-        beq !_9+
-        jmp !end+
-!_9:
-        lda 24
-        sta offset_table
-        lda table+24
-        jmp !+
+!done:
 
         //process bits
 !:
@@ -225,10 +143,7 @@ send_8bits:
         rol
         bcc !_0+
         jsr hz2070
-        pha
-        lda #'1'
-        sta $0500,y
-        pla
+
         jmp !_5ms+
 !_0:
         pha
