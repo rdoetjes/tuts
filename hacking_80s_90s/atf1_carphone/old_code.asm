@@ -2,63 +2,147 @@ BasicUpstart2(main)
 
         * = $1000         // Program starts here
 
-// --- Timer value (10 ms) ---
-.const ms10_timer = $268C         // ~9852 decimal
-.const ms600_timer = $FFFF         // and we need 9 of these
+// --- Constants ---
+.const CIA1_TIMER_A_LOW  = $dc04
+.const CIA1_TIMER_A_HIGH = $dc05
+.const CIA1_ICR          = $dc0d
+.const CIA1_CRA          = $dc0e
+.const CIA1_CRB          = $dc0f
+.const VIC_IRQ_ACK       = $d019
+.const CIA_IRQ_ENABLE    = $d01a
+.const IRQ_VECTOR        = $0314
+.const VIC_IRQ_STAT      = $d019
+.const VIC_IRQ_MASK      = $d01a
 
+.const TIMER_66ms = $FFFF  // Actually ~66.5ms on PAL
+.const TIMER_10ms = $268C  // ~10ms on PAL
+
+// --- Main Program ---
+// --- Main Program ---
 main:
-        jsr hz2070
+        sei                 // Disable interrupts during setup
+
         jsr setup_sid
-        // jsr setup_timer
-        // jsr setup_timer_600ms
-        // jsr start_timer
-        // jsr setup_timer_10ms
-        // jsr start_timer
-        jmp *
+        jsr hz2070          // Turn clear channel for transmit preamble
 
-setup_timer:
-        sei                 // Disable interrupts
-
+        // --- Take over the system IRQ ---
+        // 1. Disable all interrupt sources first
         lda #$7f
-        sta $dc0d           // Disable CIA #1 interrupts
-        sta $dd0d           // Disable CIA #2 interrupts
+        sta VIC_IRQ_STAT    // Acknowledge any pending VIC IRQs
+        lda #%00000000      // Disable ALL VIC interrupt sources (Raster, etc.)
+        sta VIC_IRQ_MASK    // VIC_IRQ_MASK is $d01a
 
-        lda $dc0d           // Acknowledge any pending CIA #1 interrupt
-        lda $dd0d           // Acknowledge any pending CIA #2 interrupt
+        // 2. Point the CPU's IRQ vector to our handler
+        lda #<preeamble_irq
+        sta IRQ_VECTOR
+        lda #>preeamble_irq
+        sta IRQ_VECTOR+1
 
-        lda #$01
-        sta $d01a           // Enable IRQs from CIA #1
+        // 3. Configure and start OUR desired interrupt source (CIA Timer A)
+        lda #<TIMER_66ms
+        sta CIA1_TIMER_A_LOW
+        lda #>TIMER_66ms
+        sta CIA1_TIMER_A_HIGH
 
-        rts
+        // 4. Set the CIA's INTERNAL interrupt mask to allow Timer A to fire
+        //    Bit 7=1 means "Set Mask", Bit 0=1 means "for Timer A"
+        lda #%10000001
+        sta CIA1_ICR        // This is the correct way to enable the CIA source
 
-setup_timer_10ms:
-        lda #<ms10_timer
-        sta $dc04           // CIA1 Timer A low byte
-        lda #>ms10_timer
-        sta $dc05           // CIA1 Timer A high byte
+        // 5. Start the timer
+        lda #%00010001      // Load start value into Timer A and start timer
+        sta CIA1_CRA
+        
+        // 6. Enable interrupts globally
+        cli
 
-        lda #<ms10irq
-        sta $0314           // Set IRQ vector low byte
-        lda #>ms10irq
-        sta $0315           // Set IRQ vector high byte
-        rts
+loop:
+        // Main loop polls the flag set by the IRQ
+        lda timer_600ms_lapsed
+        beq loop            // If flag is 0, keep looping
 
-setup_timer_600ms:
-        lda #<ms600irq
-        sta $0314           // Set IRQ vector low byte
-        lda #>ms600irq
-        sta $0315           // Set IRQ vector high byte
-        rts
+        // --- 600ms has passed ---
+        sei                 // Disable interrupts to safely change timer
+        
+        jsr hz0             // Turn beep off
+        inc $d020           // Flash border to show we got here
+        
+        // Reset the flag for the next time
+        lda #0
+        sta timer_600ms_lapsed
+        sta irq_counter
+        
+        // Here you would re-configure for the 10ms chirps used for dial sequence
+        lda #<TIMER_10ms
+        sta CIA1_TIMER_A_LOW
+        lda #>TIMER_10ms
+        sta CIA1_TIMER_A_HIGH
 
-start_timer:
-        lda #%00010001      // Start Timer A, continuous mode, count CPU cycles
-        sta $dc0e
+        // Point to the next handler
+        lda #<dial_number_irq
+        sta IRQ_VECTOR
+        lda #>dial_number_irq
+        sta IRQ_VECTOR+1
+        
+        // Restart the timer
+        lda #%00010001      // Load start value into Timer A and start timer
+        sta CIA1_CRA
+        
+        cli                 // Re-enable interrupts
+        jmp *               // Infinite loop to end the program
 
-        lda #%00000001      // Enable Timer A interrupt
-        sta $dc0d
+// --- Interrupt Service Routine ---
+preeamble_irq:
+        // --- Standard IRQ entry ---
+        pha
+        txa
+        pha
+        tya
+        pha
 
-        cli                 // Enable interrupts
-        rts
+        // --- Acknowledge the interrupt ---
+        // It's crucial to do this first. We only care about CIA1 Timer A.
+        lda CIA1_ICR
+
+        // --- IRQ Logic ---
+        // This is the only code that should be in the IRQ
+        inc irq_counter
+        lda irq_counter
+        cmp #9              // Have 9 interrupts (approx 600ms) passed?
+        bne !+         // If not, exit
+
+        // If yes, set the flag for the main loop and reset the counter
+        lda #1
+        sta timer_600ms_lapsed
+        
+!:        // --- Standard IRQ exit ---
+        pla
+        tay
+        pla
+        tax
+        pla
+        rti
+
+dial_number_irq:
+         // --- Standard IRQ entry ---
+        pha
+        txa
+        pha
+        tya
+        pha
+
+        // --- Acknowledge the interrupt ---
+        // It's crucial to do this first. We only care about CIA1 Timer A.
+        lda CIA1_ICR
+
+
+!:        // --- Standard IRQ exit ---
+        pla
+        tay
+        pla
+        tax
+        pla
+        rti
 
 setup_sid:
         // Set volume
@@ -74,7 +158,14 @@ setup_sid:
         // Set control register for pulse wave and gate
         lda #$11       // triangle
         sta $d404      // Control register for voice 1
+        rts
 
+hz0:
+        // Set frequency (example: 0 Hz) PAL   
+        lda #$00       // Low byte of frequency
+        sta $d400
+        lda #$00       // High byte of frequency
+        sta $d401
         rts
 
 hz1950:
@@ -92,53 +183,6 @@ hz2070:
         lda #$89       // High byte of frequency 
         sta $d401
         rts
-
-// --- IRQ handler 600ms ---
-// we acknowledge the interrupt 9 times, that would lead to a 598 ms delay (close enough)
-ms600irq:
-        irq_counter:
-                .byte 0
-
-        irq_handler:
-                pha
-                txa
-                pha
-                tya
-                pha
-
-                lda $dc0d           // Acknowledge Timer A
-
-                inc irq_counter
-                lda irq_counter
-                cmp #9
-                bne skip_action
-
-                // --- 600 ms elapsed clear counter for next time ---
-                lda #0
-                sta irq_counter
-
-                // Set frequency (example: 0 Hz)
-                lda #$00       // Low byte of frequency 
-                sta $D400
-                lda #$00       // High byte of frequency 
-                sta $D401
-
-        skip_action:
-                pla
-                tay
-                pla
-                tax
-                pla
-                rti
-
-// --- IRQ handler 10ms ---
-ms10irq:
-        lda $dc0d           // Acknowledge CIA1 interrupt
-
-        // Do something here if needed
-        inc $d020           // Flash border color for debug
-
-        rti
 
 starttelegram:  //S in the string
 .byte %01110010
@@ -191,6 +235,12 @@ c8:
 c9:
 .byte %01110000
 .byte %11011000
+
+irq_counter:
+.byte 0
+
+timer_600ms_lapsed:
+.byte 0
 
 number_to_dial:
 .text "S1234520717666E"
