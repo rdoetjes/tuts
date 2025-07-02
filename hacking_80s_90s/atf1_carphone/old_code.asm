@@ -48,11 +48,11 @@ irq_handler:
 
         jmp $ea31           // Jump to standard IRQ handler (restore registers, etc.)
 
-starttelegram:
+starttelegram:  //S in the string
 .byte %01110010
 .byte %00100010
 
-stoptelegram:
+stoptelegram:   //E in the string
 .byte %01110100
 .byte %00100001
 
@@ -99,3 +99,6 @@ c8:
 c9:
 .byte %01110000
 .byte %11011000
+
+number_to_dial:
+.text "S1234520717666E"
