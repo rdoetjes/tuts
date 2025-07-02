@@ -41,7 +41,7 @@ setup:
         sta byte_count
         sta offset_table
         sta irq_counter
-        
+
         jsr setup_sid
         jsr hz2070
 
@@ -349,4 +349,5 @@ c9:
 .byte %11011000
 
 number_to_convert:
-.text "s1234520717666e$"
+.text "s1234520717666e"
+.text "$"
