@@ -143,16 +143,8 @@ send_8bits:
         rol
         bcc !_0+
         jsr hz2070
-        pha
-        lda #'1'
-        sta $0500,y
-        pla
         jmp !_5ms+
 !_0:
-        pha
-        lda #'0'
-        sta $0500,y
-        pla
         jsr hz1950
 
 !_5ms:    
