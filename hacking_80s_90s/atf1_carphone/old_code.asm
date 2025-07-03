@@ -170,7 +170,9 @@ send_8bits:
         jsr hz2070
 
 !_5ms:    
-        //wait 5 ms (set by irq) to next bit
+        //wait for the next 5 ms interrupt to change the irq_counter. so we can send the next beep.
+        //We could potentially do something else here
+        //We just spin wait
         ldx irq_counter
         cpx irq_counter
         beq *-3
