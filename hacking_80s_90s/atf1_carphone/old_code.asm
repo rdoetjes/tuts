@@ -145,7 +145,7 @@ process_dial:
 
 !done:
 
-        //process bits
+        //process bytes (send the 8 bits)
 !:
         inc offset_table
         jsr send_8bits
