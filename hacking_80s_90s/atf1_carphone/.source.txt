@@ -208,7 +208,7 @@ dial_irq:
         pla
         jmp $ea31
 
-// --- SID Routines ---
+// Configures SID1 to play to use triangle wave and no attack and no decay, sustain to full release no
 setup_sid:
         lda #$0f // set volume full
         sta SID_VOLUME         
