@@ -51,6 +51,14 @@ reset_var:
         sta irq_counter
         rts
 
+// clean variables, setup the sid and cia
+// configure the CIA to trigger 10ms interrupts, in the interrupt routine we'll increment the irq_counter
+// and we check in the main what beep to send and wait during the duration until the irq_counter is incremented again
+// in affect giving a 5ms beep, we can process ~4100 instructions in that period so whe are good, we miss mere microseconds of the 5ms
+// beep because of parseing the number. So we are well withing range. In more timing critical situations we could change the timer value to get that longer
+// duration -- but microseconds on millisecond lengths are not that important.
+// But defenitely something you need to be aware of when dealing with realtime systems.
+// Hence this can't be done in BASIC.
 setup:
         sei
        
@@ -78,6 +86,7 @@ setup:
         cli
         rts
 
+// wait for 600ms and then turn off the frequency
 ms600_preeamble:
         lda timer_600ms_lapsed
         cmp #1  
@@ -88,6 +97,9 @@ ms600_preeamble:
         jsr hz0
         rts
 
+// parse the number from the number_to_convert string
+// fetch the offset from the table that contains the binary bytes to send
+// send each bit as the correct frequency for 5ms
 process_dial:
         ldx byte_count
         // read letter from string and check if we are at the end of the string
@@ -155,7 +167,10 @@ process_dial:
         jmp process_dial
 !end:
         rts
-        
+
+// Takes whatever is in A and rols the bit out in the carry and based on that varry value
+// sounds either 1950Hz for a ! and 2070Hz for a 0
+// it will wait unul irq_counter changes (indicating 5ms has passed) to process the next bit      
 send_8bits:
         ldy #8
 !rol:
