@@ -86,15 +86,11 @@ setup:
         cli
         rts
 
-// wait for 600ms and then turn off the frequency
+// wait for 600ms by checking to see if timer_600ms_lapsed is set to 1
 ms600_preeamble:
         lda timer_600ms_lapsed
         cmp #1  
         bne ms600_preeamble
-
-        // 600ms clear preeamble send
-        lda #$0
-        jsr hz0
         rts
 
 // parse the number from the number_to_convert string
