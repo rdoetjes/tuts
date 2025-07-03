@@ -14,6 +14,15 @@ number_to_convert:
 .const IRQ_VECTOR        = $0314
 .const TIMER_10ms = $268C
 .const TIMER_START_CONTINUOUS = %00010001
+//SID1 as in SID_CHANNEL1
+.const SID1_FREQ_HI = $d401
+.const SID1_FREQ_LO = $d400
+.const SID_CHANNEL_A_VOLUME = $d41b
+.const SID_VOLUME = $d418
+.const SID1_ATTACK_DECAY = $d405
+.const SID1_SUSTAIN_RELEASE = $d406
+.const SID1_OSCILATOR_TYPE = $d404
+
 
 // --- Main Program ---
 main:
@@ -199,30 +208,33 @@ dial_irq:
 
 // --- SID Routines ---
 setup_sid:
-        lda #$0f
-        sta $d418
-        lda #$00
-        sta $d405
-        lda #$f0
-        sta $d406
-        lda #$11
-        sta $d404
+        lda #$0f // set volume full
+        sta SID_VOLUME         
+        
+        lda #$00        // immediate attack, no decay
+        sta SID1_ATTACK_DECAY   
+
+        lda #$f0        // full sustain, no release
+        sta SID1_SUSTAIN_RELEASE 
+        
+        lda #$11        //use triangle wave it's closes to sine
+        sta SID1_OSCILATOR_TYPE
         rts
 
 hz0:
         lda #$00
-        sta $d400
+        sta SID1_FREQ_LO
         lda #$00
-        sta $d401
+        sta SID1_FREQ_HI
         rts
 
 hz2070:
         pha
 
         lda #$ea
-        sta $d400
+        sta SID1_FREQ_LO
         lda #$89
-        sta $d401
+        sta SID1_FREQ_HI
 
         pla
         rts
@@ -231,9 +243,9 @@ hz1950:
         pha
         
         lda #$a0
-        sta $d400
+        sta SID1_FREQ_LO
         lda #$81
-        sta $d401
+        sta SID1_FREQ_HI
 
         pla
         rts
