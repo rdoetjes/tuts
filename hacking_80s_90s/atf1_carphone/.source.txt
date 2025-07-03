@@ -236,36 +236,30 @@ setup_sid:
 // set the frequency to 0Hz
 .macro hz0(){
         pha
-
         lda #$00
         sta SID1_FREQ_LO
         lda #$00
         sta SID1_FREQ_HI
-
         pla
 }
 
 // set the frequency to 2070Hz
 .macro hz2070(){
         pha
-
         lda #$ea
         sta SID1_FREQ_LO
         lda #$89
         sta SID1_FREQ_HI
-
         pla
 }
 
 // set the frequency to 1950Hz
 .macro hz1950(){
         pha
-        
         lda #$a0
         sta SID1_FREQ_LO
         lda #$81
         sta SID1_FREQ_HI
-
         pla
 }
 
