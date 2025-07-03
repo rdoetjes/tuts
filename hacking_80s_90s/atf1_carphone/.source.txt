@@ -192,7 +192,7 @@ process_dial:
 !end:
 }
 
-// --- Preamble IRQ (Handles 10ms interrupts) ---
+// When IRQ is triggered we increment the irq_counter (the program spin locks on these variables)
 dial_irq:
         pha
         tya
