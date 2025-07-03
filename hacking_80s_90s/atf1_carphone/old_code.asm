@@ -235,6 +235,7 @@ setup_sid:
         sta SID1_OSCILATOR_TYPE
         rts
 
+// set the frequency to 0Hz
 hz0:
         pha
 
@@ -246,6 +247,7 @@ hz0:
         pla
         rts
 
+// set the frequency to 2070Hz
 hz2070:
         pha
 
@@ -257,6 +259,7 @@ hz2070:
         pla
         rts
 
+// set the frequency to 1950Hz
 hz1950:
         pha
         
