@@ -166,7 +166,8 @@ process_dial:
 !end:
         rts
 
-// Macro saves a bit of time over jsr (we want to get as close to 10ms as possible -- eventhough those 8 are so cycles are not that important)
+// Macro saves a bit of time over jsr (we want to get as close to 10ms as possible
+// eventhough those 8 are so cycles are not that important).
 // Takes whatever is in A and rols the bit out in the carry and based on that varry value
 // sounds either 1950Hz for a ! and 2070Hz for a 0
 // it will wait unul irq_counter changes (indicating 10ms has passed) to process the next bit      
