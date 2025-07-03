@@ -41,6 +41,8 @@ main:
         // exit to basic
         jmp ($A002)
 
+// set the variables to the startup values and clear the screen
+// this is required if you want to run the problem again
 reset_var:
         jsr $e544       //clr screen
 
