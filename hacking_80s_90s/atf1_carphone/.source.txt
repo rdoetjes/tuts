@@ -154,7 +154,7 @@ process_dial:
 
         //process bytes (send the 8 bits)
 !:
-        inc offset_table
+        inc offset_table        // increment the offset table for the next byte
         send_8bits()
 
         ldx offset_table
