@@ -95,7 +95,7 @@ ms600_preeamble:
 
 // parse the number from the number_to_convert string
 // fetch the offset from the table that contains the binary bytes to send
-// send each bit as the correct frequency for 5ms
+// send each bit as the correct frequency for 10ms
 process_dial:
         ldx byte_count
         // read letter from string and check if we are at the end of the string
@@ -167,18 +167,18 @@ process_dial:
 // Macro saves a bit of time over jsr (we want to get as close to 10ms as possible -- eventhough those 8 are so cycles are not that important)
 // Takes whatever is in A and rols the bit out in the carry and based on that varry value
 // sounds either 1950Hz for a ! and 2070Hz for a 0
-// it will wait unul irq_counter changes (indicating 5ms has passed) to process the next bit      
+// it will wait unul irq_counter changes (indicating 10ms has passed) to process the next bit      
 .macro send_8bits(){
         ldy #8
 !rol:
         rol
         bcc !_0+
         hz1950()
-        jmp !_5ms+
+        jmp !_10ms+
 !_0:
         hz2070()
 
-!_5ms:    
+!_10ms:    
         //wait for the next 5 ms interrupt to change the irq_counter. so we can send the next beep.
         //We could potentially do something else here
         //We just spin wait
