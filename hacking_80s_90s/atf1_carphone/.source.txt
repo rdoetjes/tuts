@@ -13,7 +13,7 @@ number_to_convert:
 .const CIA1_CRA          = $dc0e
 .const IRQ_VECTOR        = $0314
 .const TIMER_10ms = $268C
-.const TIMER_START_CONTINUOUS = %00010001
+.const TIMER_START_CONTINUOUS = %00010001       // load value, start timer
 //SID1 as in SID_CHANNEL1
 .const SID1_FREQ_HI = $d401
 .const SID1_FREQ_LO = $d400
