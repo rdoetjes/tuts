@@ -224,10 +224,14 @@ setup_sid:
         rts
 
 hz0:
+        pha
+
         lda #$00
         sta SID1_FREQ_LO
         lda #$00
         sta SID1_FREQ_HI
+
+        pla
         rts
 
 hz2070:
