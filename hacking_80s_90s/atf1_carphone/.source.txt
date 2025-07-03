@@ -120,7 +120,7 @@ process_dial:
 !digit:
         clc
         asl              // Multiply index by 2 (each entry = 2 bytes)
-        adc #6
+        adc #6           // add 6 because the s,e,c are 6 bytes long and before the digits
         tay
         sty offset_table
         lda table, y
