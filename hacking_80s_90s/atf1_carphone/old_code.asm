@@ -37,7 +37,7 @@ main:
         // do it twice like a car phone does, we found out in the past that this increased the reliability
         jsr process_dial
         // turn frequency to 0Hz (silence)
-        jsr hz0
+        hz0()
         // exit to basic
         jmp ($A002)
 
@@ -64,7 +64,7 @@ setup:
        
         jsr reset_var
         jsr setup_sid
-        jsr hz2070
+        hz2070()
 
         lda #<dial_irq
         sta IRQ_VECTOR
@@ -172,10 +172,10 @@ send_8bits:
 !rol:
         rol
         bcc !_0+
-        jsr hz1950
+        hz1950()
         jmp !_5ms+
 !_0:
-        jsr hz2070
+        hz2070()
 
 !_5ms:    
         //wait for the next 5 ms interrupt to change the irq_counter. so we can send the next beep.
@@ -232,7 +232,7 @@ setup_sid:
         rts
 
 // set the frequency to 0Hz
-hz0:
+.macro hz0(){
         pha
 
         lda #$00
@@ -241,10 +241,10 @@ hz0:
         sta SID1_FREQ_HI
 
         pla
-        rts
+}
 
 // set the frequency to 2070Hz
-hz2070:
+.macro hz2070(){
         pha
 
         lda #$ea
@@ -253,10 +253,10 @@ hz2070:
         sta SID1_FREQ_HI
 
         pla
-        rts
+}
 
 // set the frequency to 1950Hz
-hz1950:
+.macro hz1950(){
         pha
         
         lda #$a0
@@ -265,7 +265,7 @@ hz1950:
         sta SID1_FREQ_HI
 
         pla
-        rts
+}
 
 // --- Variables ---
 irq_counter: .byte 0
