@@ -153,21 +153,22 @@ process_dial:
         //process bytes (send the 8 bits)
 !:
         inc offset_table
-        jsr send_8bits
+        send_8bits()
 
         ldx offset_table
         lda table,x
-        jsr send_8bits
+        send_8bits()
 
         inc byte_count
         jmp process_dial
 !end:
         rts
 
+// Macro saves a bit of time over jsr (we want to get as close to 10ms as possible -- eventhough those 8 are so cycles are not that important)
 // Takes whatever is in A and rols the bit out in the carry and based on that varry value
 // sounds either 1950Hz for a ! and 2070Hz for a 0
 // it will wait unul irq_counter changes (indicating 5ms has passed) to process the next bit      
-send_8bits:
+.macro send_8bits(){
         ldy #8
 !rol:
         rol
@@ -187,7 +188,7 @@ send_8bits:
         dey
         bne !rol-
 !end:
-        rts
+}
 
 // --- Preamble IRQ (Handles 10ms interrupts) ---
 dial_irq:
@@ -231,6 +232,7 @@ setup_sid:
         sta SID1_OSCILATOR_TYPE
         rts
 
+// We use macros to set the frequency to 0Hz, 1950Hz, 2070Hz this way we can save a few cycles not jsring the function
 // set the frequency to 0Hz
 .macro hz0(){
         pha
