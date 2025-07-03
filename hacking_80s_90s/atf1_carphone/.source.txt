@@ -26,22 +26,19 @@ number_to_convert:
 
 // --- Main Program ---
 main:
+        // setup the cia, sid and reset variables
         jsr setup
-       
-        // Wait until the 600ms preamble is finished
-        lda timer_600ms_lapsed
-
         // send preeamble 600ms 2050hz
         jsr ms600_preeamble
-
         // process the dial
         jsr process_dial
-        // do it twice like a car phone does, we found out in the past that this increased the reliability
+        //reset the variables so we can do it again
         jsr reset_var
+        // do it twice like a car phone does, we found out in the past that this increased the reliability
         jsr process_dial
-
-stop_loop:
+        // turn frequency to 0Hz (silence)
         jsr hz0
+        // exit to basic
         jmp ($A002)
 
 reset_var:
