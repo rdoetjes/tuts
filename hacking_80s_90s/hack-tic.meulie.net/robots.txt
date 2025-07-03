@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://hack-tic.meulie.net/sitemap.xml
