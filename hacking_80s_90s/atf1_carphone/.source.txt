@@ -54,7 +54,7 @@ reset_var:
 // clean variables, setup the sid and cia
 // configure the CIA to trigger 10ms interrupts, in the interrupt routine we'll increment the irq_counter
 // and we check in the main what beep to send and wait during the duration until the irq_counter is incremented again
-// in affect giving a 5ms beep, we can process ~4100 instructions in that period so whe are good, we miss mere microseconds of the 5ms
+// in affect giving a 10ms beep, we can process ~8000 instructions in that period so whe are good, we miss mere microseconds of the 10ms
 // beep because of parseing the number. So we are well withing range. In more timing critical situations we could change the timer value to get that longer
 // duration -- but microseconds on millisecond lengths are not that important.
 // But defenitely something you need to be aware of when dealing with realtime systems.
