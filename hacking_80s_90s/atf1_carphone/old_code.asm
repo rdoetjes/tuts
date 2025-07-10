@@ -201,6 +201,13 @@ dial_irq:
         txa
         pha
 
+        // if not timer a under run TIMERA then just return
+        // we need to officially do this because other interrupt sources could trigger
+        // messing up our timing
+        lda $dd0d
+        and #%00000001
+        bne !+
+
         inc irq_counter
         lda irq_counter
         cmp #60
@@ -210,9 +217,11 @@ dial_irq:
         sta timer_600ms_lapsed
         lda #$ff
         sta irq_counter
-!:
-        lda $dc0d
 
+        // accept irq
+        lda $dc0d
+        
+!:
         pla
         tax
         pla
