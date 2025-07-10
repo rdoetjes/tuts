@@ -201,12 +201,12 @@ dial_irq:
         txa
         pha
 
-        // if not timer a under run TIMERA then just return
+        // if not timer a underrun on TIMERA then just return
         // we need to officially do this because other interrupt sources could trigger
-        // messing up our timing
-        lda $dd0d
-        and #%00000001
-        bne !+
+        // messing up our timing, although in this case it will never happen.
+        lda $dc0d       // read also clears the interrupt flag
+        and #$01
+        beq !+
 
         inc irq_counter
         lda irq_counter
@@ -217,9 +217,6 @@ dial_irq:
         sta timer_600ms_lapsed
         lda #$ff
         sta irq_counter
-
-        // accept irq
-        lda $dc0d
         
 !:
         pla
