@@ -77,7 +77,7 @@ int read_stdin(char *buffer, size_t size)
     return 0;
 }
 
-#define MAX_LENGTH 6
+#define MAX_LENGTH 5
 
 void write_error_and_exit(const char* error){
     write(STDERR_FILENO, error, strlen(error));
@@ -85,13 +85,13 @@ void write_error_and_exit(const char* error){
 }
 
 int main(){
-    char input[MAX_LENGTH] = "";
-    if (read_stdin(input, MAX_LENGTH - 1) == 0)
+    char input[MAX_LENGTH+1] = "";
+    if (read_stdin(input, MAX_LENGTH) == 0)
         write_error_and_exit("ABORTED! Input too long\n");
 
     char *endptr;
     long year = strtol(input, &endptr, 10);
-    if (*endptr != '\0' || year <= 0 || year > UINT32_MAX) {
+    if (*endptr != '\0' || year <= 0 || year > 99999) {
         write_error_and_exit("Invalid input! Please enter a valid year.\n");
     }
 
