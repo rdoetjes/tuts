@@ -43,12 +43,12 @@ fn write_error_and_exit(msg: []const u8, err: anyerror) void {
 }
 
 pub fn main() !void {
-    const MAX_LENGTH = 6;
+    const MAX_LENGTH = 5;
     const stdin = std.io.getStdIn().reader();
     const stdout = std.io.getStdOut().writer();
     const alloc = std.heap.page_allocator;
 
-    const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH) catch |err| {
+    const line = stdin.readUntilDelimiterOrEofAlloc(alloc, '\n', MAX_LENGTH + 1) catch |err| {
         write_error_and_exit("Input too long", err);
         unreachable;
     } orelse unreachable;
