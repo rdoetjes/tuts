@@ -98,7 +98,7 @@ int main(){
     if (roman != NULL)
         printf("%s\n", roman);
     else
-        write_error_and_exit("Something went wrong in conversion");
+        write_error_and_exit("Conversion failed!");
 
     free(roman);
     return 0;
