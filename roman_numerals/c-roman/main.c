@@ -27,14 +27,24 @@ char* to_roman(const uint32_t year){
     };
 
     int remainder = year;
-    char *result = (char *)calloc(1, 1);
+    char *result = (char *)calloc(1, sizeof(char));
+    if (result == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return NULL;
+    }
     size_t i = 0;
     while(remainder>0){
         if (remainder < numerals[i].dec){
             i++;
         }else{
-            int grow_to_nr_bytes = strlen(result) + strlen(numerals[i].roman);
-            result = realloc(result, grow_to_nr_bytes);
+            int grow_to_nr_bytes = strlen(result) + strlen(numerals[i].roman) + 1;
+            char *temp_result = realloc(result, grow_to_nr_bytes);
+            if (temp_result == NULL) {
+                fprintf(stderr, "Memory allocation failed\n");
+                free(result);
+                return NULL;
+            }
+            result = temp_result;
             if (result == NULL) {
                 fprintf(stderr, "Memory allocation failed\n");
                 free(result);
@@ -74,10 +84,16 @@ void write_error_and_exit(const char* error){
 }
 
 int main(){
-    char input[MAX_LENGTH]="";
-    if (read_stdin((char *)&input, MAX_LENGTH-1) == 0) write_error_and_exit("ABORTED! Input to long\n");
+    char input[MAX_LENGTH] = "";
+    if (read_stdin(input, MAX_LENGTH - 1) == 0) write_error_and_exit("ABORTED! Input too long\n");
 
-    char *roman = to_roman(atoi(input));
+    char *endptr;
+    long year = strtol(input, &endptr, 10);
+    if (*endptr != '\0' || year <= 0 || year > UINT32_MAX) {
+        write_error_and_exit("Invalid input! Please enter a valid year.\n");
+    }
+
+    char *roman = to_roman((uint32_t)year);
     printf("%s\n", roman);
     free(roman);
     return 0;
