@@ -99,9 +99,8 @@ int main(){
 
     char *endptr;
     long year = strtol(input, &endptr, 10);
-    if (*endptr != '\0' || year <= 0 || year > max_number_by_digits(MAX_LENGTH)) {
+    if (*endptr != '\0' || year <= 0 || year > max_number_by_digits(MAX_LENGTH))
         write_error_and_exit("Invalid input! Please enter a valid year.\n");
-    }
 
     char *roman = to_roman((uint32_t)year);
     if (roman != NULL)
