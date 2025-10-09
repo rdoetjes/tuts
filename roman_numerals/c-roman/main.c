@@ -32,6 +32,7 @@ char* to_roman(const uint32_t year){
         fprintf(stderr, "Memory allocation failed\n");
         return NULL;
     }
+
     size_t i = 0;
     while(remainder>0){
         if (remainder < numerals[i].dec){
@@ -94,7 +95,11 @@ int main(){
     }
 
     char *roman = to_roman((uint32_t)year);
-    printf("%s\n", roman);
+    if (roman != NULL)
+        printf("%s\n", roman);
+    else
+        write_error_and_exit("Something went wrong in conversion");
+
     free(roman);
     return 0;
 }
