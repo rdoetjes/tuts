@@ -86,7 +86,8 @@ void write_error_and_exit(const char* error){
 
 int main(){
     char input[MAX_LENGTH] = "";
-    if (read_stdin(input, MAX_LENGTH - 1) == 0) write_error_and_exit("ABORTED! Input too long\n");
+    if (read_stdin(input, MAX_LENGTH - 1) == 0)
+        write_error_and_exit("ABORTED! Input too long\n");
 
     char *endptr;
     long year = strtol(input, &endptr, 10);
