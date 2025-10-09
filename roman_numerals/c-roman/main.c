@@ -5,6 +5,8 @@
 #include <string.h>
 #include <math.h>
 
+#define MAX_LENGTH 5
+
 int max_number_by_digits(int n) {
     if (n <= 0) {
         return 0;
@@ -84,8 +86,6 @@ int read_stdin(char *buffer, size_t size)
     buffer[cnt] = 0;
     return 0;
 }
-
-#define MAX_LENGTH 5
 
 void write_error_and_exit(const char* error){
     write(STDERR_FILENO, error, strlen(error));
