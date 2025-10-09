@@ -3,6 +3,14 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+
+int max_number_by_digits(int n) {
+    if (n <= 0) {
+        return 0;
+    }
+    return (int)pow(10, n) - 1;
+}
 
 char* to_roman(const uint32_t year){
     typedef struct numeral{
@@ -91,7 +99,7 @@ int main(){
 
     char *endptr;
     long year = strtol(input, &endptr, 10);
-    if (*endptr != '\0' || year <= 0 || year > 99999) {
+    if (*endptr != '\0' || year <= 0 || year > max_number_by_digits(MAX_LENGTH)) {
         write_error_and_exit("Invalid input! Please enter a valid year.\n");
     }
 
