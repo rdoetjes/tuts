@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 
 	"phonax.com/db/db"
 )
@@ -26,21 +27,31 @@ func printRows(rows []map[string]interface{}) {
 }
 
 func main() {
+	var wg sync.WaitGroup
+
 	fmt.Println("Connecting to the database")
 
 	sql := db.Connect()
 	defer sql.Close()
 
-	res, err := db.Query(sql, "SELECT * FROM test WHERE first_name LIKE '%Keith%'")
-	if err != nil {
-		panic(err)
-	}
+	wg.Add(2)
+	go func() {
+		res, err := db.Query(sql, "SELECT * FROM test WHERE first_name LIKE '%Keith%'")
+		if err != nil {
+			panic(err)
+		}
+		printRows(res)
+		wg.Done()
+	}()
 
-	res2, err := db.Query(sql, "SELECT * FROM test WHERE last_name LIKE 'Doetjes'")
-	if err != nil {
-		panic(err)
-	}
-
-	printRows(res)
-	printRows(res2)
+	go func() {
+		res2, err := db.Query(sql, "SELECT * FROM test WHERE last_name LIKE 'Doetjes'")
+		if err != nil {
+			panic(err)
+		}
+		printRows(res2)
+		wg.Done()
+	}()
+	wg.Wait()
+	fmt.Println()
 }
