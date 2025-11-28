@@ -45,11 +45,11 @@ func main() {
 	}()
 
 	go func() {
-		res2, err := db.Query(sql, "SELECT * FROM test WHERE last_name LIKE 'Doetjes'")
+		res, err := db.Query(sql, "SELECT * FROM test WHERE last_name LIKE 'Doetjes'")
 		if err != nil {
 			panic(err)
 		}
-		printRows(res2)
+		printRows(res)
 		wg.Done()
 	}()
 	wg.Wait()
