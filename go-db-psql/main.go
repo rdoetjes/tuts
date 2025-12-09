@@ -19,16 +19,6 @@ const (
 	dbname   = "postgres"
 )
 
-func userQueries() rest.Queries {
-	return rest.Queries{
-		Create: `INSERT INTO users (firstname, lastname, dob, email) VALUES ($1, $2, $3, $4) RETURNING id`,
-		GetOne: `SELECT id, firstname, lastname, dob, email FROM users WHERE id = $1`,
-		List:   `SELECT id, firstname, lastname, dob, email FROM users`,
-		Update: `UPDATE users SET firstname=$2, lastname=$3, dob=$4, email=$5 WHERE id = $1`,
-		Delete: `DELETE FROM users WHERE id = $1`,
-	}
-}
-
 func main() {
 	const api_port = ":3000"
 
@@ -39,7 +29,8 @@ func main() {
 
 	r := chi.NewRouter()
 
-	restUser := rest.NewCrudAPI[models.User](sql, userQueries())
+	user := models.User{}
+	restUser := rest.NewCrudAPI[models.User](sql, user.SetupQueries())
 	restUser.RegisterRoutes(r, "/users")
 
 	fmt.Println("Starting REST API on port ", api_port)
