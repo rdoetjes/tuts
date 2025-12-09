@@ -2,9 +2,13 @@ package main
 
 import (
 	"fmt"
-	"sync"
+	"log"
+	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"phonax.com/db/db"
+	"phonax.com/db/models"
+	"phonax.com/db/rest"
 )
 
 const (
@@ -15,43 +19,32 @@ const (
 	dbname   = "postgres"
 )
 
-// Converts and prints result set rows
-func printRows(rows []map[string]interface{}) {
-	for _, row := range rows {
-		id := row["id"]
-		fn := row["first_name"]
-		ln := row["last_name"]
-
-		fmt.Printf("name: %v %v %v\n", id, fn, ln)
+func userQueries() rest.Queries {
+	return rest.Queries{
+		Create: `INSERT INTO users (firstname, lastname, dob, email) VALUES ($1, $2, $3, $4) RETURNING id`,
+		GetOne: `SELECT id, firstname, lastname, dob, email FROM users WHERE id = $1`,
+		List:   `SELECT id, firstname, lastname, dob, email FROM users`,
+		Update: `UPDATE users SET firstname=$2, lastname=$3, dob=$4, email=$5 WHERE id = $1`,
+		Delete: `DELETE FROM users WHERE id = $1`,
 	}
 }
 
 func main() {
-	var wg sync.WaitGroup
+	const api_port = ":3000"
 
 	fmt.Println("Connecting to the database")
 
 	sql := db.Connect()
 	defer sql.Close()
 
-	wg.Add(2)
-	go func() {
-		res, err := db.Query(sql, "SELECT * FROM test WHERE first_name LIKE '%Keith%'")
-		if err != nil {
-			panic(err)
-		}
-		printRows(res)
-		wg.Done()
-	}()
+	r := chi.NewRouter()
 
-	go func() {
-		res, err := db.Query(sql, "SELECT * FROM test WHERE last_name LIKE 'Doetjes'")
-		if err != nil {
-			panic(err)
-		}
-		printRows(res)
-		wg.Done()
-	}()
-	wg.Wait()
-	fmt.Println()
+	restUser := rest.NewCrudAPI[models.User](sql, userQueries())
+	restUser.RegisterRoutes(r, "/users")
+
+	fmt.Println("Starting REST API on port ", api_port)
+	err := http.ListenAndServe(api_port, r)
+	if err != nil {
+		log.Println(err)
+	}
 }
