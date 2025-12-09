@@ -3,6 +3,8 @@ package rest
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
@@ -55,6 +57,8 @@ func (api *RestAPI[T]) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Respond with 201 Created for a successful creation
+	w.WriteHeader(http.StatusCreated)
 	writeJSON(w, map[string]any{"id": id})
 }
 
@@ -122,6 +126,61 @@ structToArgs converts struct fields to []any for SQL args.
 You can replace this with your own logic or a reflection helper.
 */
 func structToArgs[T any](obj T) []any {
-	// TODO: implement reflect-based struct → []any mapping
-	return []any{} // placeholder
+	v := reflect.ValueOf(obj)
+	t := reflect.TypeOf(obj)
+
+	// If the struct is a pointer, dereference it
+	if v.Kind() == reflect.Pointer {
+		v = v.Elem()
+		t = t.Elem()
+	}
+
+	if v.Kind() != reflect.Struct {
+		return []any{}
+	}
+
+	args := []any{}
+
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		// Read db tag
+		dbTag := field.Tag.Get("db")
+
+		// Skip db:"-" fields
+		if dbTag == "-" {
+			continue
+		}
+
+		// If no db tag, skip — SQLX requires db tags for mapping
+		if dbTag == "" {
+			continue
+		}
+
+		// Skip "id" field on create when zero
+		if strings.EqualFold(dbTag, "id") && isZeroValue(value) {
+			continue
+		}
+
+		args = append(args, value.Interface())
+	}
+
+	return args
+}
+
+func isZeroValue(v reflect.Value) bool {
+	// Invalid or nil pointer?
+	if !v.IsValid() {
+		return true
+	}
+
+	// For pointer values
+	if v.Kind() == reflect.Pointer {
+		return v.IsNil()
+	}
+
+	// Compare to zero value
+	zero := reflect.Zero(v.Type())
+	return reflect.DeepEqual(v.Interface(), zero.Interface())
 }

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -16,6 +17,7 @@ For PostgreSQL, we need "RETURNING id" in the INSERT statement.
 */
 func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (int64, error) {
 	var id int64
+	fmt.Println(query, args)
 	err := c.DB.QueryRowxContext(ctx, query, args...).Scan(&id)
 	return id, err
 }
