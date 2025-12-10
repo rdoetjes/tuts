@@ -31,7 +31,6 @@ func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (int64,
 	start := time.Now()
 	const ACTION = "CREATE"
 	var id int64
-	fmt.Println(query, args)
 	err := c.DB.QueryRowxContext(ctx, query, args...).Scan(&id)
 	c.handleErrorAndMetrics(start, ACTION, err)
 	return id, err
