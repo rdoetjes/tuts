@@ -57,10 +57,10 @@ func TestUserCRUD_Server(t *testing.T) {
 
 	// Update user - send ID as integer, not string
 	update := map[string]interface{}{
-		"email":     "updatetest@email.com",
-		"firstname": "UpdateFirstName",
-		"dob":       "1973-12-12",
-		"lastname":  "UpdateLastName",
+		"Email":     "updatetest@email.com",
+		"FirstName": "UpdateFirstName",
+		"DOB":       "1973-12-12",
+		"LastName":  "UpdateLastName",
 	}
 	ubuf, _ := json.Marshal(update)
 	req, _ := http.NewRequest(http.MethodPut, base+"/users/"+id, bytes.NewReader(ubuf))
