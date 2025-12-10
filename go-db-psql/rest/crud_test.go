@@ -57,7 +57,6 @@ func TestUserCRUD_Server(t *testing.T) {
 
 	// Update user - send ID as integer, not string
 	update := map[string]interface{}{
-		//"id":        int(idVal.(float64)), // JSON numbers decode to float64
 		"email":     "updatetest@email.com",
 		"firstname": "UpdateFirstName",
 		"dob":       "1973-12-12",
