@@ -37,6 +37,7 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 		"SELECT id, password FROM users WHERE email = $1",
 		email,
 	).Scan(&userID, &hashedPassword)
+
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			metrics.RecordFailedLogin()
