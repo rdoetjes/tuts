@@ -10,22 +10,23 @@ var startTime = time.Now()
 
 // QueryMetrics tracks query statistics
 type QueryMetrics struct {
-	mu               sync.RWMutex
-	TotalQueries     uint64        `json:"total_queries"`
-	TotalDuration    time.Duration `json:"total_duration"`
-	TotalErrors      uint64        `json:"total_errors"`
-	Qps              uint64        `json:"qps"`
-	queryDurations   []time.Duration
-	OperationMetrics map[string]*OperationMetric `json:"operation_metrics"`
+	mu                sync.RWMutex
+	TotalQueries      uint64        `json:"total_queries"`
+	TotalFailedLogins uint64        `json:"total_failed_logins"`
+	TotalDuration     time.Duration `json:"total_duration_ms"`
+	TotalErrors       uint64        `json:"total_errors"`
+	Qps               uint64        `json:"qps"`
+	queryDurations    []time.Duration
+	OperationMetrics  map[string]*OperationMetric `json:"operation_metrics"`
 }
 
 // OperationMetric tracks metrics for a specific operation type
 type OperationMetric struct {
 	Count           uint64        `json:"count"`
-	TotalDuration   time.Duration `json:"total_duration"`
-	AverageDuration time.Duration `json:"average_duration"`
-	MinDuration     time.Duration `json:"min_duration"`
-	MaxDuration     time.Duration `json:"max_duration"`
+	TotalDuration   time.Duration `json:"total_duration_ms"`
+	AverageDuration time.Duration `json:"average_duration_ms"`
+	MinDuration     time.Duration `json:"min_duration_ms"`
+	MaxDuration     time.Duration `json:"max_duration_ms"`
 	NrErrors        uint64        `json:"nr_errors"`
 }
 
@@ -89,22 +90,23 @@ func GetMetrics() map[string]interface{} {
 		opMetrics[op] = map[string]interface{}{
 			"count": metric.Count,
 			// CHANGE: Remove .String() to keep them as time.Duration (int64 nanoseconds)
-			"total_duration":   metric.TotalDuration.Milliseconds(),
-			"average_duration": metric.AverageDuration.Milliseconds(),
-			"min_duration":     metric.MinDuration.Milliseconds(),
-			"max_duration":     metric.MaxDuration.Milliseconds(),
-			"nr_errors":        metric.NrErrors,
+			"total_duration_ms":   metric.TotalDuration.Milliseconds(),
+			"average_duration_ms": metric.AverageDuration.Milliseconds(),
+			"min_duration_ms":     metric.MinDuration.Milliseconds(),
+			"max_duration_ms":     metric.MaxDuration.Milliseconds(),
+			"nr_errors":           metric.NrErrors,
 		}
 	}
 
 	return map[string]interface{}{
-		"total_queries":     globalMetrics.TotalQueries,
-		"uptime_seconds":    time.Since(startTime).String(),
-		"qps":               globalMetrics.TotalQueries / uint64(time.Since(startTime).Seconds()),
-		"total_duration":    globalMetrics.TotalDuration.Milliseconds(),
-		"average_duration":  avgDuration.Milliseconds(),
-		"total_errors":      globalMetrics.TotalErrors,
-		"operation_metrics": opMetrics,
+		"total_queries":       globalMetrics.TotalQueries,
+		"total_failed_logins": globalMetrics.TotalFailedLogins,
+		"uptime":              time.Since(startTime).String(),
+		"qps":                 globalMetrics.TotalQueries / uint64(time.Since(startTime).Seconds()),
+		"total_duration_ms":   globalMetrics.TotalDuration.Milliseconds(),
+		"average_duration_ms": avgDuration.Milliseconds(),
+		"total_errors":        globalMetrics.TotalErrors,
+		"operation_metrics":   opMetrics,
 	}
 }
 
@@ -148,4 +150,10 @@ func GetOperationMetrics(operation string) *OperationMetric {
 		return &m
 	}
 	return nil
+}
+
+func RecordFailedLogin() {
+	globalMetrics.mu.Lock()
+	defer globalMetrics.mu.Unlock()
+	globalMetrics.TotalFailedLogins++
 }
