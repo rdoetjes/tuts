@@ -45,6 +45,7 @@ Update returns number of affected rows.
 */
 func (c *CRUD[T]) Update(ctx context.Context, query string, args ...any) (int64, error) {
 	res, err := c.DB.ExecContext(ctx, query, args...)
+	fmt.Println(query, args)
 	if err != nil {
 		return 0, err
 	}

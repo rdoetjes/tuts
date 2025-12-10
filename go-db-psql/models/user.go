@@ -15,7 +15,7 @@ func (u User) SetupQueries() rest.Queries {
 		Create: `INSERT INTO users (firstname, lastname, dob, email) VALUES ($1, $2, $3, $4) RETURNING id`,
 		GetOne: `SELECT id, firstname, lastname, dob, email FROM users WHERE id = $1`,
 		List:   `SELECT id, firstname, lastname, dob, email FROM users`,
-		Update: `UPDATE users SET firstname=$2, lastname=$3, dob=$4, email=$5 WHERE id = $1`,
+		Update: `UPDATE users SET firstname=$1, lastname=$2, dob=$3, email=$4 WHERE id = $5`,
 		Delete: `DELETE FROM users WHERE id = $1`,
 	}
 }
