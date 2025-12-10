@@ -58,6 +58,7 @@ func TestUserCRUD_ServerIntegration(t *testing.T) {
 		"lastname":  "User",
 		"dob":       "1990-01-01",
 		"email":     "test@email.com",
+		"password":  "TestPassword123",
 	}
 
 	buf, _ := json.Marshal(user)
@@ -87,12 +88,40 @@ func TestUserCRUD_ServerIntegration(t *testing.T) {
 	}
 	id := fmt.Sprintf("%v", idVal)
 
-	// Step 3: Update user
+	// Step 3: Login with newly created user to verify password
+	newUserLoginReq := map[string]string{
+		"email":    "test@email.com",
+		"password": "TestPassword123",
+	}
+	newUserLoginBuf, _ := json.Marshal(newUserLoginReq)
+	resp, err = client.Post(base+"/auth/login", "application/json", bytes.NewReader(newUserLoginBuf))
+	if err != nil {
+		t.Fatalf("login with new user failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		b, _ := io.ReadAll(resp.Body)
+		t.Fatalf("expected 200 OK on login with new user, got %d: %s", resp.StatusCode, string(b))
+	}
+
+	var newUserLoginResp map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&newUserLoginResp); err != nil {
+		t.Fatalf("decode new user login response: %v", err)
+	}
+
+	newUserToken, ok := newUserLoginResp["token"].(string)
+	if !ok || newUserToken == "" {
+		t.Fatalf("invalid token in new user login response: %v", newUserLoginResp)
+	}
+
+	// Step 4: Update user
 	update := map[string]interface{}{
 		"email":     "updatetest@email.com",
 		"firstname": "UpdateFirstName",
 		"dob":       "1973-12-12",
 		"lastname":  "UpdateLastName",
+		"password":  "NewPassword123",
 	}
 	ubuf, _ := json.Marshal(update)
 	req, _ = http.NewRequest(http.MethodPut, base+"/users/"+id, bytes.NewReader(ubuf))
@@ -108,7 +137,51 @@ func TestUserCRUD_ServerIntegration(t *testing.T) {
 		t.Fatalf("expected 200 OK on update, got %d: %s", resp.StatusCode, string(b))
 	}
 
-	// Step 4: Get user
+	// Step 5: Login with updated password to verify password update
+	updatedUserLoginReq := map[string]string{
+		"email":    "updatetest@email.com",
+		"password": "NewPassword123",
+	}
+	updatedUserLoginBuf, _ := json.Marshal(updatedUserLoginReq)
+	resp, err = client.Post(base+"/auth/login", "application/json", bytes.NewReader(updatedUserLoginBuf))
+	if err != nil {
+		t.Fatalf("login with updated user failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		b, _ := io.ReadAll(resp.Body)
+		t.Fatalf("expected 200 OK on login with updated password, got %d: %s", resp.StatusCode, string(b))
+	}
+
+	var updatedUserLoginResp map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&updatedUserLoginResp); err != nil {
+		t.Fatalf("decode updated user login response: %v", err)
+	}
+
+	updatedUserToken, ok := updatedUserLoginResp["token"].(string)
+	if !ok || updatedUserToken == "" {
+		t.Fatalf("invalid token in updated user login response: %v", updatedUserLoginResp)
+	}
+
+	// Step 5b: Verify login fails with wrong password
+	wrongPasswordLoginReq := map[string]string{
+		"email":    "updatetest@email.com",
+		"password": "WrongPassword123",
+	}
+	wrongPasswordLoginBuf, _ := json.Marshal(wrongPasswordLoginReq)
+	resp, err = client.Post(base+"/auth/login", "application/json", bytes.NewReader(wrongPasswordLoginBuf))
+	if err != nil {
+		t.Fatalf("login with wrong password request failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusUnauthorized {
+		b, _ := io.ReadAll(resp.Body)
+		t.Fatalf("expected 401 Unauthorized on login with wrong password, got %d: %s", resp.StatusCode, string(b))
+	}
+
+	// Step 6: Get user
 	req, _ = http.NewRequest(http.MethodGet, base+"/users/"+id, nil)
 	authHeader(req)
 	resp, err = client.Do(req)
@@ -142,7 +215,7 @@ func TestUserCRUD_ServerIntegration(t *testing.T) {
 		t.Fatalf("expected email 'updatetest@email.com', got %v", got["Email"])
 	}
 
-	// Step 5: Delete user
+	// Step 7: Delete user
 	req, _ = http.NewRequest(http.MethodDelete, base+"/users/"+id, nil)
 	authHeader(req)
 	resp, err = client.Do(req)

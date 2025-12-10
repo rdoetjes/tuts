@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
+	"phonax.com/db/auth"
 	"phonax.com/db/db"
 )
 
@@ -50,6 +51,9 @@ func (api *RestAPI[T]) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Hash password field if it exists
+	hashPasswordField(&obj)
+
 	// Create expects you to return ID; so obj must contain ID after creation
 	id, err := api.CRUD.Create(r.Context(), api.Queries.Create, structToArgs(obj)...)
 	if err != nil {
@@ -90,6 +94,9 @@ func (api *RestAPI[T]) update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	// Hash password field if it exists
+	hashPasswordField(&obj)
 
 	id := chi.URLParam(r, "id")
 
@@ -183,4 +190,52 @@ func isZeroValue(v reflect.Value) bool {
 	// Compare to zero value
 	zero := reflect.Zero(v.Type())
 	return reflect.DeepEqual(v.Interface(), zero.Interface())
+}
+
+// hashPasswordField finds a "password" field in the struct and hashes it using bcrypt
+func hashPasswordField[T any](obj *T) {
+	v := reflect.ValueOf(obj)
+	if v.Kind() != reflect.Pointer {
+		return
+	}
+
+	v = v.Elem()
+	t := v.Type()
+
+	if v.Kind() != reflect.Struct {
+		return
+	}
+
+	// Look for a field with db tag "password" or json tag "password"
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		fieldValue := v.Field(i)
+
+		// Check if this is a password field
+		dbTag := field.Tag.Get("db")
+		if dbTag != "password" && field.Name != "Password" {
+			continue
+		}
+
+		// Only process string fields
+		if fieldValue.Kind() != reflect.String {
+			continue
+		}
+
+		// Skip if password is empty
+		password := fieldValue.String()
+		if password == "" {
+			continue
+		}
+
+		// Hash the password
+		hashedPassword, err := auth.HashPassword(password)
+		if err != nil {
+			// Log error but continue (could add error handling here if needed)
+			continue
+		}
+
+		// Update the field with the hashed password
+		fieldValue.SetString(hashedPassword)
+	}
 }
