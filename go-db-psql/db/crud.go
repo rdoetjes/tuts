@@ -31,6 +31,7 @@ func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (int64,
 	start := time.Now()
 	const ACTION = "CREATE"
 	var id int64
+	c.DB.PingContext(ctx)
 	err := c.DB.QueryRowxContext(ctx, query, args...).Scan(&id)
 	c.handleErrorAndMetrics(start, ACTION, err)
 	return id, err
@@ -55,6 +56,7 @@ func (c *CRUD[T]) List(ctx context.Context, query string, args ...any) ([]T, err
 	start := time.Now()
 	const ACTION = "LIST"
 	var items []T
+	c.DB.PingContext(ctx)
 	err := c.DB.SelectContext(ctx, &items, query, args...)
 	c.handleErrorAndMetrics(start, ACTION, err)
 	return items, err
@@ -66,6 +68,7 @@ Update returns number of affected rows.
 func (c *CRUD[T]) Update(ctx context.Context, query string, args ...any) (int64, error) {
 	start := time.Now()
 	const ACTION = "UPDATE"
+	c.DB.PingContext(ctx)
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		metrics.RecordQuery(ACTION, time.Since(start), true)
@@ -83,6 +86,7 @@ Delete also returns number of affected rows.
 func (c *CRUD[T]) Delete(ctx context.Context, query string, args ...any) (int64, error) {
 	start := time.Now()
 	const ACTION = "DELETE"
+	c.DB.PingContext(ctx)
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		metrics.RecordQuery(ACTION, time.Since(start), true)

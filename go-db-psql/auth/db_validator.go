@@ -29,6 +29,7 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 	start := time.Now()
 	// Query the database for the user's hashed password
 	// Adjust this query to match your users table schema
+	v.db.Ping()
 	err := v.db.QueryRow(
 		"SELECT id, password FROM users WHERE email = $1",
 		email,
