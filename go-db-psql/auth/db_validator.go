@@ -2,7 +2,7 @@ package auth
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -43,7 +43,7 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 			metrics.RecordFailedLogin()
 			metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), false)
 		} else {
-			fmt.Println("ERROR VALIDATE_CREDENTIAL: ", err)
+			log.Println("ERROR VALIDATE_CREDENTIAL: ", err)
 			metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), true)
 		}
 	} else {

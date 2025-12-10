@@ -2,8 +2,9 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"time"
+
+	"log"
 
 	"github.com/jmoiron/sqlx"
 	"phonax.com/db/metrics"
@@ -22,7 +23,7 @@ func CheckConnection(db *sqlx.DB) error {
 /*Handle errors and record metrics for all CRUD operations.*/
 func (c *CRUD[T]) handleErrorAndMetrics(start time.Time, ACTION string, err error) {
 	if err != nil {
-		fmt.Println("ERROR ", ACTION, ":", err)
+		log.Println("ERROR ", ACTION, ":", err)
 		metrics.RecordQuery(ACTION, time.Since(start), true)
 	} else {
 		metrics.RecordQuery(ACTION, time.Since(start), false)
@@ -87,7 +88,7 @@ func (c *CRUD[T]) Update(ctx context.Context, query string, args ...any) (int64,
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		metrics.RecordQuery(ACTION, time.Since(start), true)
-		fmt.Println("ERROR ", ACTION, ":", err)
+		log.Println("ERROR ", ACTION, ":", err)
 		return 0, err
 	}
 	metrics.RecordQuery(ACTION, time.Since(start), false)
@@ -107,7 +108,7 @@ func (c *CRUD[T]) Delete(ctx context.Context, query string, args ...any) (int64,
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		metrics.RecordQuery(ACTION, time.Since(start), true)
-		fmt.Println("ERROR ", ACTION, ":", err)
+		log.Println("ERROR ", ACTION, ":", err)
 		return 0, err
 	}
 	metrics.RecordQuery(ACTION, time.Since(start), false)
