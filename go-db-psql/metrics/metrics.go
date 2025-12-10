@@ -88,8 +88,7 @@ func GetMetrics() map[string]interface{} {
 	opMetrics := make(map[string]interface{})
 	for op, metric := range globalMetrics.OperationMetrics {
 		opMetrics[op] = map[string]interface{}{
-			"count": metric.Count,
-			// CHANGE: Remove .String() to keep them as time.Duration (int64 nanoseconds)
+			"count":               metric.Count,
 			"total_duration_ms":   metric.TotalDuration.Milliseconds(),
 			"average_duration_ms": metric.AverageDuration.Milliseconds(),
 			"min_duration_ms":     metric.MinDuration.Milliseconds(),
