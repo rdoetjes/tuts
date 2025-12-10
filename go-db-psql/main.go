@@ -36,6 +36,7 @@ func main() {
 
 	// Public routes
 	r.Post("/auth/login", auth.LoginHandler)
+	r.Get("/metrics", rest.MetricsHandler)
 
 	// Protected routes
 	r.Group(func(rt chi.Router) {
