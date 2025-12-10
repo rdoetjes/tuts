@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"phonax.com/db/auth"
@@ -23,6 +24,10 @@ func main() {
 	// Set up database credential validator for JWT login
 	validator := auth.NewDBCredentialValidator(sql)
 	auth.SetCredentialValidator(validator)
+	if os.Getenv("JWT_SECRET") != "" {
+		fmt.Println("Using provided JWT secret")
+		auth.JWTSecret = []byte(os.Getenv("JWT_SECRET"))
+	}
 
 	r := chi.NewRouter()
 
