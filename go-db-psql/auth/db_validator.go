@@ -2,6 +2,7 @@ package auth
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -32,6 +33,7 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 		email,
 	).Scan(&userID, &hashedPassword)
 	if err != nil {
+		fmt.Println("ERROR VALIDATE_CREDENTIAL: ", err)
 		metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), true)
 	} else {
 		metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), false)
