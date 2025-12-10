@@ -4,10 +4,11 @@ CREATE TABLE IF NOT EXISTS users (
     firstname VARCHAR(128),
     lastname VARCHAR(128),
     dob DATE,
-    email VARCHAR(255) NOT NULL UNIQUE
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255)
 );
 
--- Check and add password column
+-- Check and add password column (inittially it didn't exist)
 ALTER TABLE users
 ADD COLUMN IF NOT EXISTS password VARCHAR(255) NOT NULL DEFAULT '';
 
