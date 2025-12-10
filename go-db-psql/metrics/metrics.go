@@ -5,12 +5,16 @@ import (
 	"time"
 )
 
+// Timw node is started
+var startTime = time.Now()
+
 // QueryMetrics tracks query statistics
 type QueryMetrics struct {
 	mu               sync.RWMutex
 	TotalQueries     uint64        `json:"total_queries"`
 	TotalDuration    time.Duration `json:"total_duration"`
 	TotalErrors      uint64        `json:"total_errors"`
+	Qps              uint64        `json:"qps"`
 	queryDurations   []time.Duration
 	OperationMetrics map[string]*OperationMetric `json:"operation_metrics"`
 }
@@ -85,19 +89,20 @@ func GetMetrics() map[string]interface{} {
 		opMetrics[op] = map[string]interface{}{
 			"count": metric.Count,
 			// CHANGE: Remove .String() to keep them as time.Duration (int64 nanoseconds)
-			"total_duration":   metric.TotalDuration,
-			"average_duration": metric.AverageDuration,
-			"min_duration":     metric.MinDuration,
-			"max_duration":     metric.MaxDuration,
+			"total_duration":   metric.TotalDuration.Milliseconds(),
+			"average_duration": metric.AverageDuration.Milliseconds(),
+			"min_duration":     metric.MinDuration.Milliseconds(),
+			"max_duration":     metric.MaxDuration.Milliseconds(),
 			"nr_errors":        metric.NrErrors,
 		}
 	}
 
 	return map[string]interface{}{
-		"total_queries": globalMetrics.TotalQueries,
-		// CHANGE: Remove .String() here as well
-		"total_duration":    globalMetrics.TotalDuration,
-		"average_duration":  avgDuration,
+		"total_queries":     globalMetrics.TotalQueries,
+		"uptime_seconds":    time.Since(startTime).String(),
+		"qps":               globalMetrics.TotalQueries / uint64(time.Since(startTime).Seconds()),
+		"total_duration":    globalMetrics.TotalDuration.Milliseconds(),
+		"average_duration":  avgDuration.Milliseconds(),
 		"total_errors":      globalMetrics.TotalErrors,
 		"operation_metrics": opMetrics,
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func durToSec(d time.Duration) float64 {
-	return float64(d) / float64(time.Second)
+	return float64(d) / 1000
 }
 
 func ConvertMetricsToPrometheus(metrics []byte) (string, error) {
@@ -23,6 +23,8 @@ func ConvertMetricsToPrometheus(metrics []byte) (string, error) {
 	fmt.Fprintf(&b, "api_total_errors %d\n", m.TotalErrors)
 	fmt.Fprintf(&b, "api_total_queries %d\n", m.TotalQueries)
 	fmt.Fprintf(&b, "api_average_duration_seconds %f\n", durToSec(m.TotalDuration/time.Duration(m.TotalQueries)))
+	fmt.Fprintf(&b, "api_uptime %f\n", time.Since(startTime).Seconds())
+	fmt.Fprintf(&b, "api_qps %d\n", m.Qps)
 
 	// Per-operation metrics
 	for op, om := range m.OperationMetrics {
