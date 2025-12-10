@@ -2,8 +2,10 @@ package auth
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/jmoiron/sqlx"
+	"phonax.com/db/metrics"
 )
 
 // DBCredentialValidator validates credentials against a database
@@ -22,12 +24,14 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 	var userID int
 	var hashedPassword string
 
+	start := time.Now()
 	// Query the database for the user's hashed password
 	// Adjust this query to match your users table schema
 	err := v.db.QueryRow(
 		"SELECT id, password FROM users WHERE email = $1",
 		email,
 	).Scan(&userID, &hashedPassword)
+	metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start))
 
 	if err == sql.ErrNoRows {
 		// User not found
