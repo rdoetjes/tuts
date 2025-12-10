@@ -2,22 +2,32 @@ package db
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-// Database configuration constants
-const (
-	host     = "192.168.178.92"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "postgres"
-)
+func defaultEnv(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
+}
 
 // connectionString constructs the PostgreSQL connection string
 func connectionString() string {
+	host := defaultEnv("DB_HOST", "192.168.178.92")
+	port, err := strconv.ParseInt(defaultEnv("DB_PORT", "5432"), 10, 64)
+	if err != nil {
+		fmt.Println("ERROR CONVERTING PORT NUMBER, CANNOT LAUNCH!")
+		os.Exit(1)
+	}
+	user := defaultEnv("DB_USER", "postgres")
+	password := defaultEnv("DB_PASS", "postgres")
+	dbname := defaultEnv("DB_NAME", "postgres")
+
 	return fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname,
