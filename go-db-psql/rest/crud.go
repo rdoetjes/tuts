@@ -46,8 +46,8 @@ func (api *RestAPI[T]) RegisterRoutes(r chi.Router, basePath string) {
 
 func (api *RestAPI[T]) create(w http.ResponseWriter, r *http.Request) {
 	var obj T
-	if err := json.NewDecoder(r.Body).Decode(&obj); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err := api.DecodeJSON(r, &obj); err != nil {
+		api.RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -57,13 +57,11 @@ func (api *RestAPI[T]) create(w http.ResponseWriter, r *http.Request) {
 	// Create expects you to return ID; so obj must contain ID after creation
 	id, err := api.CRUD.Create(r.Context(), api.Queries.Create, structToArgs(obj)...)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		api.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// Respond with 201 Created for a successful creation
-	w.WriteHeader(http.StatusCreated)
-	writeJSON(w, map[string]any{"id": id})
+	api.RespondCreated(w, id)
 }
 
 func (api *RestAPI[T]) getOne(w http.ResponseWriter, r *http.Request) {
@@ -71,27 +69,27 @@ func (api *RestAPI[T]) getOne(w http.ResponseWriter, r *http.Request) {
 
 	obj, err := api.CRUD.GetOne(r.Context(), api.Queries.GetOne, id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		api.RespondError(w, http.StatusNotFound, err.Error())
 		return
 	}
 
-	writeJSON(w, obj)
+	api.RespondOK(w, obj)
 }
 
 func (api *RestAPI[T]) list(w http.ResponseWriter, r *http.Request) {
 	obj, err := api.CRUD.List(r.Context(), api.Queries.List)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		api.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	writeJSON(w, obj)
+	api.RespondOK(w, obj)
 }
 
 func (api *RestAPI[T]) update(w http.ResponseWriter, r *http.Request) {
 	var obj T
-	if err := json.NewDecoder(r.Body).Decode(&obj); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err := api.DecodeJSON(r, &obj); err != nil {
+		api.RespondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -102,11 +100,11 @@ func (api *RestAPI[T]) update(w http.ResponseWriter, r *http.Request) {
 
 	_, err := api.CRUD.Update(r.Context(), api.Queries.Update, append(structToArgs(obj), id)...)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		api.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	writeJSON(w, map[string]string{"status": "updated"})
+	api.RespondOK(w, map[string]string{"status": "updated"})
 }
 
 func (api *RestAPI[T]) delete(w http.ResponseWriter, r *http.Request) {
@@ -114,11 +112,45 @@ func (api *RestAPI[T]) delete(w http.ResponseWriter, r *http.Request) {
 
 	_, err := api.CRUD.Delete(r.Context(), api.Queries.Delete, id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		api.RespondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	writeJSON(w, map[string]string{"status": "deleted"})
+	api.RespondNoContent(w)
+}
+
+// ---- Helper Methods ----
+
+// DecodeJSON decodes a JSON request body into the given object
+func (api *RestAPI[T]) DecodeJSON(r *http.Request, obj *T) error {
+	return json.NewDecoder(r.Body).Decode(obj)
+}
+
+// RespondJSON writes a successful JSON response with the given status code
+func (api *RestAPI[T]) RespondJSON(w http.ResponseWriter, statusCode int, data any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(data)
+}
+
+// RespondError writes an error response
+func (api *RestAPI[T]) RespondError(w http.ResponseWriter, statusCode int, message string) {
+	api.RespondJSON(w, statusCode, map[string]string{"error": message})
+}
+
+// RespondCreated writes a 201 Created response with the created ID
+func (api *RestAPI[T]) RespondCreated(w http.ResponseWriter, id any) {
+	api.RespondJSON(w, http.StatusCreated, map[string]any{"id": id})
+}
+
+// RespondOK writes a 200 OK response
+func (api *RestAPI[T]) RespondOK(w http.ResponseWriter, data any) {
+	api.RespondJSON(w, http.StatusOK, data)
+}
+
+// RespondNoContent writes a 204 No Content response
+func (api *RestAPI[T]) RespondNoContent(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // ---- Helpers ----
