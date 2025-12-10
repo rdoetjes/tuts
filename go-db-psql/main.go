@@ -29,6 +29,7 @@ func main() {
 	// Public routes
 	r.Post("/auth/login", auth.LoginHandler)
 	r.Get("/metrics", rest.MetricsHandler)
+	r.Get("/metrics_prometheus", rest.MetricsHandlerPrometheus)
 
 	// Protected routes
 	r.Group(func(rt chi.Router) {
