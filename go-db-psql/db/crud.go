@@ -22,7 +22,11 @@ func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (int64,
 	var id int64
 	fmt.Println(query, args)
 	err := c.DB.QueryRowxContext(ctx, query, args...).Scan(&id)
-	metrics.RecordQuery("CREATE", time.Since(start))
+	if err != nil {
+		metrics.RecordQuery("CREATE", time.Since(start), true)
+	} else {
+		metrics.RecordQuery("CREATE", time.Since(start), false)
+	}
 	return id, err
 }
 
@@ -33,7 +37,11 @@ func (c *CRUD[T]) GetOne(ctx context.Context, query string, args ...any) (T, err
 	start := time.Now()
 	var obj T
 	err := c.DB.GetContext(ctx, &obj, query, args...)
-	metrics.RecordQuery("GET_ONE", time.Since(start))
+	if err != nil {
+		metrics.RecordQuery("GET_ONE", time.Since(start), true)
+	} else {
+		metrics.RecordQuery("GET_ONE", time.Since(start), false)
+	}
 	return obj, err
 }
 
@@ -44,7 +52,11 @@ func (c *CRUD[T]) List(ctx context.Context, query string, args ...any) ([]T, err
 	start := time.Now()
 	var items []T
 	err := c.DB.SelectContext(ctx, &items, query, args...)
-	metrics.RecordQuery("LIST", time.Since(start))
+	if err != nil {
+		metrics.RecordQuery("LIST", time.Since(start), true)
+	} else {
+		metrics.RecordQuery("LIST", time.Since(start), false)
+	}
 	return items, err
 }
 
@@ -59,7 +71,11 @@ func (c *CRUD[T]) Update(ctx context.Context, query string, args ...any) (int64,
 	if err != nil {
 		return 0, err
 	}
-	metrics.RecordQuery("UPDATE", time.Since(start))
+	if err != nil {
+		metrics.RecordQuery("UPDATE", time.Since(start), true)
+	} else {
+		metrics.RecordQuery("UPDATE", time.Since(start), false)
+	}
 	return res.RowsAffected()
 }
 
@@ -72,6 +88,10 @@ func (c *CRUD[T]) Delete(ctx context.Context, query string, args ...any) (int64,
 	if err != nil {
 		return 0, err
 	}
-	metrics.RecordQuery("DELETE", time.Since(start))
+	if err != nil {
+		metrics.RecordQuery("DELETE", time.Since(start), true)
+	} else {
+		metrics.RecordQuery("DELETE", time.Since(start), false)
+	}
 	return res.RowsAffected()
 }

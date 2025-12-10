@@ -8,19 +8,21 @@ import (
 // QueryMetrics tracks query statistics
 type QueryMetrics struct {
 	mu               sync.RWMutex
-	totalQueries     int64
+	totalQueries     uint64
 	totalDuration    time.Duration
+	totalErrors      uint64
 	queryDurations   []time.Duration
 	operationMetrics map[string]*OperationMetric
 }
 
 // OperationMetric tracks metrics for a specific operation type
 type OperationMetric struct {
-	Count           int64
+	Count           uint64
 	TotalDuration   time.Duration
 	AverageDuration time.Duration
 	MinDuration     time.Duration
 	MaxDuration     time.Duration
+	NrErrors        uint64
 }
 
 var globalMetrics = &QueryMetrics{
@@ -28,12 +30,16 @@ var globalMetrics = &QueryMetrics{
 }
 
 // RecordQuery records a query execution
-func RecordQuery(operation string, duration time.Duration) {
+func RecordQuery(operation string, duration time.Duration, err bool) {
 	globalMetrics.mu.Lock()
 	defer globalMetrics.mu.Unlock()
 
 	globalMetrics.totalQueries++
 	globalMetrics.totalDuration += duration
+	if err {
+		globalMetrics.totalErrors++
+	}
+
 	globalMetrics.queryDurations = append(globalMetrics.queryDurations, duration)
 
 	// Record operation-specific metrics
@@ -41,6 +47,9 @@ func RecordQuery(operation string, duration time.Duration) {
 		opMetric.Count++
 		opMetric.TotalDuration += duration
 		opMetric.AverageDuration = opMetric.TotalDuration / time.Duration(opMetric.Count)
+		if err {
+			opMetric.NrErrors++
+		}
 
 		if duration < opMetric.MinDuration || opMetric.MinDuration == 0 {
 			opMetric.MinDuration = duration
@@ -55,6 +64,7 @@ func RecordQuery(operation string, duration time.Duration) {
 			AverageDuration: duration,
 			MinDuration:     duration,
 			MaxDuration:     duration,
+			NrErrors:        0,
 		}
 	}
 }
@@ -78,6 +88,7 @@ func GetMetrics() map[string]interface{} {
 			"average_duration": metric.AverageDuration.String(),
 			"min_duration":     metric.MinDuration.String(),
 			"max_duration":     metric.MaxDuration.String(),
+			"nr_errors":        metric.NrErrors,
 		}
 	}
 
@@ -85,6 +96,7 @@ func GetMetrics() map[string]interface{} {
 		"total_queries":     globalMetrics.totalQueries,
 		"total_duration":    globalMetrics.totalDuration.String(),
 		"average_duration":  avgDuration.String(),
+		"total_errors":      globalMetrics.totalErrors,
 		"operation_metrics": opMetrics,
 	}
 }
@@ -101,7 +113,7 @@ func ResetMetrics() {
 }
 
 // GetTotalQueries returns total number of queries executed
-func GetTotalQueries() int64 {
+func GetTotalQueries() uint64 {
 	globalMetrics.mu.RLock()
 	defer globalMetrics.mu.RUnlock()
 	return globalMetrics.totalQueries

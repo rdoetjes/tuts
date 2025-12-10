@@ -31,7 +31,11 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 		"SELECT id, password FROM users WHERE email = $1",
 		email,
 	).Scan(&userID, &hashedPassword)
-	metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start))
+	if err != nil {
+		metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), true)
+	} else {
+		metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), false)
+	}
 
 	if err == sql.ErrNoRows {
 		// User not found
