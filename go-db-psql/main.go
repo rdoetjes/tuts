@@ -12,14 +12,6 @@ import (
 	"phonax.com/db/rest"
 )
 
-const (
-	host     = "192.168.178.92"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "postgres"
-)
-
 func main() {
 	const api_port = ":3000"
 
