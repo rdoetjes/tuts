@@ -22,6 +22,7 @@ func ConvertMetricsToPrometheus(metrics []byte) (string, error) {
 	fmt.Fprintf(&b, "api_total_duration_seconds %f\n", durToSec(m.TotalDuration))
 	fmt.Fprintf(&b, "api_total_errors %d\n", m.TotalErrors)
 	fmt.Fprintf(&b, "api_total_queries %d\n", m.TotalQueries)
+	fmt.Fprintf(&b, "api_average_duration_seconds %f\n", durToSec(m.TotalDuration/time.Duration(m.TotalQueries)))
 
 	// Per-operation metrics
 	for op, om := range m.OperationMetrics {
