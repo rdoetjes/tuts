@@ -29,15 +29,16 @@ func setupRoutes(sql *sqlx.DB) *chi.Mux {
 
 	// Public routes
 	r.Post("/auth/login", auth.LoginHandler)
-	r.Get("/metrics", rest.MetricsHandler)
-	r.Get("/metrics_prometheus", rest.MetricsHandlerPrometheus)
+	r.Get("/v1/metrics", rest.MetricsHandler)
+	r.Get("/v1/metrics_prometheus", rest.MetricsHandlerPrometheus)
 
 	// Protected routes
 	r.Group(func(rt chi.Router) {
 		rt.Use(auth.JWTMiddleware)
+
 		user := models.User{}
 		restUser := rest.NewCrudAPI[models.User](sql, user.SetupQueries())
-		restUser.RegisterRoutes(rt, "/users")
+		restUser.RegisterRoutes(rt, "/v1/users")
 	})
 	return r
 }
