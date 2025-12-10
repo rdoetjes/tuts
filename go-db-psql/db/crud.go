@@ -69,13 +69,11 @@ func (c *CRUD[T]) Update(ctx context.Context, query string, args ...any) (int64,
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	fmt.Println(query, args)
 	if err != nil {
+		metrics.RecordQuery("UPDATE", time.Since(start), true)
 		return 0, err
 	}
-	if err != nil {
-		metrics.RecordQuery("UPDATE", time.Since(start), true)
-	} else {
-		metrics.RecordQuery("UPDATE", time.Since(start), false)
-	}
+	metrics.RecordQuery("UPDATE", time.Since(start), false)
+
 	return res.RowsAffected()
 }
 
@@ -86,12 +84,10 @@ func (c *CRUD[T]) Delete(ctx context.Context, query string, args ...any) (int64,
 	start := time.Now()
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
+		metrics.RecordQuery("DELETE", time.Since(start), true)
 		return 0, err
 	}
-	if err != nil {
-		metrics.RecordQuery("DELETE", time.Since(start), true)
-	} else {
-		metrics.RecordQuery("DELETE", time.Since(start), false)
-	}
+	metrics.RecordQuery("DELETE", time.Since(start), false)
+
 	return res.RowsAffected()
 }
