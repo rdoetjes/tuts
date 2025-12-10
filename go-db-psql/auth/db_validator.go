@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"phonax.com/db/db"
 	"phonax.com/db/metrics"
 )
 
@@ -30,10 +30,8 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 	start := time.Now()
 	// Query the database for the user's hashed password
 	// Adjust this query to match your users table schema
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	v.db.PingContext(ctx)
+	db.CheckConnection(v.db)
 
 	err := v.db.QueryRow(
 		"SELECT id, password FROM users WHERE email = $1",
