@@ -1,5 +1,11 @@
 -- Bootstrap migration: Add password column to users table if it doesn't exist
- create table users(id SERIAL PRIMARY KEY, firstname varchar(128), lastname varchar(128), dob date, email varchar(255) NOT NULL UNIQUE);
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    firstname VARCHAR(128),
+    lastname VARCHAR(128),
+    dob DATE,
+    email VARCHAR(255) NOT NULL UNIQUE
+);
 
 -- Check and add password column
 ALTER TABLE users
