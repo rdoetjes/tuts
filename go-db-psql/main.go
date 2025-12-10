@@ -2,9 +2,14 @@ package main
 
 import (
 	"fmt"
-	"sync"
+	"log"
+	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"phonax.com/db/auth"
 	"phonax.com/db/db"
+	"phonax.com/db/models"
+	"phonax.com/db/rest"
 )
 
 const (
@@ -15,43 +20,35 @@ const (
 	dbname   = "postgres"
 )
 
-// Converts and prints result set rows
-func printRows(rows []map[string]interface{}) {
-	for _, row := range rows {
-		id := row["id"]
-		fn := row["first_name"]
-		ln := row["last_name"]
-
-		fmt.Printf("name: %v %v %v\n", id, fn, ln)
-	}
-}
-
 func main() {
-	var wg sync.WaitGroup
+	const api_port = ":3000"
 
 	fmt.Println("Connecting to the database")
 
 	sql := db.Connect()
 	defer sql.Close()
 
-	wg.Add(2)
-	go func() {
-		res, err := db.Query(sql, "SELECT * FROM test WHERE first_name LIKE '%Keith%'")
-		if err != nil {
-			panic(err)
-		}
-		printRows(res)
-		wg.Done()
-	}()
+	// Set up database credential validator for JWT login
+	validator := auth.NewDBCredentialValidator(sql)
+	auth.SetCredentialValidator(validator)
 
-	go func() {
-		res, err := db.Query(sql, "SELECT * FROM test WHERE last_name LIKE 'Doetjes'")
-		if err != nil {
-			panic(err)
-		}
-		printRows(res)
-		wg.Done()
-	}()
-	wg.Wait()
-	fmt.Println()
+	r := chi.NewRouter()
+
+	// Public routes
+	r.Post("/auth/login", auth.LoginHandler)
+	r.Get("/metrics", rest.MetricsHandler)
+
+	// Protected routes
+	r.Group(func(rt chi.Router) {
+		rt.Use(auth.JWTMiddleware)
+		user := models.User{}
+		restUser := rest.NewCrudAPI[models.User](sql, user.SetupQueries())
+		restUser.RegisterRoutes(rt, "/users")
+	})
+
+	fmt.Println("Starting REST API on port ", api_port)
+	err := http.ListenAndServe(api_port, r)
+	if err != nil {
+		log.Println(err)
+	}
 }
