@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 )
@@ -277,6 +278,7 @@ func TestCompleteUserCRUD(t *testing.T) {
 		"email":     "complete@email.com",
 		"password":  "CompletePass123",
 	})
+	defer deleteUser(t, client, base, token, userID)
 
 	// Login with new user
 	_, ok := login(t, client, base, "complete@email.com", "CompletePass123")
@@ -319,8 +321,11 @@ func TestCompleteUserCRUD(t *testing.T) {
 	if user["DOB"] != "1973-12-12T00:00:00Z" {
 		t.Fatalf("expected DOB 1973-12-12T00:00:00Z, got %v", user["DOB"])
 	}
+	var p = fmt.Sprintf("%v", user["Password"])
+	if strings.Contains(p, "$2a$10$") == false {
+		t.Fatalf("expected Password to have $2a$10$, got %v", user["Password"])
+	}
 
-	// Delete user
 	deleteUser(t, client, base, token, userID)
 
 	// Verify user is deleted (login should fail)

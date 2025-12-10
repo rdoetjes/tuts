@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"phonax.com/db/auth"
 	"phonax.com/db/db"
-	"phonax.com/db/models"
+	"phonax.com/db/db/models"
 	"phonax.com/db/rest"
 )
 
