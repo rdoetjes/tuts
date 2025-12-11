@@ -46,7 +46,6 @@ func main() {
 	const api_port = ":3000"
 
 	log.Println("Connecting to the database")
-
 	sql := db.Connect()
 	defer sql.Close()
 
