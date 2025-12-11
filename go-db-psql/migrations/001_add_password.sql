@@ -5,12 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     lastname VARCHAR(128),
     dob DATE,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255)
+    password VARCHAR(255) NOT NULL DEFAULT ''
 );
-
--- Check and add password column (inittially it didn't exist)
-ALTER TABLE users
-ADD COLUMN IF NOT EXISTS password VARCHAR(255) NOT NULL DEFAULT '';
 
 -- Create an initial admin user with a default password (CHANGE THIS IN PRODUCTION)
 -- Password: 'admin123' (hashed with bcrypt)
