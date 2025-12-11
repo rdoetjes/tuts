@@ -9,7 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// JWTSecret should be set from environment or config in production
+// JWTSecret should be set from environment or config in production.
 var JWTSecret = []byte("your-secret-key-change-in-production")
 
 // Claims represents the JWT claims
@@ -78,7 +78,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Store claims in request context for downstream handlers
-		r.Header.Set("X-User-ID", string(claims.UserID))
+		r.Header.Set("X-User-ID", string(rune(claims.UserID)))
 		r.Header.Set("X-User-Email", claims.Email)
 
 		next.ServeHTTP(w, r)
