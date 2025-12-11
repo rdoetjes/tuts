@@ -34,10 +34,10 @@ func (c *CRUD[T]) handleErrorAndMetrics(start time.Time, ACTION string, err erro
 Create returns last inserted ID.
 For PostgreSQL, we need "RETURNING id" in the INSERT statement.
 */
-func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (int64, error) {
+func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (uint64, error) {
 	start := time.Now()
 	const ACTION = "CREATE"
-	var id int64
+	var id uint64
 
 	CheckConnection(c.DB)
 
