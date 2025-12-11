@@ -2,8 +2,9 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"time"
+
+	"log"
 
 	"github.com/jmoiron/sqlx"
 	"phonax.com/db/metrics"
@@ -13,10 +14,16 @@ type CRUD[T any] struct {
 	DB *sqlx.DB
 }
 
+func CheckConnection(db *sqlx.DB) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	return db.PingContext(ctx)
+}
+
 /*Handle errors and record metrics for all CRUD operations.*/
 func (c *CRUD[T]) handleErrorAndMetrics(start time.Time, ACTION string, err error) {
 	if err != nil {
-		fmt.Println("ERROR ", ACTION, ":", err)
+		log.Println("ERROR ", ACTION, ":", err)
 		metrics.RecordQuery(ACTION, time.Since(start), true)
 	} else {
 		metrics.RecordQuery(ACTION, time.Since(start), false)
@@ -32,9 +39,7 @@ func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (int64,
 	const ACTION = "CREATE"
 	var id int64
 
-	bgctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	c.DB.PingContext(bgctx)
+	CheckConnection(c.DB)
 
 	err := c.DB.QueryRowxContext(ctx, query, args...).Scan(&id)
 	c.handleErrorAndMetrics(start, ACTION, err)
@@ -49,9 +54,7 @@ func (c *CRUD[T]) GetOne(ctx context.Context, query string, args ...any) (T, err
 	const ACTION = "GET_ONE"
 	var obj T
 
-	bgctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	c.DB.PingContext(bgctx)
+	CheckConnection(c.DB)
 
 	err := c.DB.GetContext(ctx, &obj, query, args...)
 	c.handleErrorAndMetrics(start, ACTION, err)
@@ -66,9 +69,7 @@ func (c *CRUD[T]) List(ctx context.Context, query string, args ...any) ([]T, err
 	const ACTION = "LIST"
 	var items []T
 
-	bgctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	c.DB.PingContext(bgctx)
+	CheckConnection(c.DB)
 
 	err := c.DB.SelectContext(ctx, &items, query, args...)
 	c.handleErrorAndMetrics(start, ACTION, err)
@@ -82,14 +83,12 @@ func (c *CRUD[T]) Update(ctx context.Context, query string, args ...any) (int64,
 	start := time.Now()
 	const ACTION = "UPDATE"
 
-	bgctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	c.DB.PingContext(bgctx)
+	CheckConnection(c.DB)
 
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		metrics.RecordQuery(ACTION, time.Since(start), true)
-		fmt.Println("ERROR ", ACTION, ":", err)
+		log.Println("ERROR ", ACTION, ":", err)
 		return 0, err
 	}
 	metrics.RecordQuery(ACTION, time.Since(start), false)
@@ -104,14 +103,12 @@ func (c *CRUD[T]) Delete(ctx context.Context, query string, args ...any) (int64,
 	start := time.Now()
 	const ACTION = "DELETE"
 
-	bgctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	c.DB.PingContext(bgctx)
+	CheckConnection(c.DB)
 
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		metrics.RecordQuery(ACTION, time.Since(start), true)
-		fmt.Println("ERROR ", ACTION, ":", err)
+		log.Println("ERROR ", ACTION, ":", err)
 		return 0, err
 	}
 	metrics.RecordQuery(ACTION, time.Since(start), false)
