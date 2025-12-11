@@ -1,3 +1,11 @@
+/*
+Quick and dirty bootstrap tool for initializing the database schema and creating the first user(s) with password.
+Without this tool, there is no way to be able to login and create/update/delete users via the REST API.
+Usage:
+
+	go run tools/setup.go init-db       - Initialize database schema with password column
+	go run tools/setup.go create-user   - Create a new user with email and password
+*/
 package main
 
 import (
