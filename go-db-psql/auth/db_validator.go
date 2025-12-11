@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"context"
 	"database/sql"
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"phonax.com/db/db"
 	"phonax.com/db/metrics"
 )
 
@@ -30,21 +30,20 @@ func (v *DBCredentialValidator) ValidateCredentials(email string, password strin
 	start := time.Now()
 	// Query the database for the user's hashed password
 	// Adjust this query to match your users table schema
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
-	v.db.PingContext(ctx)
+	db.CheckConnection(v.db)
 
 	err := v.db.QueryRow(
 		"SELECT id, password FROM users WHERE email = $1",
 		email,
-	).Scan(&sessionID, &hashedPassword)
+	).Scan(&userID, &hashedPassword)
+
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			metrics.RecordFailedLogin()
 			metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), false)
 		} else {
-			fmt.Println("ERROR VALIDATE_CREDENTIAL: ", err)
+			log.Println("ERROR VALIDATE_CREDENTIAL: ", err)
 			metrics.RecordQuery("SELECT_VALIDATE_CREDENTIALS", time.Since(start), true)
 		}
 	} else {

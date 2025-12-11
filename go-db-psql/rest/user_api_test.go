@@ -12,6 +12,10 @@ import (
 )
 
 func testServersBaseURL() string {
+	return "http://localhost:3000/v1"
+}
+
+func authServerBaseURL() string {
 	return "http://localhost:3000"
 }
 
@@ -178,7 +182,7 @@ func TestCreateUserWithPassword(t *testing.T) {
 	base := testServersBaseURL()
 
 	// Login as admin
-	token := loginAsAdmin(t, client, base)
+	token := loginAsAdmin(t, client, authServerBaseURL())
 
 	// Create user
 	userID := createUser(t, client, base, token, map[string]interface{}{
@@ -190,7 +194,7 @@ func TestCreateUserWithPassword(t *testing.T) {
 	})
 
 	// Login with newly created user
-	newToken, ok := login(t, client, base, "create@email.com", "CreatePassword123")
+	newToken, ok := login(t, client, authServerBaseURL(), "create@email.com", "CreatePassword123")
 	if !ok || newToken == "" {
 		t.Fatal("failed to login with newly created user")
 	}
@@ -205,7 +209,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	base := testServersBaseURL()
 
 	// Login as admin
-	token := loginAsAdmin(t, client, base)
+	token := loginAsAdmin(t, client, authServerBaseURL())
 
 	// Create user
 	userID := createUser(t, client, base, token, map[string]interface{}{
@@ -226,7 +230,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	})
 
 	// Login with new password
-	newToken, ok := login(t, client, base, "updated@email.com", "NewPassword456")
+	newToken, ok := login(t, client, authServerBaseURL(), "updated@email.com", "NewPassword456")
 	if !ok || newToken == "" {
 		t.Fatal("failed to login with updated password")
 	}
@@ -241,7 +245,7 @@ func TestLoginWithWrongPassword(t *testing.T) {
 	base := testServersBaseURL()
 
 	// Login as admin
-	token := loginAsAdmin(t, client, base)
+	token := loginAsAdmin(t, client, authServerBaseURL())
 
 	// Create user
 	userID := createUser(t, client, base, token, map[string]interface{}{
@@ -253,7 +257,7 @@ func TestLoginWithWrongPassword(t *testing.T) {
 	})
 
 	// Attempt login with wrong password
-	_, ok := login(t, client, base, "wrongpass@email.com", "WrongPassword123")
+	_, ok := login(t, client, authServerBaseURL(), "wrongpass@email.com", "WrongPassword123")
 	if ok {
 		t.Fatal("login should have failed with wrong password")
 	}
@@ -268,7 +272,7 @@ func TestCompleteUserCRUD(t *testing.T) {
 	base := testServersBaseURL()
 
 	// Login as admin
-	token := loginAsAdmin(t, client, base)
+	token := loginAsAdmin(t, client, authServerBaseURL())
 
 	// Create user
 	userID := createUser(t, client, base, token, map[string]interface{}{
@@ -281,7 +285,7 @@ func TestCompleteUserCRUD(t *testing.T) {
 	defer deleteUser(t, client, base, token, userID)
 
 	// Login with new user
-	_, ok := login(t, client, base, "complete@email.com", "CompletePass123")
+	_, ok := login(t, client, authServerBaseURL(), "complete@email.com", "CompletePass123")
 	if !ok {
 		t.Fatal("failed to login with newly created user")
 	}
@@ -296,13 +300,13 @@ func TestCompleteUserCRUD(t *testing.T) {
 	})
 
 	// Verify old password no longer works
-	_, ok = login(t, client, base, "completed@email.com", "CompletePass123")
+	_, ok = login(t, client, authServerBaseURL(), "completed@email.com", "CompletePass123")
 	if ok {
 		t.Fatal("old password should not work after update")
 	}
 
 	// Verify new password works
-	_, ok = login(t, client, base, "completed@email.com", "UpdatedPass456")
+	_, ok = login(t, client, authServerBaseURL(), "completed@email.com", "UpdatedPass456")
 	if !ok {
 		t.Fatal("failed to login with updated password")
 	}
@@ -329,7 +333,7 @@ func TestCompleteUserCRUD(t *testing.T) {
 	deleteUser(t, client, base, token, userID)
 
 	// Verify user is deleted (login should fail)
-	_, ok = login(t, client, base, "completed@email.com", "UpdatedPass456")
+	_, ok = login(t, client, authServerBaseURL(), "completed@email.com", "UpdatedPass456")
 	if ok {
 		t.Fatal("login should fail after user deletion")
 	}
