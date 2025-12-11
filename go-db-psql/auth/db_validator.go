@@ -22,9 +22,9 @@ func NewDBCredentialValidator(db *sqlx.DB) *DBCredentialValidator {
 }
 
 // ValidateCredentials checks if email and password match a user in the database
-// Returns (userID, isValid, error)
-func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int, bool, error) {
-	var userID int
+// Returns (SessionOD, isValid, error)
+func (v *DBCredentialValidator) ValidateCredentials(email string, password string) (string, bool, error) {
+	var sessionID string
 	var hashedPassword string
 
 	start := time.Now()
@@ -52,15 +52,15 @@ func (v *DBCredentialValidator) ValidateCredentials(email, password string) (int
 
 	if err == sql.ErrNoRows {
 		// User not found
-		return 0, false, nil
+		return "", false, nil
 	}
 
 	if err != nil {
 		// Database error
-		return 0, false, err
+		return "", false, err
 	}
 
 	// Verify the password
 	isValid := VerifyPassword(hashedPassword, password)
-	return userID, isValid, nil
+	return sessionID, isValid, nil
 }
