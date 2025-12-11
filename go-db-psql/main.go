@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -46,7 +45,7 @@ func setupRoutes(sql *sqlx.DB) *chi.Mux {
 func main() {
 	const api_port = ":3000"
 
-	fmt.Println("Connecting to the database")
+	log.Println("Connecting to the database")
 
 	sql := db.Connect()
 	defer sql.Close()
@@ -55,7 +54,7 @@ func main() {
 
 	r := setupRoutes(sql)
 
-	fmt.Println("Starting REST API on port ", api_port)
+	log.Println("Starting REST API on port ", api_port)
 	err := http.ListenAndServe(api_port, r)
 	if err != nil {
 		log.Println(err)
