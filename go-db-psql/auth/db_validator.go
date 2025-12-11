@@ -23,8 +23,8 @@ func NewDBCredentialValidator(db *sqlx.DB) *DBCredentialValidator {
 
 // ValidateCredentials checks if email and password match a user in the database
 // Returns (SessionOD, isValid, error)
-func (v *DBCredentialValidator) ValidateCredentials(email string, password string) (string, bool, error) {
-	var sessionID string
+func (v *DBCredentialValidator) ValidateCredentials(email string, password string) (int, bool, error) {
+	var UserID int
 	var hashedPassword string
 
 	start := time.Now()
@@ -36,7 +36,7 @@ func (v *DBCredentialValidator) ValidateCredentials(email string, password strin
 	err := v.db.QueryRow(
 		"SELECT id, password FROM users WHERE email = $1",
 		email,
-	).Scan(&sessionID, &hashedPassword)
+	).Scan(&UserID, &hashedPassword)
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			metrics.RecordFailedLogin()
@@ -51,15 +51,15 @@ func (v *DBCredentialValidator) ValidateCredentials(email string, password strin
 
 	if err == sql.ErrNoRows {
 		// User not found
-		return "", false, nil
+		return 0, false, nil
 	}
 
 	if err != nil {
 		// Database error
-		return "", false, err
+		return 0, false, err
 	}
 
 	// Verify the password
 	isValid := VerifyPassword(hashedPassword, password)
-	return sessionID, isValid, nil
+	return UserID, isValid, nil
 }

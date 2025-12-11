@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,7 +21,7 @@ type LoginResponse struct {
 // CredentialValidator is an interface for validating user credentials
 // Implement this with your database logic
 type CredentialValidator interface {
-	ValidateCredentials(email string, password string) (SessionID string, valid bool, err error)
+	ValidateCredentials(email string, password string) (UserID int, valid bool, err error)
 }
 
 var credentialValidator CredentialValidator
@@ -52,20 +51,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var SessionID string
+	var UserID int
 	var valid bool
 
 	// If a credential validator is set, use it; otherwise use demo mode
 	if credentialValidator != nil {
 		var err error
-		SessionID, valid, err = credentialValidator.ValidateCredentials(req.Email, req.Password)
+		UserID, valid, err = credentialValidator.ValidateCredentials(req.Email, req.Password)
 		if err != nil {
 			http.Error(w, "credential validation error", http.StatusInternalServerError)
 			return
 		}
 	} else {
 		// Demo mode: accept any email/password
-		SessionID = uuid.NewString()
+		UserID = 1
 		valid = true
 	}
 
@@ -75,7 +74,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate token with a 24-hour expiration
-	token, err := GenerateToken(SessionID, req.Email, 24)
+	token, err := GenerateToken(UserID, req.Email, 24)
 	if err != nil {
 		http.Error(w, "failed to generate token", http.StatusInternalServerError)
 		return

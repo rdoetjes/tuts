@@ -14,17 +14,17 @@ var JWTSecret = []byte("your-secret-key-change-in-production")
 
 // Claims represents the JWT claims
 type Claims struct {
-	SessionID string `json:"session_id"`
-	Email     string `json:"email"`
+	UserID int    `json:"user_id"`
+	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
 
 // GenerateToken creates a new JWT token for a user
-func GenerateToken(SessionID string, email string, expirationHours int) (string, error) {
+func GenerateToken(UserID int, email string, expirationHours int) (string, error) {
 	expirationTime := time.Now().Add(time.Duration(expirationHours) * time.Hour)
 	claims := &Claims{
-		SessionID: SessionID,
-		Email:     email,
+		UserID: UserID,
+		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -78,7 +78,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Store claims in request context for downstream handlers
-		r.Header.Set("X-User-ID", string(claims.SessionID))
+		r.Header.Set("X-User-ID", string(claims.UserID))
 		r.Header.Set("X-User-Email", claims.Email)
 
 		next.ServeHTTP(w, r)
