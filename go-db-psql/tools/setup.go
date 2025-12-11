@@ -48,8 +48,7 @@ func printUsage() {
 	fmt.Println(`
 Usage:
   go run tools/setup.go init-db       - Initialize database schema with password column
-  go run tools/setup.go create-user   - Create a new user with email and password
-`)
+  go run tools/setup.go create-user   - Create a new user with email and password`)
 }
 
 // initDB adds the password column to users table if it doesn't exist
