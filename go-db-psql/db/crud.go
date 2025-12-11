@@ -2,9 +2,8 @@ package db
 
 import (
 	"context"
-	"time"
-
 	"log"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"phonax.com/db/metrics"
