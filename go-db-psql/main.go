@@ -17,7 +17,7 @@ import (
 func setupAuth(sql *sqlx.DB) {
 	// Set up database credential validator for JWT login
 	if os.Getenv("JWT_SECRET") != "" {
-		fmt.Println("Using provided JWT secret")
+		log.Println("Using provided JWT secret")
 		auth.JWTSecret = []byte(os.Getenv("JWT_SECRET"))
 	}
 	validator := auth.NewDBCredentialValidator(sql)
