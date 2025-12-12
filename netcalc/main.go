@@ -73,7 +73,7 @@ func main() {
 	flag.Parse()
 
 	if (ip != "" && netmask != "" && cidr != "") || (cidr == "" && (ip == "" || netmask == "")) {
-		fmt.Println("Please provide either both IP and netmask, or a CIDR, but not both.")
+		fmt.Println("Please provide either both -ip <ip address> -netmask <netmask> or a -cidr <cidr>")
 		return
 	}
 
