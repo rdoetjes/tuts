@@ -48,3 +48,17 @@ func TestConvertBinaryToIp(t *testing.T) {
 		fmt.Println("Test passed")
 	}
 }
+
+func TestConvCidrToIpNetmask(t *testing.T) {
+	cidr := "192.168.178.0/24"
+	expected_ip := "192.168.178.0"
+	expected_netmask := "255.255.255.0"
+
+	result_ip, result_netmask := convertCIDRToIPNetmask(cidr)
+
+	if result_ip != expected_ip || result_netmask != expected_netmask {
+		fmt.Printf("Test failed: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
+	} else {
+		fmt.Println("Test passed")
+	}
+}
