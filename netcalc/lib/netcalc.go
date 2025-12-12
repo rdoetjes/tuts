@@ -7,7 +7,7 @@ import (
 )
 
 /*
- * convertDotNotationToUInt32 converts an IP address from dot notation (e.g., "192.168.1.1") to a 32-bit unsigned integer using bitwise operations.
+ * ConvertDotNotationToUInt32 converts an IP address from dot notation (e.g., "192.168.1.1") to a 32-bit unsigned integer using bitwise operations.
  *
  * Parameter:
  *   - ip: The IP address in dot notation.
@@ -42,7 +42,7 @@ func ConvertDotNotationToUInt32(ip string) uint32 {
 }
 
 /*
- * u32UserToDotNotation converts a 32-bit unsigned integer into an IP address in dot notation using bitwise operations.
+ * U32UserToDotNotation converts a 32-bit unsigned integer into an IP address in dot notation using bitwise operations.
  *
  * Parameter:
  *   - ip: The IP address as a 32-bit unsigned integer.
@@ -70,7 +70,7 @@ func U32UserToDotNotation(ip uint32) string {
 }
 
 /*
- * calculateNetworkAddress computes the network and broadcast addresses using bitwise operations.
+ * CalculateNetworkAddress computes the network and broadcast addresses using bitwise operations.
  *
  * Parameters:
  *   - ipU32: The IP address as a 32-bit unsigned integer.
@@ -100,7 +100,7 @@ func CalculateNetworkAddress(ipU32 uint32, netmaskU32 uint32) (uint32, uint32) {
 }
 
 /*
- * numberOfHosts calculates the number of usable hosts in a network using bitwise operations.
+ * NumberOfHosts calculates the number of usable hosts in a network using bitwise operations.
  *
  * Parameter:
  *   - netmaskU32: The netmask as a 32-bit unsigned integer.
@@ -121,10 +121,26 @@ func NumberOfHosts(netmaskU32 uint32) uint32 {
 }
 
 /*
- * create a 32bit variable
- * set all the bits to 1
- * 32-nr of set bits
- * shift that number of in (adding the 0s at the beginning)
+ * ConvertCIDRToIPNetmask converts a CIDR notation string to an IP address and its corresponding netmask in dot-decimal notation.
+ *
+ * Parameter:
+ *   - cidr: The CIDR notation string (e.g., "192.168.1.1/24").
+ *
+ * Returns:
+ *   - ip: The IP address in dot-decimal notation.
+ *   - netmask: The netmask in dot-decimal notation.
+ *
+ * Calculation:
+ *   - The netmask is calculated based on the CIDR prefix.
+ *     Example:
+ *        CIDR:        /24
+ *        Netmask:     11111111.11111111.11111111.00000000 => 255.255.255.0
+ *
+ * Process:
+ *   - Splits the CIDR string into an IP address and a prefix length.
+ *   - Converts the IP address to its 32-bit unsigned integer representation.
+ *   - Calculates the netmask by creating a 32-bit integer with `prefixLength` ones followed by zeros.
+ *   - Converts both the IP and netmask integers back to dot-decimal notation.
  */
 func ConvertCIDRToIPNetmask(cidr string) (string, string) {
 	parts := strings.Split(cidr, "/")
