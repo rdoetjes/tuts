@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -47,7 +48,6 @@ func numberOfHosts(netmaskU32 uint32) uint32 {
 func convertCIDRToIPNetmask(cidr string) (string, string) {
 	parts := strings.Split(cidr, "/")
 	if len(parts) != 2 {
-		fmt.Println("Invalid CIDR format")
 		return "", ""
 	}
 
@@ -81,6 +81,10 @@ func main() {
 
 	if cidr != "" {
 		ip, netmask = convertCIDRToIPNetmask(cidr)
+		if ip == "" || netmask == "" {
+			fmt.Println("Invalid CIDR or ip and netmask")
+			os.Exit(1)
+		}
 	}
 
 	ipU32 := converDotNotationToBinary(ip)
