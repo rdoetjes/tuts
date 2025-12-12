@@ -59,7 +59,7 @@ func convertDotNotationToUInt32(ip string) uint32 {
  *        Dot Notation:            => 192     .168     .1       .1
  *
  * Process:
- *   - Extract each octet using bit masking and shifting.
+ *   - Extract each octet shifting it to the first 8 bits and mask that with 255, so the 8 bit value remains.
  *   - Format the octets into dot notation.
  */
 func u32UserToDotNotation(ip uint32) string {
