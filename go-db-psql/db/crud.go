@@ -13,12 +13,6 @@ type CRUD[T any] struct {
 	DB *sqlx.DB
 }
 
-func CheckConnection(db *sqlx.DB) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	return db.PingContext(ctx)
-}
-
 /*Handle errors and record metrics for all CRUD operations.*/
 func (c *CRUD[T]) handleErrorAndMetrics(start time.Time, ACTION string, err error) {
 	if err != nil {
@@ -38,8 +32,6 @@ func (c *CRUD[T]) Create(ctx context.Context, query string, args ...any) (uint64
 	const ACTION = "CREATE"
 	var id uint64
 
-	CheckConnection(c.DB)
-
 	err := c.DB.QueryRowxContext(ctx, query, args...).Scan(&id)
 	c.handleErrorAndMetrics(start, ACTION, err)
 	return id, err
@@ -52,8 +44,6 @@ func (c *CRUD[T]) GetOne(ctx context.Context, query string, args ...any) (T, err
 	start := time.Now()
 	const ACTION = "GET_ONE"
 	var obj T
-
-	CheckConnection(c.DB)
 
 	err := c.DB.GetContext(ctx, &obj, query, args...)
 	c.handleErrorAndMetrics(start, ACTION, err)
@@ -68,8 +58,6 @@ func (c *CRUD[T]) List(ctx context.Context, query string, args ...any) ([]T, err
 	const ACTION = "LIST"
 	var items []T
 
-	CheckConnection(c.DB)
-
 	err := c.DB.SelectContext(ctx, &items, query, args...)
 	c.handleErrorAndMetrics(start, ACTION, err)
 	return items, err
@@ -81,8 +69,6 @@ Update returns number of affected rows.
 func (c *CRUD[T]) Update(ctx context.Context, query string, args ...any) (int64, error) {
 	start := time.Now()
 	const ACTION = "UPDATE"
-
-	CheckConnection(c.DB)
 
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
@@ -101,8 +87,6 @@ Delete also returns number of affected rows.
 func (c *CRUD[T]) Delete(ctx context.Context, query string, args ...any) (int64, error) {
 	start := time.Now()
 	const ACTION = "DELETE"
-
-	CheckConnection(c.DB)
 
 	res, err := c.DB.ExecContext(ctx, query, args...)
 	if err != nil {
