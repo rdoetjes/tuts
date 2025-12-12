@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func converDotNotationToBinary(ip string) uint32 {
+func convertDotNotationToUInt32(ip string) uint32 {
 	octets := strings.Split(ip, ".")
 	if len(octets) != 4 {
 		return 0
@@ -49,7 +49,7 @@ func convertCIDRToIPNetmask(cidr string) (string, string) {
 		return "", ""
 	}
 
-	ipU32 := converDotNotationToBinary(parts[0])
+	ipU32 := convertDotNotationToUInt32(parts[0])
 	prefixLength, err := strconv.Atoi(parts[1])
 	if err != nil || prefixLength < 0 || prefixLength > 32 {
 		fmt.Println("Invalid prefix length")
@@ -82,8 +82,8 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 }
 
 func calcNetworkDetails(ip *string, netmask *string) {
-	ipU32 := converDotNotationToBinary(*ip)
-	netmaskU32 := converDotNotationToBinary(*netmask)
+	ipU32 := convertDotNotationToUInt32(*ip)
+	netmaskU32 := convertDotNotationToUInt32(*netmask)
 	networkAddress, broadcastAddress := calculateNetworkAddress(ipU32, netmaskU32)
 
 	fmt.Printf("IP Address: %s Netmask: %s\n", *ip, *netmask)

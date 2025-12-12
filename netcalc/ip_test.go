@@ -8,7 +8,7 @@ import (
 func TestConvertIpToBinary(t *testing.T) {
 	ip := "255.255.255.255"
 	expected := uint32(4294967295)
-	result := converDotNotationToBinary(ip)
+	result := convertDotNotationToUInt32(ip)
 
 	if result != expected {
 		fmt.Printf("Test failed: expected %d, got %d\n", expected, result)
@@ -18,7 +18,7 @@ func TestConvertIpToBinary(t *testing.T) {
 
 	ip = "10.10.10.10"
 	expected = uint32(168430090)
-	result = converDotNotationToBinary(ip)
+	result = convertDotNotationToUInt32(ip)
 
 	if result != expected {
 		fmt.Printf("Test failed: expected %d, got %d\n", expected, result)
