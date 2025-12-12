@@ -61,29 +61,33 @@ func convertCIDRToIPNetmask(cidr string) (string, string) {
 	return u32UserToDotNotation(ipU32), u32UserToDotNotation(mask)
 }
 
+func parseCLI(ip *string, netmask *string, cidr *string) {
+	flag.StringVar(ip, "ip", "", "IP address in dot notation (e.g., 192.168.1.1)")
+	flag.StringVar(netmask, "netmask", "", "Netmask in dot notation (e.g., 255.255.255.0)")
+	flag.StringVar(cidr, "cidr", "", "Network in CIDR notation (e.g., 192.168.1.0/24)")
+
+	flag.Parse()
+
+	if (*ip != "" && *netmask != "" && *cidr != "") || (*cidr == "" && (*ip == "" || *netmask == "")) {
+		fmt.Println("Please provide either both -ip <ip address> -netmask <netmask> or a -cidr <cidr>")
+		os.Exit(0)
+	}
+
+	if *cidr != "" {
+		*ip, *netmask = convertCIDRToIPNetmask(*cidr)
+		if *ip == "" || *netmask == "" {
+			fmt.Println("Invalid CIDR or ip and netmask")
+			os.Exit(0)
+		}
+	}
+}
+
 func main() {
 	var ip string
 	var netmask string
 	var cidr string
 
-	flag.StringVar(&ip, "ip", "", "IP address in dot notation (e.g., 192.168.1.1)")
-	flag.StringVar(&netmask, "netmask", "", "Netmask in dot notation (e.g., 255.255.255.0)")
-	flag.StringVar(&cidr, "cidr", "", "Network in CIDR notation (e.g., 192.168.1.0/24)")
-
-	flag.Parse()
-
-	if (ip != "" && netmask != "" && cidr != "") || (cidr == "" && (ip == "" || netmask == "")) {
-		fmt.Println("Please provide either both -ip <ip address> -netmask <netmask> or a -cidr <cidr>")
-		return
-	}
-
-	if cidr != "" {
-		ip, netmask = convertCIDRToIPNetmask(cidr)
-		if ip == "" || netmask == "" {
-			fmt.Println("Invalid CIDR or ip and netmask")
-			os.Exit(1)
-		}
-	}
+	parseCLI(&ip, &netmask, &cidr)
 
 	ipU32 := converDotNotationToBinary(ip)
 	netmaskU32 := converDotNotationToBinary(netmask)
