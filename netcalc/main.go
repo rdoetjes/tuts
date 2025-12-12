@@ -81,19 +81,22 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 }
 
+func calcNetworkDetails(ip *string, netmask *string) {
+	ipU32 := converDotNotationToBinary(*ip)
+	netmaskU32 := converDotNotationToBinary(*netmask)
+	networkAddress, broadcastAddress := calculateNetworkAddress(ipU32, netmaskU32)
+
+	fmt.Printf("IP Address: %s Netmask: %s\n", *ip, *netmask)
+	fmt.Printf("Network Address: %s\n", u32UserToDotNotation(networkAddress))
+	fmt.Printf("Broadcast Address: %s\n", u32UserToDotNotation(broadcastAddress))
+	fmt.Printf("Number of usable hosts: %d\n", numberOfHosts(netmaskU32))
+}
+
 func main() {
 	var ip string
 	var netmask string
 	var cidr string
 
 	parseCLI(&ip, &netmask, &cidr)
-
-	ipU32 := converDotNotationToBinary(ip)
-	netmaskU32 := converDotNotationToBinary(netmask)
-	networkAddress, broadcastAddress := calculateNetworkAddress(ipU32, netmaskU32)
-
-	fmt.Printf("IP Address: %s Netmask: %s\n", ip, netmask)
-	fmt.Printf("Network Address: %s\n", u32UserToDotNotation(networkAddress))
-	fmt.Printf("Broadcast Address: %s\n", u32UserToDotNotation(broadcastAddress))
-	fmt.Printf("Number of usable hosts: %d\n", numberOfHosts(netmaskU32))
+	calcNetworkDetails(&ip, &netmask)
 }
