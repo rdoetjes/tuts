@@ -24,6 +24,7 @@ By exploring these topics in Go, students gain both theoretical understanding an
 Go is well-suited for teaching these concepts because of its:  
 - Clean and readable syntax but lower level than Python 
 - Strong emphasis on low-level operations  
+- Demonstration of pointers and dereferencing pointers (transferable to C/C++)
 
 ## How to Use
 
