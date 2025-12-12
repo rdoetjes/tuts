@@ -7,7 +7,7 @@ The project demonstrates how bit manipulation can be used to perform common netw
 ## What This Program Teaches
 
 ### 🔹 Bitwise Operations  
-Students will learn how operators like **AND**, **OR**, **NOT**, and bit shifting are used to manipulate binary data. These examples show how bitwise logic forms the foundation of low-level computing and networking.
+Students will learn how operators like **AND**, **OR**, **NOT**,**SHL**, **SHR**  and bit shifting are used to manipulate binary data. These examples show how bitwise logic forms the foundation of low-level computing and networking.
 
 ### 🔹 Network Calculations  
 The program includes demonstrations of:  
