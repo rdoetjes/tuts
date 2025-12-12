@@ -22,10 +22,8 @@ By exploring these topics in Go, students gain both theoretical understanding an
 ## Why Go?
 
 Go is well-suited for teaching these concepts because of its:  
-- Clean and readable syntax  
-- Powerful standard library  
-- Strong emphasis on performance and low-level operations  
-- Built-in support for network-related features  
+- Clean and readable syntax but lower level than Python 
+- Strong emphasis on low-level operations  
 
 ## How to Use
 
