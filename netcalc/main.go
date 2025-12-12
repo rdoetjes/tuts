@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"phonax.com/netcalc/helpers"
+	calc "phonax.com/netcalc/lib"
 )
 
 /*
@@ -24,7 +24,7 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 
 	if *cidr != "" {
-		*ip, *netmask = helpers.ConvertCIDRToIPNetmask(*cidr)
+		*ip, *netmask = calc.ConvertCIDRToIPNetmask(*cidr)
 		if *ip == "" || *netmask == "" {
 			fmt.Println("Invalid CIDR or ip and netmask")
 			os.Exit(0)
@@ -36,14 +36,14 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
  * Just calls the calculation functions and prints the output
  */
 func calcNetworkDetails(ip *string, netmask *string) {
-	ipU32 := helpers.ConvertDotNotationToUInt32(*ip)
-	netmaskU32 := helpers.ConvertDotNotationToUInt32(*netmask)
-	networkAddress, broadcastAddress := helpers.CalculateNetworkAddress(ipU32, netmaskU32)
+	ipU32 := calc.ConvertDotNotationToUInt32(*ip)
+	netmaskU32 := calc.ConvertDotNotationToUInt32(*netmask)
+	networkAddress, broadcastAddress := calc.CalculateNetworkAddress(ipU32, netmaskU32)
 
 	fmt.Printf("IP Address: %s Netmask: %s\n", *ip, *netmask)
-	fmt.Printf("Network Address: %s\n", helpers.U32UserToDotNotation(networkAddress))
-	fmt.Printf("Broadcast Address: %s\n", helpers.U32UserToDotNotation(broadcastAddress))
-	fmt.Printf("Number of usable hosts: %d\n", helpers.NumberOfHosts(netmaskU32))
+	fmt.Printf("Network Address: %s\n", calc.U32UserToDotNotation(networkAddress))
+	fmt.Printf("Broadcast Address: %s\n", calc.U32UserToDotNotation(broadcastAddress))
+	fmt.Printf("Number of usable hosts: %d\n", calc.NumberOfHosts(netmaskU32))
 }
 
 func main() {
