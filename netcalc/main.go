@@ -36,7 +36,6 @@ func u32UserToDotNotation(ip uint32) string {
 func calculateNetworkAddress(ipU32 uint32, netmaskU32 uint32) (uint32, uint32) {
 	networkAddress := ipU32 & netmaskU32
 	broadcastAddress := networkAddress | ^netmaskU32
-
 	return networkAddress, broadcastAddress
 }
 
@@ -59,7 +58,6 @@ func convertCIDRToIPNetmask(cidr string) (string, string) {
 	}
 
 	var mask uint32 = ^uint32(0) << (32 - prefixLength)
-
 	return u32UserToDotNotation(ipU32), u32UserToDotNotation(mask)
 }
 
