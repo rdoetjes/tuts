@@ -15,7 +15,6 @@ func converDotNotationToBinary(ip string) uint32 {
 	}
 
 	var u32Ip uint32 = 0
-
 	for _, octet := range octets {
 		num, _ := strconv.Atoi(octet)
 		u32Ip = (u32Ip << 8) | uint32(num)
