@@ -70,15 +70,14 @@ func U32UserToDotNotation(ip uint32) string {
 }
 
 /*
- * CalculateNetworkAddress computes the network and broadcast addresses using bitwise operations.
+ * CalculateNetworkAddress computes the network address using bitwise operations.
  *
  * Parameters:
  *   - ipU32: The IP address as a 32-bit unsigned integer.
  *   - netmaskU32: The netmask as a 32-bit unsigned integer.
  *
  * Returns:
- *   - networkAddress: The network address as a 32-bit unsigned integer.
- *   - broadcastAddress: The broadcast address as a 32-bit unsigned integer.
+ *   The network address as a 32-bit unsigned integer.
  *
  * Calculation:
  *   - Network address is calculated using a bitwise AND between the IP address and netmask:
@@ -86,17 +85,31 @@ func U32UserToDotNotation(ip uint32) string {
  *        IP:           10.10.10.0   => 00001010.00001010.00001010.00000000
  *        Netmask:     255.255.254.0 => 11111111.11111111.11111110.00000000
  *        Network Addr:              => 00001010.00001010.00001010.00000000 (10.10.10.0)
+ */
+func CalculateNetworkAddress(ipU32 uint32, netmaskU32 uint32) uint32 {
+	return ipU32 & netmaskU32
+}
+
+/*
+ * CalculateBroadcastAddress computes the broadcast address using bitwise operations.
  *
- *   - Broadcast address is calculated by inverting the netmask and performing a bitwise OR with the network address:
+ * Parameters:
+ *   - ipU32: The IP address as a 32-bit unsigned integer.
+ *   - netmaskU32: The netmask as a 32-bit unsigned integer.
+ *
+ * Returns:
+ *   The broadcast address as a 32-bit unsigned integer.
+ *
+ * Calculation:
+ *   - The broadcast address is calculated by inverting the netmask and performing a bitwise OR with the network address.
  *     Example:
  *        Network Addr:              => 00001010.00001010.00001010.00000000
  *        Inverted Netmask:          => 00000000.00000000.00000001.11111111
  *        Broadcast Addr:            => 00001010.00001010.00001011.11111111 (10.10.11.255)
  */
-func CalculateNetworkAddress(ipU32 uint32, netmaskU32 uint32) (uint32, uint32) {
-	networkAddress := ipU32 & netmaskU32
-	broadcastAddress := networkAddress | ^netmaskU32
-	return networkAddress, broadcastAddress
+func CalculateBroadcastAddress(ipU32 uint32, netmaskU32 uint32) uint32 {
+	networkAddress := CalculateNetworkAddress(ipU32, netmaskU32)
+	return networkAddress | ^netmaskU32
 }
 
 /*
