@@ -38,7 +38,8 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 func calcNetworkDetails(ip *string, netmask *string) {
 	ipU32 := calc.ConvertDotNotationToUInt32(*ip)
 	netmaskU32 := calc.ConvertDotNotationToUInt32(*netmask)
-	networkAddress, broadcastAddress := calc.CalculateNetworkAddress(ipU32, netmaskU32)
+	networkAddress := calc.CalculateNetworkAddress(ipU32, netmaskU32)
+	broadcastAddress := calc.CalculateBroadcastAddress(ipU32, netmaskU32)
 
 	fmt.Printf("IP Address: %s Netmask: %s\n", *ip, *netmask)
 	fmt.Printf("Network Address: %s\n", calc.U32UserToDotNotation(networkAddress))
