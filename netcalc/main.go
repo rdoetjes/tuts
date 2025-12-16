@@ -42,6 +42,11 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 }
 
+/*
+ * if the resuly from the ConverDotNotationToUint32 is 0 then it means
+ * something is not right the octet format for example range does not match
+ * In that case print the error and exit with error code 1
+ */
 func checkDotNotationResult(s uint32, err string) {
 	if s == 0 {
 		fmt.Println(err)
