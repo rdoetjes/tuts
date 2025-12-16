@@ -2,9 +2,20 @@ package lib
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
+
+func isValidIpOctet(sOctet string) bool {
+	octet := `(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`
+	regex := `^(` + octet + `\.){3}` + octet + `$`
+	match, err := regexp.MatchString(regex, sOctet)
+	if err != nil || !match {
+		return false
+	}
+	return match
+}
 
 /*
  * ConvertDotNotationToUInt32 converts an IP address from dot notation (e.g., "192.168.1.1") to a 32-bit unsigned integer using bitwise operations.
@@ -27,11 +38,11 @@ import (
  *   - Shift and combine into a 32-bit integer.
  */
 func ConvertDotNotationToUInt32(ip string) uint32 {
-	octets := strings.Split(ip, ".")
-	if len(octets) != 4 {
+	if !isValidIpOctet(ip) {
 		return 0
 	}
 
+	octets := strings.Split(ip, ".")
 	var u32Ip uint32 = 0
 	for _, octet := range octets {
 		num, _ := strconv.Atoi(octet)
@@ -133,6 +144,20 @@ func NumberOfHosts(netmaskU32 uint32) uint32 {
 	return hostBits - 1
 }
 
+func isValidCIDR(cidr string) bool {
+	// Define octet validation
+	octet := `(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`
+	// Construct the regex for CIDR notation
+	regex := `^(` + octet + `\.){3}` + octet + `/([0-9]|[1-2][0-9]|3[0-2])$`
+	// Validate CIDR using the regex
+	match, err := regexp.MatchString(regex, cidr)
+	if err != nil {
+		return false
+	}
+
+	return match
+}
+
 /*
  * ConvertCIDRToIPNetmask converts a CIDR notation string to an IP address and its corresponding netmask in dot-decimal notation.
  *
@@ -156,15 +181,15 @@ func NumberOfHosts(netmaskU32 uint32) uint32 {
  *   - Converts both the IP and netmask integers back to dot-decimal notation.
  */
 func ConvertCIDRToIPNetmask(cidr string) (string, string) {
-	parts := strings.Split(cidr, "/")
-	if len(parts) != 2 {
+	if !isValidCIDR(cidr) {
 		return "", ""
 	}
+
+	parts := strings.Split(cidr, "/")
 
 	ipU32 := ConvertDotNotationToUInt32(parts[0])
 	prefixLength, err := strconv.Atoi(parts[1])
 	if err != nil || prefixLength < 0 || prefixLength > 32 {
-		fmt.Println("Invalid prefix length")
 		return "", ""
 	}
 

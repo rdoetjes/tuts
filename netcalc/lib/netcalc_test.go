@@ -12,9 +12,9 @@ func TestConvertIpToBinary(t *testing.T) {
 	result := ConvertDotNotationToUInt32(ip)
 
 	if result != expected {
-		fmt.Printf("Test failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+		fmt.Printf("Test 1: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
-		fmt.Println("Test passed for ConvertDotNotationToUInt32")
+		fmt.Println("Test 1: passed for ConvertDotNotationToUInt32")
 	}
 
 	ip = "10.10.10.10"
@@ -22,9 +22,27 @@ func TestConvertIpToBinary(t *testing.T) {
 	result = ConvertDotNotationToUInt32(ip)
 
 	if result != expected {
-		fmt.Printf("Test failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+		fmt.Printf("Test 2: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
-		fmt.Println("Test passed for ConvertDotNotationToUInt32")
+		fmt.Println("Test 2: passed for ConvertDotNotationToUInt32")
+	}
+
+	ip = "1234.123.123.123"
+	expected = 0
+	result = ConvertDotNotationToUInt32(ip)
+	if result != expected {
+		fmt.Printf("Test 3: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+	} else {
+		fmt.Println("Test 3: passed ConvertDotNotationToUInt32")
+	}
+
+	ip = "123.123.123"
+	expected = 0
+	result = ConvertDotNotationToUInt32(ip)
+	if result != expected {
+		fmt.Printf("Test 4: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+	} else {
+		fmt.Println("Test 4: passed ConvertDotNotationToUInt32")
 	}
 }
 
@@ -58,9 +76,21 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 	result_ip, result_netmask := ConvertCIDRToIPNetmask(cidr)
 
 	if result_ip != expected_ip || result_netmask != expected_netmask {
-		fmt.Printf("Test failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
+		fmt.Printf("Test 1: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
 	} else {
-		fmt.Println("Test passed for ConvertCIDRToIPNetmask")
+		fmt.Println("Test 1: passed for ConvertCIDRToIPNetmask")
+	}
+
+	cidr = "192.168.1782.0/242"
+	expected_ip = ""
+	expected_netmask = ""
+
+	result_ip, result_netmask = ConvertCIDRToIPNetmask(cidr)
+
+	if result_ip != expected_ip || result_netmask != expected_netmask {
+		fmt.Printf("Input 2: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
+	} else {
+		fmt.Println("Test 2: passed for ConvertCIDRToIPNetmask")
 	}
 }
 
