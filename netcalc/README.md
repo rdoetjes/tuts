@@ -39,7 +39,7 @@ The command make test implicitely call make build, to create the binary for the 
 Clone the repository and run the program:
 
 ```bash
-bin/netcalc -cidr 192.168.1.1/24
+netcalc -cidr 192.168.1.1/24
 or
-bin/netcalc -ip 192.168.1.1 -netmask 255.255.255.0
+netcalc -ip 192.168.1.1 -netmask 255.255.255.0
 ```
