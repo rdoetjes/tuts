@@ -7,6 +7,35 @@ import (
 	"strings"
 )
 
+/* Private helper function as it's used in the exported functions.
+ *
+ * Checks to see if the values in a IPv4 octet lay between 0 and 255
+ *
+ * Returns true if that is the case false if a value is small than 0 or larger than 255
+ */
+func areOctetsValuesCorrect(s string) bool {
+	sOctets := strings.Split(s, ".")
+	for _, sOctet := range sOctets {
+		if x, err := strconv.Atoi(sOctet); err != nil || x < 0 || x > 255 {
+			return false
+		}
+	}
+	return true
+}
+
+/* Private helper function as it's used in the exported functions.
+ *
+ * Checks to see if the string value for the CIDR mask lays between 0 and e32
+ *
+ * Returns true if that is the case false if a value is small than 0 or larger than 32
+ */
+func isCIDRMaskCorrect(s string) bool {
+	if mask, err := strconv.Atoi(s); err != nil || mask < 0 || mask > 32 {
+		return false
+	}
+	return true
+}
+
 /*
 	isValidIpOrNetMask checks whether a given string represents a valid IPv4 octet.
 
@@ -34,12 +63,10 @@ func isValidIpOrNetMask(sOctet string) bool {
 		return false
 	}
 
-	sOctets := strings.Split(sOctet, ".")
-	for _, sOctet := range sOctets {
-		if x, err := strconv.Atoi(sOctet); err != nil || x < 0 || x > 255 {
-			return false
-		}
+	if !areOctetsValuesCorrect(sOctet) {
+		return false
 	}
+
 	return match
 }
 
@@ -204,15 +231,12 @@ func isValidCIDR(cidr string) bool {
 
 	parts := strings.Split(cidr, "/")
 
-	if mask, err := strconv.Atoi(parts[1]); err != nil || mask < 0 || mask > 32 {
+	if !isCIDRMaskCorrect(parts[1]) {
 		return false
 	}
 
-	sOctets := strings.Split(parts[0], ".")
-	for _, sOctet := range sOctets {
-		if x, err := strconv.Atoi(sOctet); err != nil || x < 0 || x > 255 {
-			return false
-		}
+	if !areOctetsValuesCorrect(parts[0]) {
+		return false
 	}
 
 	return match
