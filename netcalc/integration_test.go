@@ -31,6 +31,19 @@ func TestNetcalcIntegrationCorrectIp(t *testing.T) {
 	}
 }
 
+func TestNetcalcIntegrationCorrectCIDR(t *testing.T) {
+	output, _ := runCommand("-cidr", "192.168.10.139/22")
+
+	expectedOutput := "IP Address: 192.168.10.139 Netmask: 255.255.252.0\nNetwork Address: 192.168.8.0\nBroadcast Address: 192.168.11.255\nNumber of usable hosts: 1022\n"
+	actualOutput := string(output)
+
+	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {
+		t.Errorf("Integration test failed. Unexpected output: expected:\n%s\ngot:\n%s", expectedOutput, actualOutput)
+	} else {
+		t.Logf("Integration test passed")
+	}
+}
+
 func TestNetcalcIntegrationWrongIp(t *testing.T) {
 	output, _ := runCommand("-ip", "192.168.10.300", "-netmask", "255.255.252.0")
 

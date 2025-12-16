@@ -31,9 +31,11 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 
 	if *cidr != "" {
-		var err error
+		var err error = nil
 		*ip, *netmask, err = calc.ConvertCIDRToIPNetmask(*cidr)
-		handleError(err, err.Error())
+		if err != nil {
+			handleError(err, err.Error())
+		}
 	}
 }
 
