@@ -8,9 +8,7 @@ import (
 	calc "phonax.com/netcalc/lib"
 )
 
-/*
- * If an error occured print the error message and exit to os with exit code 1
- */
+// If an error occured print the error message and exit to os with exit code 1
 func handleError(err error, msg string) {
 	if err != nil {
 		fmt.Printf("%s\n", msg)
@@ -18,9 +16,7 @@ func handleError(err error, msg string) {
 	}
 }
 
-/*
- * Parse the CLI arguments make sure the input is correct, otherwise do not start
- */
+// Parse the CLI arguments make sure the input is correct, otherwise do not start
 func parseCLI(ip *string, netmask *string, cidr *string) {
 	flag.StringVar(ip, "ip", "", "IP address in dot notation (e.g., 192.168.1.1)")
 	flag.StringVar(netmask, "netmask", "", "Netmask in dot notation (e.g., 255.255.255.0)")
@@ -42,11 +38,9 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 }
 
-/*
- * if the resuly from the ConverDotNotationToUint32 is 0 then it means
- * something is not right the octet format for example range does not match
- * In that case print the error and exit with error code 1
- */
+// if the resuly from the ConverDotNotationToUint32 is 0 then it means
+// something is not right the octet format for example range does not match
+// In that case print the error and exit with error code 1
 func checkDotNotationResult(s uint32, err string) {
 	if s == 0 {
 		fmt.Println(err)
@@ -54,9 +48,7 @@ func checkDotNotationResult(s uint32, err string) {
 	}
 }
 
-/*
- * Just calls the calculation functions and prints the output
- */
+// Just calls the calculation functions and prints the output
 func calcNetworkDetails(ip *string, netmask *string) {
 	ipU32, err := calc.ConvertDotNotationToUInt32(*ip)
 	handleError(err, "IP Address incorrectly formatted, needs to be 4 octets 0-255")
