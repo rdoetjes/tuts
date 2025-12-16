@@ -12,9 +12,9 @@ func TestConvertIpToBinary(t *testing.T) {
 	result := ConvertDotNotationToUInt32(ip)
 
 	if result != expected {
-		fmt.Printf("Test 1: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+		t.Errorf("Test 1: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
-		fmt.Println("Test 1: passed for ConvertDotNotationToUInt32")
+		t.Log("Test 1: passed for ConvertDotNotationToUInt32")
 	}
 
 	ip = "10.10.10.10"
@@ -22,27 +22,27 @@ func TestConvertIpToBinary(t *testing.T) {
 	result = ConvertDotNotationToUInt32(ip)
 
 	if result != expected {
-		fmt.Printf("Test 2: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+		t.Errorf("Test 2: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
-		fmt.Println("Test 2: passed for ConvertDotNotationToUInt32")
+		t.Log("Test 2: passed ConvertDotNotationToUInt32")
 	}
 
 	ip = "1234.123.123.123"
 	expected = 0
 	result = ConvertDotNotationToUInt32(ip)
 	if result != expected {
-		fmt.Printf("Test 3: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+		t.Errorf("Test 3: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
-		fmt.Println("Test 3: passed ConvertDotNotationToUInt32")
+		t.Log("Test 3: passed ConvertDotNotationToUInt32")
 	}
 
 	ip = "123.123.123"
 	expected = 0
 	result = ConvertDotNotationToUInt32(ip)
 	if result != expected {
-		fmt.Printf("Test 4: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
+		t.Errorf("Test 4: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
-		fmt.Println("Test 4: passed ConvertDotNotationToUInt32")
+		t.Log("Test 4: passed ConvertDotNotationToUInt32")
 	}
 }
 
@@ -52,9 +52,9 @@ func TestConvertBinaryToIp(t *testing.T) {
 	result := U32UserToDotNotation(ipU32)
 
 	if result != expected {
-		fmt.Printf("Test failed for U32UserToDotNotation: expected %s, got %s\n", expected, result)
+		t.Errorf("1: Test failed for U32UserToDotNotation: expected %s, got %s\n", expected, result)
 	} else {
-		fmt.Println("Test passed for U32UserToDotNotation")
+		t.Log("1: Test passed for U32UserToDotNotation")
 	}
 
 	ipU32 = uint32(168430090)
@@ -62,9 +62,9 @@ func TestConvertBinaryToIp(t *testing.T) {
 	result = U32UserToDotNotation(ipU32)
 
 	if result != expected {
-		fmt.Printf("Test failed for U32UserToDotNotation: expected %s, got %s\n", expected, result)
+		t.Errorf("2: Test failed for U32UserToDotNotation: expected %s, got %s\n", expected, result)
 	} else {
-		fmt.Println("Test passed for U32UserToDotNotation")
+		t.Log("2: Test passed for U32UserToDotNotation")
 	}
 }
 
@@ -76,9 +76,9 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 	result_ip, result_netmask := ConvertCIDRToIPNetmask(cidr)
 
 	if result_ip != expected_ip || result_netmask != expected_netmask {
-		fmt.Printf("Test 1: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
+		t.Errorf("Test 1: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
 	} else {
-		fmt.Println("Test 1: passed for ConvertCIDRToIPNetmask")
+		t.Log("Test 1: passed for ConvertCIDRToIPNetmask")
 	}
 
 	cidr = "192.168.1782.0/242"
@@ -88,9 +88,9 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 	result_ip, result_netmask = ConvertCIDRToIPNetmask(cidr)
 
 	if result_ip != expected_ip || result_netmask != expected_netmask {
-		fmt.Printf("Input 2: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
+		t.Errorf("Input 2: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
 	} else {
-		fmt.Println("Test 2: passed for ConvertCIDRToIPNetmask")
+		t.Log("Test 2: passed for ConvertCIDRToIPNetmask")
 	}
 }
 
@@ -116,6 +116,6 @@ func TestCalculateBroadcastAddress(t *testing.T) {
 	if result != expected {
 		t.Errorf("Test failed for CalculateBroadcastAddress: expected %s, got %s\n", U32UserToDotNotation(expected), U32UserToDotNotation(result))
 	} else {
-		fmt.Println("Test passed for CalculateBroadcastAddress")
+		t.Log("Test passed for CalculateBroadcastAddress")
 	}
 }

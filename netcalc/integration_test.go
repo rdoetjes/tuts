@@ -40,7 +40,7 @@ func TestNetcalcIntegrationWrongIp(t *testing.T) {
 	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {
 		t.Errorf("Integration test failed. Unexpected output: expected:\n%s\ngot:\n%s", expectedOutput, actualOutput)
 	} else {
-		t.Logf("Integration test passed with output: %s", actualOutput)
+		t.Logf("Integration test passed")
 	}
 }
 
@@ -53,7 +53,7 @@ func TestNetcalcIntegrationWrongMask(t *testing.T) {
 	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {
 		t.Errorf("Integration test failed. Unexpected output: expected:\n%s\ngot:\n%s", expectedOutput, actualOutput)
 	} else {
-		t.Logf("Integration test passed with output: %s", actualOutput)
+		t.Log("Integration test passed")
 	}
 }
 
@@ -66,7 +66,7 @@ func TestNetcalcIntegrationWrongCidr(t *testing.T) {
 	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {
 		t.Errorf("1: Integration test failed. Unexpected output: expected:\n%s\ngot:\n%s", expectedOutput, actualOutput)
 	} else {
-		t.Logf("1: Integration test passed with output: %s", actualOutput)
+		t.Log("1: Integration test passed")
 	}
 
 	output, _ = runCommand("-cidr", "192.168.10.256/22")
@@ -77,6 +77,6 @@ func TestNetcalcIntegrationWrongCidr(t *testing.T) {
 	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {
 		t.Errorf("2: Integration test failed. Unexpected output: expected:\n%s\ngot:\n%s", expectedOutput, actualOutput)
 	} else {
-		t.Logf("2: Integration test passed with output: %s", actualOutput)
+		t.Log("2: Integration test passed")
 	}
 }
