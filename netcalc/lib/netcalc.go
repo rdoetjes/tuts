@@ -251,12 +251,12 @@ func isValidCIDR(cidr string) (bool, error) {
 
 	parts := strings.Split(cidr, "/")
 
-	if success, err := isCIDRMaskCorrect(parts[1]); err != nil || !success {
-		return false, fmt.Errorf("CIDR mask incorrect")
-	}
-
 	if success, err := areOctetsValuesCorrect(parts[0]); err != nil || !success {
 		return false, fmt.Errorf("IP Address incorrectly formatted, needs to be 4 octets 0-255")
+	}
+
+	if success, err := isCIDRMaskCorrect(parts[1]); err != nil || !success {
+		return false, fmt.Errorf("CIDR mask incorrect should be 0-32")
 	}
 
 	return match, nil

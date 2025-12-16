@@ -72,7 +72,7 @@ func TestNetcalcIntegrationWrongMask(t *testing.T) {
 
 func TestNetcalcIntegrationWrongCidr(t *testing.T) {
 	output, _ := runCommand("-cidr", "192.168.10.3/64")
-	expectedOutput := "CIDR mask incorrect"
+	expectedOutput := "CIDR mask incorrect should be 0-32"
 	actualOutput := string(output)
 
 	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {
