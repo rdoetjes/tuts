@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"testing"
 	//calc "phonax.com/netcalc/lib"
 )
@@ -103,7 +102,7 @@ func TestCalculateNetworkAddress(t *testing.T) {
 	if result != expected {
 		t.Errorf("Test failed for CalculateNetworkAddress: expected %s, got %s\n", U32UserToDotNotation(expected), U32UserToDotNotation(result))
 	} else {
-		fmt.Println("Test passed for CalculateNetworkAddress")
+		t.Log("Test passed for CalculateNetworkAddress")
 	}
 }
 
