@@ -46,7 +46,7 @@ The command make test implicitely call make build, to create the binary for the 
 
 ## How to Use
 
-Clone the repository and run the program:
+Clone the repository and build the solution (see above) then run the program:
 
 ```bash
 netcalc -cidr 192.168.1.1/24
