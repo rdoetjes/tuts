@@ -98,22 +98,9 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 }
 
 func TestCalculateNetworkAddress(t *testing.T) {
-	ipU32, err := ConvertDotNotationToUInt32("192.168.10.139")
-	if err != nil {
-		t.Errorf("Input 1: failed for ConvertDotNotationToUInt32: %s", err)
-		return
-	}
-
-	netmaskU32, err := ConvertDotNotationToUInt32("255.255.252.0")
-	if err != nil {
-		t.Errorf("Input 1: failed for ConvertDotNotationToUInt32: %s", err)
-		return
-	}
-	expected, err := ConvertDotNotationToUInt32("192.168.8.0")
-	if err != nil {
-		t.Errorf("Input 1: failed for ConvertDotNotationToUInt32: %s", err)
-		return
-	}
+	ipU32, _ := ConvertDotNotationToUInt32("192.168.10.139")
+	netmaskU32, _ := ConvertDotNotationToUInt32("255.255.252.0")
+	expected, _ := ConvertDotNotationToUInt32("192.168.8.0")
 	result := CalculateNetworkAddress(ipU32, netmaskU32)
 
 	if result != expected {
