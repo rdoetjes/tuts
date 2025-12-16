@@ -8,6 +8,9 @@ import (
 	calc "phonax.com/netcalc/lib"
 )
 
+/*
+ * If an error occured print the error message and exit to os with exit code 1
+ */
 func handleError(err error, msg string) {
 	if err != nil {
 		fmt.Printf("%s\n", msg)
