@@ -83,10 +83,10 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 	cidr = "192.168.1782.0/242"
 	expected_ip = ""
 	expected_netmask = ""
-
 	result_ip, result_netmask, err = ConvertCIDRToIPNetmask(cidr)
+	//should fail that is a successful test
 	if err != nil {
-		t.Errorf("Input 2: failed for ConvertCIDRToIPNetmask: %s", err)
+		t.Log("Test 2: success for ConvertCIDRToIPNetmask")
 		return
 	}
 

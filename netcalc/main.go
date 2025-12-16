@@ -8,6 +8,13 @@ import (
 	calc "phonax.com/netcalc/lib"
 )
 
+func handleError(err error, msg string) {
+	if err != nil {
+		fmt.Printf("%s\n", msg)
+		os.Exit(1)
+	}
+}
+
 /*
  * Parse the CLI arguments make sure the input is correct, otherwise do not start
  */
@@ -20,17 +27,13 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 
 	if (*ip != "" && *netmask != "" && *cidr != "") || (*cidr == "" && (*ip == "" || *netmask == "")) {
 		fmt.Println("Please provide either both -ip <ip address> -netmask <netmask> or a -cidr <cidr>")
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	if *cidr != "" {
 		var err error
 		*ip, *netmask, err = calc.ConvertCIDRToIPNetmask(*cidr)
-		conversionError(err)
-		if *ip == "" || *netmask == "" {
-			fmt.Println("Invalid CIDR")
-			os.Exit(0)
-		}
+		handleError(err, err.Error())
 	}
 }
 
@@ -41,23 +44,16 @@ func checkDotNotationResult(s uint32, err string) {
 	}
 }
 
-func conversionError(err error) {
-	if err != nil {
-		fmt.Printf("Conversion error occured: %v", err)
-		os.Exit(1)
-	}
-}
-
 /*
  * Just calls the calculation functions and prints the output
  */
 func calcNetworkDetails(ip *string, netmask *string) {
 	ipU32, err := calc.ConvertDotNotationToUInt32(*ip)
-	conversionError(err)
+	handleError(err, "IP Address incorrectly formatted, needs to be 4 octets 0-255")
 	checkDotNotationResult(ipU32, "IP Address incorrectly formatted, needs to be 4 octets 0-255")
 
 	netmaskU32, err := calc.ConvertDotNotationToUInt32(*netmask)
-	conversionError(err)
+	handleError(err, "Netmask incorrectly formatted, needs to be 4 octets 0-255")
 	checkDotNotationResult(netmaskU32, "Netmask incorrectly formatted, needs to be 4 octets 0-255")
 
 	networkAddress := calc.CalculateNetworkAddress(ipU32, netmaskU32)

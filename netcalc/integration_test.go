@@ -59,8 +59,7 @@ func TestNetcalcIntegrationWrongMask(t *testing.T) {
 
 func TestNetcalcIntegrationWrongCidr(t *testing.T) {
 	output, _ := runCommand("-cidr", "192.168.10.3/64")
-
-	expectedOutput := "Invalid CIDR"
+	expectedOutput := "CIDR mask incorrect"
 	actualOutput := string(output)
 
 	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {
@@ -70,8 +69,7 @@ func TestNetcalcIntegrationWrongCidr(t *testing.T) {
 	}
 
 	output, _ = runCommand("-cidr", "192.168.10.256/22")
-
-	expectedOutput = "Invalid CIDR"
+	expectedOutput = "IP Address incorrectly formatted, needs to be 4 octets 0-255"
 	actualOutput = string(output)
 
 	if strings.TrimSpace(actualOutput) != strings.TrimSpace(expectedOutput) {

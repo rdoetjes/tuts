@@ -241,18 +241,22 @@ func isValidCIDR(cidr string) (bool, error) {
 	regex := `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}$`
 	match, err := regexp.MatchString(regex, cidr)
 
-	if err != nil || !match {
+	if err != nil {
 		return false, err
+	}
+
+	if !match {
+		return false, fmt.Errorf("Invalid CIDR format 192.168.178.12/24")
 	}
 
 	parts := strings.Split(cidr, "/")
 
 	if success, err := isCIDRMaskCorrect(parts[1]); err != nil || !success {
-		return false, err
+		return false, fmt.Errorf("CIDR mask incorrect")
 	}
 
 	if success, err := areOctetsValuesCorrect(parts[0]); err != nil || !success {
-		return false, err
+		return false, fmt.Errorf("IP Address incorrectly formatted, needs to be 4 octets 0-255")
 	}
 
 	return match, nil
@@ -299,7 +303,7 @@ func ConvertCIDRToIPNetmask(cidr string) (string, string, error) {
 	}
 
 	if prefixLength < 0 || prefixLength > 32 {
-		return "", "", fmt.Errorf("invalid CIDR prefix length")
+		return "", "", fmt.Errorf("invalid CIDR mask length")
 	}
 
 	var mask uint32 = ^uint32(0) << (32 - prefixLength)
