@@ -28,11 +28,18 @@ Example:
 	isValid will be false because an octet must lay between 0-255.
 */
 func isValidIpOctet(sOctet string) bool {
-	octet := `(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`
-	regex := `^(` + octet + `\.){3}` + octet + `$`
+
+	regex := `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$`
 	match, err := regexp.MatchString(regex, sOctet)
 	if err != nil || !match {
 		return false
+	}
+
+	sOctets := strings.Split(sOctet, ".")
+	for _, sOctet := range sOctets {
+		if x, err := strconv.Atoi(sOctet); err != nil || x < 0 || x > 255 {
+			return false
+		}
 	}
 	return match
 }
@@ -190,14 +197,23 @@ Example:
 	isValid will be false because the octet 256 is out of range.
 */
 func isValidCIDR(cidr string) bool {
-	// Define octet validation
-	octet := `(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`
-	// Construct the regex for CIDR notation
-	regex := `^(` + octet + `\.){3}` + octet + `/([0-9]|[1-2][0-9]|3[0-2])$`
-	// Validate CIDR using the regex
+	regex := `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}$`
 	match, err := regexp.MatchString(regex, cidr)
-	if err != nil {
+	if err != nil || !match {
 		return false
+	}
+
+	parts := strings.Split(cidr, "/")
+
+	if mask, err := strconv.Atoi(parts[1]); err != nil || mask < 0 || mask > 32 {
+		return false
+	}
+
+	sOctets := strings.Split(parts[0], ".")
+	for _, sOctet := range sOctets {
+		if x, err := strconv.Atoi(sOctet); err != nil || x < 0 || x > 255 {
+			return false
+		}
 	}
 
 	return match
