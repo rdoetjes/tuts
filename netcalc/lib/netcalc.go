@@ -286,7 +286,7 @@ func isValidCIDR(cidr string) (bool, error) {
  *   - Converts both the IP and netmask integers back to dot-decimal notation.
  */
 func ConvertCIDRToIPNetmask(cidr string) (string, string, error) {
-	if succces, err := isValidCIDR(cidr); err != nil || !succces {
+	if succcess, err := isValidCIDR(cidr); err != nil || !succcess {
 		return "", "", err
 	}
 
