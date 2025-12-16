@@ -13,7 +13,7 @@ func TestNetcalcIntegration(t *testing.T) {
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		t.Fatalf("Failed to execute netcalc: %v", err)
+		t.Fatalf("Integration test failed to execute netcalc: %v", err)
 	}
 
 	expectedOutput := "IP Address: 192.168.10.139 Netmask: 255.255.252.0\nNetwork Address: 192.168.8.0\nBroadcast Address: 192.168.11.255\nNumber of usable hosts: 1022\n"
