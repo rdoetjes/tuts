@@ -4,6 +4,8 @@ This Go program is designed as an educational tool to help students understand *
 
 The project demonstrates how bit manipulation can be used to perform common networking tasks, such as calculating subnet masks, determining network and broadcast addresses, and understanding how IP addressing works behind the scenes.
 
+Also the project shows unit tests and leans on the dry and single purpose functions principles
+
 ## What This Program Teaches
 
 ### 🔹 Bitwise Operations  
