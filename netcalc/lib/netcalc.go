@@ -8,7 +8,7 @@ import (
 )
 
 /*
-	isValidIpOctet checks whether a given string represents a valid IPv4 octet.
+	isValidIpOrNetMask checks whether a given string represents a valid IPv4 octet.
 
 The function evaluates if the provided string `sOctet` is a string that consists of
 4 octets between 0-255 so 0-255.0-255.0-255.0-255
@@ -21,14 +21,13 @@ Returns:
 
 Example:
 
-	isValid := isValidIpOctet("192.12.14.15")
+	isValid := isValidIpOrNetMask("192.12.14.15")
 	isValid will be true because is a valid IPv4 octet.
 
-	isValid := isValidIpOctet("192.12.1422.15")
+	isValid := isValidIpOrNetMask("192.12.1422.15")
 	isValid will be false because an octet must lay between 0-255.
 */
-func isValidIpOctet(sOctet string) bool {
-
+func isValidIpOrNetMask(sOctet string) bool {
 	regex := `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$`
 	match, err := regexp.MatchString(regex, sOctet)
 	if err != nil || !match {
@@ -65,7 +64,7 @@ func isValidIpOctet(sOctet string) bool {
  *   - Shift and combine into a 32-bit integer.
  */
 func ConvertDotNotationToUInt32(ip string) uint32 {
-	if !isValidIpOctet(ip) {
+	if !isValidIpOrNetMask(ip) {
 		return 0
 	}
 
