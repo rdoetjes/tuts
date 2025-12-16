@@ -27,10 +27,20 @@ Go is well-suited for teaching these concepts because of its:
 - Demonstration of pointers and dereferencing pointers (transferable to C/C++)
 
 ## Building the project
+
+### Unix like systems (like real men use)
 ```
 make test
 sudo make install
 ```
+
+### Windows systems like systems (like soyboys use)
+Open a CMD Window that you run as Administrator!!!
+```
+make test
+make install
+```
+
 
 The command make test implicitely call make build, to create the binary for the integration tests; that way you can avoid calling make build explictely.
 

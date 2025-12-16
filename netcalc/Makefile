@@ -9,8 +9,18 @@ test:
 	go test ./... -v -count=1|| exit 1
 
 install:
+ifeq ($(OS), Windows_NT)
+	if exist bin\netcalc.exe (
+		copy bin\netcalc.exe C:\Windows\System32\
+	) else (
+		$(MAKE) build
+		copy bin\netcalc.exe C:\Windows\System32\
+	)
+else
 	if [ -f ./bin/netcalc ]; then \
 		cp bin/netcalc /usr/local/bin/; \
 	else \
-		echo "Run make before running make install"; \
+		$(MAKE) build; \
+		cp bin/netcalc /usr/local/bin/; \
 	fi
+endif
