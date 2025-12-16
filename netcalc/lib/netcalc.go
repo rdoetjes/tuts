@@ -7,6 +7,26 @@ import (
 	"strings"
 )
 
+/*
+	isValidIpOctet checks whether a given string represents a valid IPv4 octet.
+
+The function evaluates if the provided string `sOctet` is a string that consists of
+4 octets between 0-255 so 0-255.0-255.0-255.0-255
+
+Parameters:
+  - sOctet: A string representing the 4 octets value to be checked.
+
+Returns:
+  - A boolean: True if the `sOctet` is a IPv4 address or subnetmask, otherwise false.
+
+Example:
+
+	isValid := isValidIpOctet("192.12.14.15")
+	isValid will be true because is a valid IPv4 octet.
+
+	isValid := isValidIpOctet("192.12.1422.15")
+	isValid will be false because an octet must lay between 0-255.
+*/
 func isValidIpOctet(sOctet string) bool {
 	octet := `(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`
 	regex := `^(` + octet + `\.){3}` + octet + `$`
@@ -144,6 +164,31 @@ func NumberOfHosts(netmaskU32 uint32) uint32 {
 	return hostBits - 1
 }
 
+/*
+	isValidCIDR checks whether a given string represents a valid CIDR notation.
+
+The function assesses if the `cidr` string is a valid representation of CIDR
+notation, consisting of a valid IPv4 address followed by a slash and a valid
+prefix length (0-32). It uses a regex pattern to perform this validation.
+
+Parameters:
+  - cidr: A string representing the CIDR notation to be validated.
+
+Returns:
+  - A boolean: True if the provided `cidr` is a valid CIDR notation; otherwise, false.
+
+The function verifies:
+  - The IPv4 address part consists of four octets, each ranging from 0 to 255.
+  - The CIDR prefix length is a number between 0 and 32 inclusive.
+
+Example:
+
+	isValid := isValidCIDR("192.168.1.0/24")
+	isValid will be true because "192.168.1.0/24" is a valid CIDR notation.
+
+	isValid := isValidCIDR("256.100.100.0/24")
+	isValid will be false because the octet 256 is out of range.
+*/
 func isValidCIDR(cidr string) bool {
 	// Define octet validation
 	octet := `(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)`
