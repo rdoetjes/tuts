@@ -24,7 +24,10 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 
 	if *cidr != "" {
-		if *ip, *netmask = calc.ConvertCIDRToIPNetmask(*cidr); *ip == "" || *netmask == "" {
+		var err error
+		*ip, *netmask, err = calc.ConvertCIDRToIPNetmask(*cidr)
+		conversionError(err)
+		if *ip == "" || *netmask == "" {
 			fmt.Println("Invalid CIDR")
 			os.Exit(0)
 		}
@@ -38,14 +41,23 @@ func checkDotNotationResult(s uint32, err string) {
 	}
 }
 
+func conversionError(err error) {
+	if err != nil {
+		fmt.Printf("Conversion error occured: %v", err)
+		os.Exit(1)
+	}
+}
+
 /*
  * Just calls the calculation functions and prints the output
  */
 func calcNetworkDetails(ip *string, netmask *string) {
-	ipU32 := calc.ConvertDotNotationToUInt32(*ip)
+	ipU32, err := calc.ConvertDotNotationToUInt32(*ip)
+	conversionError(err)
 	checkDotNotationResult(ipU32, "IP Address incorrectly formatted, needs to be 4 octets 0-255")
 
-	netmaskU32 := calc.ConvertDotNotationToUInt32(*netmask)
+	netmaskU32, err := calc.ConvertDotNotationToUInt32(*netmask)
+	conversionError(err)
 	checkDotNotationResult(netmaskU32, "Netmask incorrectly formatted, needs to be 4 octets 0-255")
 
 	networkAddress := calc.CalculateNetworkAddress(ipU32, netmaskU32)

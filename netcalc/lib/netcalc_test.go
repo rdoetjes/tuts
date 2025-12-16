@@ -8,9 +8,9 @@ import (
 func TestConvertIpToBinary(t *testing.T) {
 	ip := "255.255.255.255"
 	expected := uint32(4294967295)
-	result := ConvertDotNotationToUInt32(ip)
+	result, err := ConvertDotNotationToUInt32(ip)
 
-	if result != expected {
+	if result != expected || err != nil {
 		t.Errorf("Test 1: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
 		t.Log("Test 1: passed for ConvertDotNotationToUInt32")
@@ -18,9 +18,9 @@ func TestConvertIpToBinary(t *testing.T) {
 
 	ip = "10.10.10.10"
 	expected = uint32(168430090)
-	result = ConvertDotNotationToUInt32(ip)
+	result, err = ConvertDotNotationToUInt32(ip)
 
-	if result != expected {
+	if result != expected || err != nil {
 		t.Errorf("Test 2: failed for ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
 		t.Log("Test 2: passed ConvertDotNotationToUInt32")
@@ -28,8 +28,8 @@ func TestConvertIpToBinary(t *testing.T) {
 
 	ip = "1234.123.123.123"
 	expected = 0
-	result = ConvertDotNotationToUInt32(ip)
-	if result != expected {
+	result, err = ConvertDotNotationToUInt32(ip)
+	if result != expected || err != nil {
 		t.Errorf("Test 3: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
 		t.Log("Test 3: passed ConvertDotNotationToUInt32")
@@ -37,8 +37,8 @@ func TestConvertIpToBinary(t *testing.T) {
 
 	ip = "123.123.123"
 	expected = 0
-	result = ConvertDotNotationToUInt32(ip)
-	if result != expected {
+	result, err = ConvertDotNotationToUInt32(ip)
+	if result != expected || err != nil {
 		t.Errorf("Test 4: failed ConvertDotNotationToUInt32: expected %d, got %d\n", expected, result)
 	} else {
 		t.Log("Test 4: passed ConvertDotNotationToUInt32")
@@ -72,9 +72,9 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 	expected_ip := "192.168.178.0"
 	expected_netmask := "255.255.255.0"
 
-	result_ip, result_netmask := ConvertCIDRToIPNetmask(cidr)
+	result_ip, result_netmask, err := ConvertCIDRToIPNetmask(cidr)
 
-	if result_ip != expected_ip || result_netmask != expected_netmask {
+	if result_ip != expected_ip || result_netmask != expected_netmask || err != nil {
 		t.Errorf("Test 1: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
 	} else {
 		t.Log("Test 1: passed for ConvertCIDRToIPNetmask")
@@ -84,7 +84,11 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 	expected_ip = ""
 	expected_netmask = ""
 
-	result_ip, result_netmask = ConvertCIDRToIPNetmask(cidr)
+	result_ip, result_netmask, err = ConvertCIDRToIPNetmask(cidr)
+	if err != nil {
+		t.Errorf("Input 2: failed for ConvertCIDRToIPNetmask: %s", err)
+		return
+	}
 
 	if result_ip != expected_ip || result_netmask != expected_netmask {
 		t.Errorf("Input 2: failed for ConvertCIDRToIPNetmask: expected %s %s, got %s %s\n", expected_ip, expected_netmask, result_ip, result_netmask)
@@ -94,9 +98,22 @@ func TestConvCidrToIpNetmask(t *testing.T) {
 }
 
 func TestCalculateNetworkAddress(t *testing.T) {
-	ipU32 := ConvertDotNotationToUInt32("192.168.10.139")
-	netmaskU32 := ConvertDotNotationToUInt32("255.255.252.0")
-	expected := ConvertDotNotationToUInt32("192.168.8.0")
+	ipU32, err := ConvertDotNotationToUInt32("192.168.10.139")
+	if err != nil {
+		t.Errorf("Input 1: failed for ConvertDotNotationToUInt32: %s", err)
+		return
+	}
+
+	netmaskU32, err := ConvertDotNotationToUInt32("255.255.252.0")
+	if err != nil {
+		t.Errorf("Input 1: failed for ConvertDotNotationToUInt32: %s", err)
+		return
+	}
+	expected, err := ConvertDotNotationToUInt32("192.168.8.0")
+	if err != nil {
+		t.Errorf("Input 1: failed for ConvertDotNotationToUInt32: %s", err)
+		return
+	}
 	result := CalculateNetworkAddress(ipU32, netmaskU32)
 
 	if result != expected {
@@ -107,9 +124,9 @@ func TestCalculateNetworkAddress(t *testing.T) {
 }
 
 func TestCalculateBroadcastAddress(t *testing.T) {
-	ipU32 := ConvertDotNotationToUInt32("192.168.10.139")
-	netmaskU32 := ConvertDotNotationToUInt32("255.255.252.0")
-	expected := ConvertDotNotationToUInt32("192.168.11.255")
+	ipU32, _ := ConvertDotNotationToUInt32("192.168.10.139")
+	netmaskU32, _ := ConvertDotNotationToUInt32("255.255.252.0")
+	expected, _ := ConvertDotNotationToUInt32("192.168.11.255")
 	result := CalculateBroadcastAddress(ipU32, netmaskU32)
 
 	if result != expected {

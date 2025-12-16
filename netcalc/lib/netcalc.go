@@ -13,14 +13,15 @@ import (
  *
  * Returns true if that is the case false if a value is small than 0 or larger than 255
  */
-func areOctetsValuesCorrect(s string) bool {
+func areOctetsValuesCorrect(s string) (bool, error) {
 	sOctets := strings.Split(s, ".")
 	for _, sOctet := range sOctets {
-		if x, err := strconv.Atoi(sOctet); err != nil || x < 0 || x > 255 {
-			return false
+		x, err := strconv.Atoi(sOctet)
+		if err != nil || !isValueInRange(x, 0, 255) {
+			return false, err
 		}
 	}
-	return true
+	return true, nil
 }
 
 /* Private helper function as it's used in the exported functions.
@@ -29,11 +30,19 @@ func areOctetsValuesCorrect(s string) bool {
  *
  * Returns true if that is the case false if a value is small than 0 or larger than 32
  */
-func isCIDRMaskCorrect(s string) bool {
-	if mask, err := strconv.Atoi(s); err != nil || mask < 0 || mask > 32 {
-		return false
+func isCIDRMaskCorrect(s string) (bool, error) {
+	mask, err := strconv.Atoi(s)
+	if err != nil {
+		return false, err
 	}
-	return true
+	return isValueInRange(mask, 0, 32), nil
+}
+
+/*
+ * Check the value to be in a predetermined range
+ */
+func isValueInRange(value, min, max int) bool {
+	return value >= min && value <= max
 }
 
 /*
@@ -56,18 +65,20 @@ Example:
 	isValid := isValidIpOrNetMask("192.12.1422.15")
 	isValid will be false because an octet must lay between 0-255.
 */
-func isValidIpOrNetMask(sOctet string) bool {
+func isValidIpOrNetMask(sOctet string) (bool, error) {
 	regex := `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$`
+
+	success, err := areOctetsValuesCorrect(sOctet)
+	if err != nil || !success {
+		return false, err
+	}
+
 	match, err := regexp.MatchString(regex, sOctet)
-	if err != nil || !match {
-		return false
+	if err != nil {
+		return false, err
 	}
 
-	if !areOctetsValuesCorrect(sOctet) {
-		return false
-	}
-
-	return match
+	return match, nil
 }
 
 /*
@@ -90,19 +101,22 @@ func isValidIpOrNetMask(sOctet string) bool {
  *   - Convert each octet to an integer.
  *   - Shift and combine into a 32-bit integer.
  */
-func ConvertDotNotationToUInt32(ip string) uint32 {
-	if !isValidIpOrNetMask(ip) {
-		return 0
+func ConvertDotNotationToUInt32(ip string) (uint32, error) {
+	if success, err := isValidIpOrNetMask(ip); err != nil || !success {
+		return 0, err
 	}
 
 	octets := strings.Split(ip, ".")
 	var u32Ip uint32 = 0
 	for _, octet := range octets {
-		num, _ := strconv.Atoi(octet)
+		num, err := strconv.Atoi(octet)
+		if err != nil {
+			return 0, fmt.Errorf("invalid octet %s: %v", octet, err)
+		}
 		u32Ip = (u32Ip << 8) | uint32(num)
 	}
 
-	return u32Ip
+	return u32Ip, nil
 }
 
 /*
@@ -209,6 +223,7 @@ Parameters:
 
 Returns:
   - A boolean: True if the provided `cidr` is a valid CIDR notation; otherwise, false.
+  - an error: returns in case of regexp errors or Atoi conversion errors bubbling up from checks
 
 The function verifies:
   - The IPv4 address part consists of four octets, each ranging from 0 to 255.
@@ -222,24 +237,25 @@ Example:
 	isValid := isValidCIDR("256.100.100.0/24")
 	isValid will be false because the octet 256 is out of range.
 */
-func isValidCIDR(cidr string) bool {
+func isValidCIDR(cidr string) (bool, error) {
 	regex := `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}$`
 	match, err := regexp.MatchString(regex, cidr)
+
 	if err != nil || !match {
-		return false
+		return false, err
 	}
 
 	parts := strings.Split(cidr, "/")
 
-	if !isCIDRMaskCorrect(parts[1]) {
-		return false
+	if success, err := isCIDRMaskCorrect(parts[1]); err != nil || !success {
+		return false, err
 	}
 
-	if !areOctetsValuesCorrect(parts[0]) {
-		return false
+	if success, err := areOctetsValuesCorrect(parts[0]); err != nil || !success {
+		return false, err
 	}
 
-	return match
+	return match, nil
 }
 
 /*
@@ -251,6 +267,7 @@ func isValidCIDR(cidr string) bool {
  * Returns:
  *   - ip: The IP address in dot-decimal notation.
  *   - netmask: The netmask in dot-decimal notation.
+ *	 - error: can be conversion errors bubbling up from checks or IP/Netmask format error
  *
  * Calculation:
  *   - The netmask is calculated based on the CIDR prefix.
@@ -264,19 +281,27 @@ func isValidCIDR(cidr string) bool {
  *   - Calculates the netmask by creating a 32-bit integer with `prefixLength` ones followed by zeros.
  *   - Converts both the IP and netmask integers back to dot-decimal notation.
  */
-func ConvertCIDRToIPNetmask(cidr string) (string, string) {
-	if !isValidCIDR(cidr) {
-		return "", ""
+func ConvertCIDRToIPNetmask(cidr string) (string, string, error) {
+	if succces, err := isValidCIDR(cidr); err != nil || !succces {
+		return "", "", err
 	}
 
 	parts := strings.Split(cidr, "/")
 
-	ipU32 := ConvertDotNotationToUInt32(parts[0])
+	ipU32, err := ConvertDotNotationToUInt32(parts[0])
+	if err != nil {
+		return "", "", err
+	}
+
 	prefixLength, err := strconv.Atoi(parts[1])
-	if err != nil || prefixLength < 0 || prefixLength > 32 {
-		return "", ""
+	if err != nil {
+		return "", "", fmt.Errorf("conversion error %v", err)
+	}
+
+	if prefixLength < 0 || prefixLength > 32 {
+		return "", "", fmt.Errorf("invalid CIDR prefix length")
 	}
 
 	var mask uint32 = ^uint32(0) << (32 - prefixLength)
-	return U32UserToDotNotation(ipU32), U32UserToDotNotation(mask)
+	return U32UserToDotNotation(ipU32), U32UserToDotNotation(mask), nil
 }
