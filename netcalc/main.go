@@ -31,7 +31,7 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 }
 
-func checkDotNotResult(s uint32, err string) {
+func checkDotNotationResult(s uint32, err string) {
 	if s == 0 {
 		fmt.Println(err)
 		os.Exit(1)
@@ -43,10 +43,10 @@ func checkDotNotResult(s uint32, err string) {
  */
 func calcNetworkDetails(ip *string, netmask *string) {
 	ipU32 := calc.ConvertDotNotationToUInt32(*ip)
-	checkDotNotResult(ipU32, "IP Address in correctly formatted, needs to be 4 octets 0-255")
+	checkDotNotationResult(ipU32, "IP Address in correctly formatted, needs to be 4 octets 0-255")
 
 	netmaskU32 := calc.ConvertDotNotationToUInt32(*netmask)
-	checkDotNotResult(netmaskU32, "Netmask in correctly formatted")
+	checkDotNotationResult(netmaskU32, "Netmask in correctly formatted")
 
 	networkAddress := calc.CalculateNetworkAddress(ipU32, netmaskU32)
 	broadcastAddress := calc.CalculateBroadcastAddress(ipU32, netmaskU32)
