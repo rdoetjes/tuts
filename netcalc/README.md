@@ -26,13 +26,20 @@ Go is well-suited for teaching these concepts because of its:
 - Strong emphasis on low-level operations  
 - Demonstration of pointers and dereferencing pointers (transferable to C/C++)
 
+## Building the project
+```
+make test
+sudo make install
+```
+
+The command make test implicitely call make build, to create the binary for the integration tests; that way you can avoid calling make build explictely.
+
 ## How to Use
 
 Clone the repository and run the program:
 
 ```bash
-go run main.go -cidr 192.168.1.1/24
+bin/netcalc -cidr 192.168.1.1/24
 or
-go run main.go -ip 192.168.1.1 -netmask 255.255.255.0
+bin/netcalc -ip 192.168.1.1 -netmask 255.255.255.0
 ```
-(After compiling with go build you don't need the go run main.go anymore)
