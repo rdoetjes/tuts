@@ -1,4 +1,4 @@
-# Teaching Bitwise Operations and Network Calculations
+# Teaching structured code, tests and Bitwise Operations and Network Calculations
 
 This Go program is designed as an educational tool to help students understand **bitwise operations** and **network calculation concepts** through practical, hands-on examples.  
 
