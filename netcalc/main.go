@@ -24,9 +24,8 @@ func parseCLI(ip *string, netmask *string, cidr *string) {
 	}
 
 	if *cidr != "" {
-		*ip, *netmask = calc.ConvertCIDRToIPNetmask(*cidr)
-		if *ip == "" || *netmask == "" {
-			fmt.Println("Invalid CIDR or ip and netmask")
+		if *ip, *netmask = calc.ConvertCIDRToIPNetmask(*cidr); *ip == "" || *netmask == "" {
+			fmt.Println("Invalid CIDR")
 			os.Exit(0)
 		}
 	}
