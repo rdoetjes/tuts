@@ -145,8 +145,7 @@ func CalculateBroadcastAddress(ipU32 uint32, netmaskU32 uint32) uint32 {
 //
 //	The total number of usable hosts as a 32-bit unsigned integer.
 func NumberOfHosts(netmaskU32 uint32) uint32 {
-	hostBits := ^netmaskU32
-	return hostBits - 1
+	return ^netmaskU32 - 1
 }
 
 // isValidCIDR checks whether a given string represents a valid CIDR notation.
