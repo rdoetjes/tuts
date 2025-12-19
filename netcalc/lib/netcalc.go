@@ -58,13 +58,13 @@ func isValueInRange(value, min, max int) bool {
 func isValidIpOrNetMask(sOctet string) (bool, error) {
 	regex := `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$`
 
-	success, err := areOctetsValuesCorrect(sOctet)
-	if err != nil || !success {
+	match, err := regexp.MatchString(regex, sOctet)
+	if err != nil {
 		return false, err
 	}
 
-	match, err := regexp.MatchString(regex, sOctet)
-	if err != nil {
+	success, err := areOctetsValuesCorrect(sOctet)
+	if err != nil || !success {
 		return false, err
 	}
 
