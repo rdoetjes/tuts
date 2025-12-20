@@ -19,17 +19,6 @@ type ApiResponse struct {
 	Error            string `json:"error,omitempty"`
 }
 
-// main creates and runs the HTTP server.
-func main() {
-	router := mux.NewRouter()
-	router.HandleFunc("/calculate", calculateHandler).Methods("GET")
-
-	log.Println("Starting netcalc API on port 8080")
-	if err := http.ListenAndServe(":8080", router); err != nil {
-		log.Fatalf("Could not start server: %s\n", err)
-	}
-}
-
 func checkValidity(w http.ResponseWriter, ip string, netmask string, cidr string) (string, string) {
 	if (ip != "" && netmask != "" && cidr != "") || (cidr == "" && (ip == "" || netmask == "")) {
 		http.Error(w, "Please provide either both ip & netmask or a cidr", http.StatusBadRequest)
@@ -93,4 +82,15 @@ func calculateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+// main creates and runs the HTTP server.
+func main() {
+	router := mux.NewRouter()
+	router.HandleFunc("/calculate", calculateHandler).Methods("GET")
+
+	log.Println("Starting netcalc API on port 8080")
+	if err := http.ListenAndServe(":8080", router); err != nil {
+		log.Fatalf("Could not start server: %s\n", err)
+	}
 }
