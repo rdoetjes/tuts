@@ -10,12 +10,12 @@ int knight_moves[8][2] = {
     {-2, -1}, {-1, -2}, {1, -2}, {2, -1}
 };
 
-// Function to check if a move is valid
+// Check if a move is valid
 bool is_valid(int x, int y, int board[N][N]) {
     return (x >= 0 && y >= 0 && x < N && y < N && board[x][y] == -1);
 }
 
-// Function to count possible moves from a cell
+// Count possible moves from a position
 int get_degree(int x, int y, int board[N][N]) {
     int count = 0;
     for (int i = 0; i < 8; i++) {
@@ -28,7 +28,7 @@ int get_degree(int x, int y, int board[N][N]) {
     return count;
 }
 
-// Helper function to sort moves by minimum degree heuristic
+// Helper to sort moves by minimum degree heuristic
 void sort_moves(int x, int y, int board[N][N], int moves[8][2]) {
     int degree[8];
     for (int i = 0; i < 8; i++) {
@@ -52,7 +52,7 @@ void sort_moves(int x, int y, int board[N][N], int moves[8][2]) {
     }
 }
 
-// Backtracking function to find the Knight's Tour
+// Backtracking algorithm to find the Knight's Tour
 bool knight_tour(int x, int y, int movei, int board[N][N]) {
     if (movei == N * N) {
         return true;
@@ -81,7 +81,7 @@ bool knight_tour(int x, int y, int movei, int board[N][N]) {
     return false;
 }
 
-// Function to convert board indices to chess notation
+// Convert board indices to chess notation
 void to_chess_notation(int x, int y, char* notation) {
     notation[0] = 'A' + y;
     notation[1] = '1' + (7 - x);
@@ -89,13 +89,13 @@ void to_chess_notation(int x, int y, char* notation) {
 }
 
 // set all the squares to -1 (start position)
-// when set to 0 (or anything !-1 then square was visited)
 void reset_board(int board[N][N]){
     for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
             board[i][j] = -1;
 }
-// Function to start the tour and print the result
+
+// Start the tour and print the result
 bool solve_knight_tour(int start_x, int start_y) {
     int board[N][N];
     reset_board(board);
@@ -129,7 +129,8 @@ bool solve_knight_tour(int start_x, int start_y) {
     }
 }
 
-// Test function to try the tour from every square on the board
+// Test to try the tour from every square on the board
+// algorithm needs to work guaranteed for every position (it does)
 void test_knight_tour(void) {
     int successful_tours = 0;
     char chess_notation[3];
@@ -152,6 +153,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    // test the algorithm for all 64 positions
     if (atoi(argv[1]) > 7 || atoi(argv[2]) > 7 ) {
         test_knight_tour();
         exit(1);
