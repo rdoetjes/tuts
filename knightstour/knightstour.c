@@ -88,13 +88,19 @@ void to_chess_notation(int x, int y, char* notation) {
     notation[2] = '\0';
 }
 
-// Function to start the tour and print the result
-bool solve_knight_tour(int start_x, int start_y) {
-    char chess_notation[3];
-    int board[N][N];
+// set all the squares to -1 (start position)
+// when set to 0 (or anything !-1 then square was visited)
+void reset_board(int board[N][N]){
     for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
             board[i][j] = -1;
+}
+// Function to start the tour and print the result
+bool solve_knight_tour(int start_x, int start_y) {
+    int board[N][N];
+    reset_board(board);
+
+    char chess_notation[3];
 
     board[start_x][start_y] = 0; // Start at the initial position
 
@@ -126,9 +132,9 @@ bool solve_knight_tour(int start_x, int start_y) {
 // Test function to try the tour from every square on the board
 void test_knight_tour(void) {
     int successful_tours = 0;
+    char chess_notation[3];
     for (int x = 0; x < N; x++) {
         for (int y = 0; y < N; y++) {
-            char chess_notation[3];
             to_chess_notation(x, y, chess_notation);
             printf("Starting at %s:\n", chess_notation);
             if (solve_knight_tour(x, y)) {
@@ -140,7 +146,17 @@ void test_knight_tour(void) {
     printf("Total successful tours: %d out of %d\n", successful_tours, N * N);
 }
 
-int main(void) {
-    test_knight_tour();
+int main(int argc, char **argv) {
+    if (argc!=3) {
+        printf("Usage %s start_x start_y\nf.i. %s 0 0 to start at A8\n\n or %s >7 >7 to test\n",argv[0], argv[0], argv[0]);
+        exit(1);
+    }
+
+    if (atoi(argv[1]) > 7 || atoi(argv[2]) > 7 ) {
+        test_knight_tour();
+        exit(1);
+    }
+
+    solve_knight_tour(atoi(argv[1]), atoi(argv[2]));
     return 0;
 }
