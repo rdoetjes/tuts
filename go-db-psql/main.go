@@ -25,6 +25,10 @@ func setupAuth(sql *sqlx.DB) {
 
 func setupRoutes(sql *sqlx.DB) *chi.Mux {
 	r := chi.NewRouter()
+	if r == nil {
+		log.Fatal("Failed to create router, can't continue")
+		os.Exit(1)
+	}
 
 	// Public routes
 	r.Post("/auth/login", auth.LoginHandler)
