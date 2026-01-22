@@ -61,7 +61,7 @@ char* to_roman(const uint32_t year){
                 free(result);
                 return NULL;
             }
-            strncat(result, numerals[i].roman, strlen(numerals[i].roman));
+            strncat(result, numerals[i].roman, grow_to_nr_bytes);
             remainder -= numerals[i].dec;
         }
     }
