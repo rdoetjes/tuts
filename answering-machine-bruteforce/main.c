@@ -130,6 +130,18 @@ static speed_t baud_to_speed(int baud) {
     }
 }
 
+typedef struct {
+    int baud;
+    int do_read;
+    int timeout_ms;
+    int pause_ms;
+    int dry_run;
+    int fd;
+    int num_digits;
+    const char *device;
+    const char *phone;
+} Config;
+
 /* Ensure the buffer has at least `need` bytes capacity. Resize by doubling. */
 static int ensure_capacity(char **bufp, size_t *capp, size_t need) {
     if (*capp >= need) return 0;
@@ -168,20 +180,25 @@ static int appendf(char **bufp, size_t *capp, size_t *pos, const char *fmt, ...)
  * Format: ATDT<phone>;AT+VTD=1; (for each combo) AT+VTS=x;... ,; \r
  */
 static char *build_batch_command(int num_digits, const char *phone, int start, int end) {
-    if (!phone || start >= end) return NULL;
-
+    printf("Building batch command for phone: %s, range: %d-%d\n", phone, start, end);
+    if (!phone || start >= end) {
+        fprintf(stderr, "Invalid input for build_batch_command\n");
+        return NULL;
+    }
     int combos = end - start;
     size_t phone_len = strlen(phone);
     size_t approx_per = (num_digits == 3) ? APPROX_PER_3DIG : APPROX_PER_2DIG;
     size_t cap = APPROX_BASE + phone_len + (size_t)combos * approx_per + 8;
 
     char *buf = malloc(cap);
-    if (!buf) return NULL;
+    if (!buf) {
+        fprintf(stderr, "Failed to allocate memory for batch command\n");
+        return NULL;
+    }
 
     size_t pos = 0;
     int r = appendf(&buf, &cap, &pos, "ATDT%s;AT+VTD=1;", phone);
-
-    if (r < 0) { free(buf); return NULL; }
+    if (r < 0) { fprintf(stderr, "append error\n"); free(buf); return NULL; }
 
     for (int idx = start; idx < end; ++idx) {
         if (num_digits == 3) {
@@ -316,23 +333,72 @@ static void msleep(int ms) {
     usleep((useconds_t)ms * 1000);
 }
 
+/*
+ * Dial and brute force DTMF
+ */
+void dtmf_out(Config *c){
+    const int batch_size = 3;
+    const int max_combos = (c->num_digits == 3) ? 1000 : 100;
+
+    for (int i = 0; i < max_combos; i += batch_size) {
+        int end = i + batch_size;
+        if (end > max_combos) end = max_combos;
+
+        char *cmd = build_batch_command(c->num_digits, c->phone, i, end);
+        if (!cmd) { fprintf(stderr, "Failed to build batch command for combos %d..%d\n", i, end-1); break; }
+
+        if (c->dry_run) {
+            printf("DRY-RUN: batch %d..%d command:\n%s\n", i, end-1, cmd);
+            free(cmd);
+            continue;
+        }
+
+        ssize_t wrote = write_all(c->fd, cmd, strlen(cmd));
+        if (wrote < 0) { fprintf(stderr, "Failed to send command for combos %d..%d\n", i, end-1); free(cmd); break; }
+        printf("Sent call for combos %d..%d (%zd bytes)\n", i, end-1, wrote);
+
+        if (!c->do_read) {
+            char *resp = NULL;
+            ssize_t r = read_response(c->fd, &resp, c->timeout_ms);
+            if (r < 0) {
+                fprintf(stderr, "Error reading response after sending batch %d..%d\n", i, end-1);
+            } else if (r == 0) {
+                printf("No modem response for batch %d..%d within %d ms\n", i, end-1, c->timeout_ms);
+            } else {
+                printf("Modem response (%zd bytes):\n%s\n", r, resp);
+                free(resp);
+            }
+        }
+        free(cmd);
+
+        /* Hang up the call */
+        const char *hang = "ATH\r";
+        ssize_t hw = write_all(c->fd, hang, strlen(hang));
+        if (hw < 0) { fprintf(stderr, "Failed to send hangup after batch %d..%d\n", i, end-1); break; }
+        msleep(c->pause_ms);
+
+        if (c->fd >= 0) close(c->fd);
+    }
+}
+
 /* Allow -T anywhere by pre-scanning argv for "-T" entries and removing them
  * before getopt runs. This makes -T usable even after positional args.
  */
 int main(int argc, char *argv[]) {
     int opt;
-    const char *device = DEFAULT_DEVICE;
-    int baud = DEFAULT_BAUD;
-    int do_read = 0;
-    int timeout_ms = DEFAULT_TIMEOUT_MS;
-    int pause_ms = DEFAULT_PAUSE_MS;
-    int dry_run = 0;
+    Config c;
+    c.device = DEFAULT_DEVICE;
+    c.baud = DEFAULT_BAUD;
+    c.do_read = 0;
+    c.timeout_ms = DEFAULT_TIMEOUT_MS;
+    c.pause_ms = DEFAULT_PAUSE_MS;
+    c.dry_run = 0;
 
     /* Pre-scan argv and remove any "-T" occurrences so getopt will parse options
      * reliably even if -T appears after non-option arguments. */
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-T") == 0) {
-            dry_run = 1;
+           c. dry_run = 1;
             /* shift left */
             for (int j = i; j < argc - 1; ++j) argv[j] = argv[j + 1];
             argc--;
@@ -345,74 +411,40 @@ int main(int argc, char *argv[]) {
     /* Now parse remaining options normally */
     while ((opt = getopt(argc, argv, "d:b:rt:p:T")) != -1) {
         switch (opt) {
-            case 'd': device = optarg; break;
-            case 'b': baud = atoi(optarg); if (baud <= 0) { fprintf(stderr, "Invalid baud\n"); return 1; } break;
-            case 'r': do_read = 1; break;
-            case 't': timeout_ms = atoi(optarg); if (timeout_ms < 0) { fprintf(stderr, "Invalid timeout\n"); return 1; } break;
-            case 'p': pause_ms = atoi(optarg); if (pause_ms < 0) { fprintf(stderr, "Invalid pause\n"); return 1; } break;
-            case 'T': dry_run = 1; break; /* also handle if user specified it normally */
+            case 'd': c.device = optarg; break;
+            case 'r': c.do_read = 1; break;
+
+            case 'b': c.baud = atoi(optarg);
+            if (c.baud <= 0) { fprintf(stderr, "Invalid baud\n"); return 1; } break;
+
+            case 't': c.timeout_ms = atoi(optarg);
+            if (c.timeout_ms < 0) { fprintf(stderr, "Invalid timeout\n"); return 1; } break;
+
+            case 'p': c.pause_ms = atoi(optarg);
+            if (c.pause_ms < 0) { fprintf(stderr, "Invalid pause\n"); return 1; } break;
+
+            case 'T': c.dry_run = 1; break; /* also handle if user specified it normally */
             default: usage(argv[0]); return 1;
         }
     }
 
     if (optind + 2 != argc) { usage(argv[0]); return 1; }
 
-    int num_digits = atoi(argv[optind]);
-    if (num_digits != 2 && num_digits != 3) { fprintf(stderr, "Digits must be 2 or 3\n"); return 1; }
-    const char *phone = argv[optind + 1];
+    c.num_digits = atoi(argv[optind]);
+    if (c.num_digits != 2 && c.num_digits != 3) { fprintf(stderr, "Digits must be 2 or 3\n"); return 1; }
+    c.phone = argv[optind + 1];
 
-    int max_combos = (num_digits == 3) ? 1000 : 100;
-
-    int fd = -1;
-    speed_t sp = baud_to_speed(baud);
-    if (sp == (speed_t)0) fprintf(stderr, "Warning: baud %d not mapped to termios constant; attempting to configure anyway\n", baud);
-    if (!dry_run) {
-        fd = open_serial(device);
-        if (fd < 0) return 1;
-        if (configure_serial(fd, sp) != 0) { close(fd); return 1; }
+    c.fd = -1;
+    speed_t sp = baud_to_speed(c.baud);
+    if (sp == (speed_t)0) fprintf(stderr, "Warning: baud %d not mapped to termios constant; attempting to configure anyway\n", c.baud);
+    if (!c.dry_run) {
+        c.fd = open_serial(c.device);
+        if (c.fd < 0) return 1;
+        if (configure_serial(c.fd, sp) != 0) { close(c.fd); return 1; }
     }
 
-    const int batch_size = 3;
-    for (int i = 0; i < max_combos; i += batch_size) {
-        int end = i + batch_size;
-        if (end > max_combos) end = max_combos;
+    dtmf_out(&c);
 
-        char *cmd = build_batch_command(num_digits, phone, i, end);
-        if (!cmd) { fprintf(stderr, "Failed to build batch command for combos %d..%d\n", i, end-1); break; }
-
-        if (dry_run) {
-            printf("DRY-RUN: batch %d..%d command:\n%s\n", i, end-1, cmd);
-            free(cmd);
-            continue;
-        }
-
-        ssize_t wrote = write_all(fd, cmd, strlen(cmd));
-        if (wrote < 0) { fprintf(stderr, "Failed to send command for combos %d..%d\n", i, end-1); free(cmd); break; }
-        printf("Sent call for combos %d..%d (%zd bytes)\n", i, end-1, wrote);
-
-        if (do_read) {
-            char *resp = NULL;
-            ssize_t r = read_response(fd, &resp, timeout_ms);
-            if (r < 0) {
-                fprintf(stderr, "Error reading response after sending batch %d..%d\n", i, end-1);
-            } else if (r == 0) {
-                printf("No modem response for batch %d..%d within %d ms\n", i, end-1, timeout_ms);
-            } else {
-                printf("Modem response (%zd bytes):\n%s\n", r, resp);
-                free(resp);
-            }
-        }
-
-        free(cmd);
-
-        /* Hang up the call */
-        const char *hang = "ATH\r";
-        ssize_t hw = write_all(fd, hang, strlen(hang));
-        if (hw < 0) { fprintf(stderr, "Failed to send hangup after batch %d..%d\n", i, end-1); break; }
-
-        msleep(pause_ms);
-    }
-
-    if (fd >= 0) close(fd);
+    if (c.fd >= 0) close(c.fd);
     return 0;
 }
