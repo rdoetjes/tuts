@@ -158,14 +158,18 @@ static int appendf(char **bufp, size_t *capp, size_t *pos, const char *fmt, ...)
  */
 static char *build_batch_command(int num_digits, const char *phone, int start, int end) {
     if (!phone || start >= end) return NULL;
+
     int combos = end - start;
     size_t phone_len = strlen(phone);
     size_t approx_per = (num_digits == 3) ? APPROX_PER_3DIG : APPROX_PER_2DIG;
     size_t cap = APPROX_BASE + phone_len + (size_t)combos * approx_per + 8;
+
     char *buf = malloc(cap);
     if (!buf) return NULL;
+
     size_t pos = 0;
     int r = appendf(&buf, &cap, &pos, "ATDT%s;AT+VTD=1;", phone);
+
     if (r < 0) { free(buf); return NULL; }
 
     for (int idx = start; idx < end; ++idx) {
@@ -186,6 +190,7 @@ static char *build_batch_command(int num_digits, const char *phone, int start, i
     if (ensure_capacity(&buf, &cap, pos + 2) != 0) { free(buf); return NULL; }
     buf[pos++] = '\r';
     buf[pos] = '\0';
+
     return buf;
 }
 
