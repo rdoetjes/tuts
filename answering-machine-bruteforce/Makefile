@@ -13,4 +13,5 @@ $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
+	$(RM) $(OBJS)
 	$(RM) $(EXE)
