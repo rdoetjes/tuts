@@ -13,6 +13,8 @@
  *      -T          dry-run: print commands to screen but do not send to serial
  *
  * Build:
+ *   run make
+ *     or manualy
  *   gcc -std=c11 -Wall -Wextra -o main main.c
  *
  * Use responsibly.
