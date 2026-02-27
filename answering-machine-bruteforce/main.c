@@ -348,8 +348,6 @@ int main(int argc, char *argv[]) {
         fd = open_serial(device);
         if (fd < 0) return 1;
         if (configure_serial(fd, sp) != 0) { close(fd); return 1; }
-    } else {
-        /* Dry-run mode: do not open or configure serial device. */
     }
 
     const int batch_size = 3;
@@ -365,6 +363,7 @@ int main(int argc, char *argv[]) {
             free(cmd);
             continue;
         }
+
         ssize_t wrote = write_all(fd, cmd, strlen(cmd));
         if (wrote < 0) { fprintf(stderr, "Failed to send command for combos %d..%d\n", i, end-1); free(cmd); break; }
         printf("Sent call for combos %d..%d (%zd bytes)\n", i, end-1, wrote);
