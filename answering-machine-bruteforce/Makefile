@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c11 -Wall -Wextra
+CFLAGS = -std=gnu99 -Wall -Wextra
 RM = rm -f
 
 all:
