@@ -16,7 +16,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 
-
+/*Converts baud rate to termios speed_t */
 speed_t baud_to_speed(int baud);
 
 /* Open serial device and return fd or -1 */
