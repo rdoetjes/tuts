@@ -15,9 +15,9 @@
  * Build:
  *   run make
  *     or manualy
- *   gcc -std=c11 -Wall -Wextra -o main main.c
+ *   gcc -std=gnu99 -Wall -Wextra -o main main.c
  *
- * Use responsibly.
+ * Use responsibly.phone
  */
 
 #include <stdio.h>
@@ -42,6 +42,15 @@
 #define APPROX_BASE 64
 #define APPROX_PER_2DIG 32
 #define APPROX_PER_3DIG 48
+
+#include <time.h>
+
+void sleep_us(unsigned long microseconds) {
+    struct timespec ts;
+    ts.tv_sec = microseconds / 1000000UL;
+    ts.tv_nsec = (microseconds % 1000000UL) * 1000;
+    nanosleep(&ts, NULL);
+}
 
 static void usage(const char *prog) {
     fprintf(stderr,
