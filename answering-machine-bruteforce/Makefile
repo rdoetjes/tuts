@@ -2,8 +2,15 @@ CC = gcc
 CFLAGS = -std=gnu99 -Wall -Wextra
 RM = rm -f
 
-all:
-	$(CC) $(CFLAGS) -o brute-force main.c
+SRCS = main.c serial.c
+OBJS = $(SRCS:.c=.o)
+EXE = brute-force
+
+$(EXE): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) 'brute-force'
+	$(RM) $(EXE)
