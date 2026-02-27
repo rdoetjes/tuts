@@ -267,13 +267,18 @@ static ssize_t read_response(int fd, char **out_buf, int timeout_ms) {
         tv.tv_sec = timeout_ms / 1000;
         tv.tv_usec = (timeout_ms % 1000) * 1000;
         int rv = select(fd + 1, &rfds, NULL, NULL, &tv);
+
         if (rv < 0) { if (errno == EINTR) continue; perror("select"); free(buf); return -1; }
         if (rv == 0) break; /* inactivity */
+
         if (FD_ISSET(fd, &rfds)) {
             char tmp[1024];
             ssize_t r = read(fd, tmp, sizeof(tmp));
+
             if (r < 0) { if (errno == EINTR) continue; perror("read"); free(buf); return -1; }
+
             if (r == 0) break;
+
             if (len + (size_t)r + 1 > cap) {
                 size_t newcap = cap * 2;
                 while (newcap < len + (size_t)r + 1) newcap *= 2;
@@ -281,6 +286,7 @@ static ssize_t read_response(int fd, char **out_buf, int timeout_ms) {
                 if (!nb) { perror("realloc"); free(buf); return -1; }
                 buf = nb; cap = newcap;
             }
+
             memcpy(buf + len, tmp, (size_t)r);
             len += (size_t)r;
             continue;
