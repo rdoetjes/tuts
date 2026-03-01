@@ -174,7 +174,10 @@ void dtmf_out(Config *c){
             continue;
         }
 
+        printf("Sending batch %d..%d command:\n%s\n", i, end-1, cmd);
         ssize_t wrote = write_all(c->fd, cmd, strlen(cmd));
+        printf("Send done\n\n");
+
         if (wrote < 0) { fprintf(stderr, "Failed to send command for combos %d..%d\n", i, end-1); free(cmd); break; }
         printf("Sent call for combos %d..%d (%zd bytes)\n", i, end-1, wrote);
 
@@ -191,14 +194,6 @@ void dtmf_out(Config *c){
             }
         }
         free(cmd);
-
-        /* Hang up the call */
-        const char *hang = "ATH\r";
-        ssize_t hw = write_all(c->fd, hang, strlen(hang));
-        if (hw < 0) { fprintf(stderr, "Failed to send hangup after batch %d..%d\n", i, end-1); break; }
-        msleep(c->pause_ms);
-
-        if (c->fd >= 0) close(c->fd);
     }
 }
 
@@ -265,6 +260,14 @@ int main(int argc, char *argv[]) {
     }
 
     dtmf_out(&c);
+
+    /* Hang up the call */
+    printf("Hang up the call\n");
+    const char *hang = "ATH\r";
+    ssize_t hw = write_all(c.fd, hang, strlen(hang));
+    if (hw < 0) { fprintf(stderr, "Failed to send hangup\n"); }
+    if (tcflush(c.fd, TCIOFLUSH) != 0) perror("tcflush");
+    msleep(c.pause_ms);
 
     if (c.fd >= 0) close(c.fd);
     return 0;

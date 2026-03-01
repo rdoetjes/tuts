@@ -108,6 +108,7 @@ ssize_t write_all(int fd, const char *buf, size_t len) {
     size_t total = 0;
     while (total < len) {
         ssize_t w = write(fd, buf + total, len - total);
+
         if (w < 0) {
             if (errno == EINTR) continue;
             perror("write");
@@ -115,8 +116,10 @@ ssize_t write_all(int fd, const char *buf, size_t len) {
         }
         if (w == 0) break;
         total += (size_t)w;
+
+        fprintf(stderr, "write_all: len: %zd wrote: %zd bytes total: %zd\n", len, w, total);
     }
-    if (tcdrain(fd) != 0) perror("tcdrain");
+    if (tcflush(fd, TCIOFLUSH) != 0) perror("tcflush");
     return (ssize_t)total;
 }
 
