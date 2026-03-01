@@ -185,7 +185,6 @@ void dtmf_out(Config *c){
         printf("Send done\n\n");
 
         if (wrote < 0) { fprintf(stderr, "Failed to send command for combos %d..%d\n", i, end-1); free(cmd); break; }
-        printf("Sent call for combos %d..%d (%zd bytes)\n", i, end-1, wrote);
 
         if (c->do_read) {
             printf("Reading response\n");
