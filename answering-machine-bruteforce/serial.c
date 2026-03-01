@@ -153,7 +153,7 @@ ssize_t read_response(int fd, char **out_buf, int timeout_ms) {
         FD_ZERO(&rfds);
         FD_SET(fd, &rfds);
         tv.tv_sec = timeout_ms / 1000;
-        tv.tv_usec = (timeout_ms % 1000) * 1000;
+        tv.tv_usec = (timeout_ms % 100) * 1000;
         int rv = select(fd + 1, &rfds, NULL, NULL, &tv);
 
         if (rv < 0) { if (errno == EINTR) continue; perror("select"); free(buf); return -1; }
