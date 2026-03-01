@@ -141,6 +141,11 @@ static char *build_batch_command(int num_digits, const char *phone, int start, i
         }
     }
 
+    if (appendf(&buf, &cap, &pos, "\r\n") < 0) {
+        free(buf);
+        return NULL;
+    }
+
     if (ensure_capacity(&buf, &cap, pos + 2) != 0) { free(buf); return NULL; }
     buf[pos++] = '\r';
     buf[pos] = '\0';
@@ -154,7 +159,7 @@ static void msleep(int ms) {
     usleep((useconds_t)ms * 1000);
 }
 
-/*
+/*send and flush
  * Dial and brute force DTMF
  */
 void dtmf_out(Config *c){
@@ -162,6 +167,7 @@ void dtmf_out(Config *c){
     const int max_combos = (c->num_digits == 3) ? 1000 : 100;
 
     for (int i = 0; i < max_combos; i += batch_size) {
+        printf("----------------------------------------\n\n");
         int end = i + batch_size;
         if (end > max_combos) end = max_combos;
 
@@ -181,7 +187,8 @@ void dtmf_out(Config *c){
         if (wrote < 0) { fprintf(stderr, "Failed to send command for combos %d..%d\n", i, end-1); free(cmd); break; }
         printf("Sent call for combos %d..%d (%zd bytes)\n", i, end-1, wrote);
 
-        if (!c->do_read) {
+        if (c->do_read) {
+            printf("Reading response\n");
             char *resp = NULL;
             ssize_t r = read_response(c->fd, &resp, c->timeout_ms);
             if (r < 0) {
@@ -194,6 +201,7 @@ void dtmf_out(Config *c){
             }
         }
         free(cmd);
+        printf("----------------------------------------\n\n");
     }
 }
 

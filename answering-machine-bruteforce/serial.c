@@ -79,30 +79,44 @@ int open_serial(const char *device) {
 int configure_serial(int fd, speed_t speed) {
     struct termios tty;
     if (tcgetattr(fd, &tty) != 0) { perror("tcgetattr"); return -1; }
+
     if (speed != (speed_t)0) {
         if (cfsetispeed(&tty, speed) != 0 || cfsetospeed(&tty, speed) != 0) {
-            perror("cfset[io]speed");
+            perror("cfset[io]speed");  // note: you might want to return -1 here
         }
     }
 
+    // --- cflag: 8N1, no hw flow, ignore modem lines ---
     tty.c_cflag &= ~PARENB;
     tty.c_cflag &= ~CSTOPB;
     tty.c_cflag &= ~CSIZE;
     tty.c_cflag |= CS8;
-
     tty.c_cflag &= ~CRTSCTS;
     tty.c_cflag |= (CLOCAL | CREAD);
 
-    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    // --- iflag: DISABLE all input processing ICRNL WAS REQUIRED FOR LOOP BACK READ! IN CASE OF ACTUAL MODEM YOU MAY NEED TO REMOVE ICRNL ---
+    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON | IXOFF);
+
+    // --- lflag: already good, but make sure fully raw ---
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHONL | ISIG | IEXTEN);
+
+    // --- oflag: raw output ---
     tty.c_oflag &= ~OPOST;
 
-    tty.c_cc[VMIN] = 0;
-    tty.c_cc[VTIME] = 10; /* 1s */
+    // --- timeouts: your current setting is ok for select() ---
+    tty.c_cc[VMIN]  = 0;
+    tty.c_cc[VTIME] = 10;   // 1 second inter-char timeout
 
-    if (tcsetattr(fd, TCSANOW, &tty) != 0) { perror("tcsetattr"); return -1; }
+    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+        perror("tcsetattr");
+        return -1;
+    }
+
+    // Bonus: flush any garbage before starting
+    tcflush(fd, TCIOFLUSH);
+
     return 0;
 }
-
 /* Write all bytes robustly */
 ssize_t write_all(int fd, const char *buf, size_t len) {
     size_t total = 0;
@@ -119,7 +133,7 @@ ssize_t write_all(int fd, const char *buf, size_t len) {
 
         fprintf(stderr, "write_all: len: %zd wrote: %zd bytes total: %zd\n", len, w, total);
     }
-    if (tcflush(fd, TCIOFLUSH) != 0) perror("tcflush");
+    //if (tcflush(fd, TCIOFLUSH) != 0) perror("tcflush");
     return (ssize_t)total;
 }
 
@@ -148,7 +162,6 @@ ssize_t read_response(int fd, char **out_buf, int timeout_ms) {
         if (FD_ISSET(fd, &rfds)) {
             char tmp[1024];
             ssize_t r = read(fd, tmp, sizeof(tmp));
-
             if (r < 0) { if (errno == EINTR) continue; perror("read"); free(buf); return -1; }
 
             if (r == 0) break;
