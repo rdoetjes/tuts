@@ -268,14 +268,16 @@ int main(int argc, char *argv[]) {
 
     dtmf_out(&c);
 
-    /* Hang up the call */
-    printf("Hang up the call\n");
-    const char *hang = "ATH\r";
-    ssize_t hw = write_all(c.fd, hang, strlen(hang));
-    if (hw < 0) { fprintf(stderr, "Failed to send hangup\n"); }
-    if (tcflush(c.fd, TCIOFLUSH) != 0) perror("tcflush");
-    msleep(c.pause_ms);
+     if (!c.dry_run) {
+        /* Hang up the call */
+        printf("Hang up the call\n");
+        const char *hang = "ATH\r";
+        ssize_t hw = write_all(c.fd, hang, strlen(hang));
+        if (hw < 0) { fprintf(stderr, "Failed to send hangup\n"); }
+        if (tcflush(c.fd, TCIOFLUSH) != 0) perror("tcflush");
+        msleep(c.pause_ms);
 
-    if (c.fd >= 0) close(c.fd);
+        if (c.fd >= 0) close(c.fd);
+    }
     return 0;
 }
