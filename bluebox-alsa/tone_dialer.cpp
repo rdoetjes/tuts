@@ -32,7 +32,7 @@ struct alignas(16) SequenceStep {
     std::string tone;
 };
 
-// Forward declarations of helper functions from the preserved block that we will reuse
+// Forward declarations of helper functions
 bool get_dtmf_freqs(char digit, int& f1, int& f2);
 bool get_c5_freqs(const std::string& code, int& f1, int& f2);
 void generate_tone_buffer(int f1, int f2, int duration_ms, std::vector<int16_t>& buffer);
@@ -138,37 +138,6 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence)
             remaining -= chunk_frames;
         }
     }
-}
-
-// New main
-int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " sequence.txt\n\n"
-                  << "Tab-delimited format (one line per step):\n"
-                  << "Type\tTone\tDuration_ms\tPause_ms\n"
-                  << "D\t5\t120\t80\n"
-                  << "~\t\t\t\t(Wait for keypress)\n";
-        return 1;
-    }
-
-    std::vector<SequenceStep> sequence;
-    if (!parse_sequence_file(argv[1], sequence)) {
-        return 1;
-    }
-
-    std::cout << "Loaded " << sequence.size() << " steps.\n";
-
-    snd_pcm_t* handle = nullptr;
-    if (!setup_alsa(handle)) {
-        return 1;
-    }
-
-    play_sequence(handle, sequence);
-
-    snd_pcm_drain(handle);
-    snd_pcm_close(handle);
-
-    return 0;
 }
 
 
@@ -326,4 +295,36 @@ bool write_frames(snd_pcm_t* handle, const int16_t* data, size_t frame_count) {
     }
 
     return true;
+}
+
+
+// New main
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " sequence.txt\n\n"
+                  << "Tab-delimited format (one line per step):\n"
+                  << "Type\tTone\tDuration_ms\tPause_ms\n"
+                  << "D\t5\t120\t80\n"
+                  << "~\t\t\t\t(Wait for keypress)\n";
+        return 1;
+    }
+
+    std::vector<SequenceStep> sequence;
+    if (!parse_sequence_file(argv[1], sequence)) {
+        return 1;
+    }
+
+    std::cout << "Loaded " << sequence.size() << " steps.\n";
+
+    snd_pcm_t* handle = nullptr;
+    if (!setup_alsa(handle)) {
+        return 1;
+    }
+
+    play_sequence(handle, sequence);
+
+    snd_pcm_drain(handle);
+    snd_pcm_close(handle);
+
+    return 0;
 }
