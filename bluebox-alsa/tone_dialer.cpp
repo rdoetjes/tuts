@@ -186,8 +186,8 @@ bool setup_alsa(snd_pcm_t*& handle) {
     snd_pcm_hw_params_alloca(&hw_params);
 
     unsigned int rate = SAMPLE_RATE;
-    unsigned int period = PERIOD_SIZE;
-    unsigned int bufsz  = PERIOD_SIZE * BUFFER_MULTIPLIER;
+    snd_pcm_uframes_t period = PERIOD_SIZE;
+    snd_pcm_uframes_t bufsz  = PERIOD_SIZE * BUFFER_MULTIPLIER;
 
     if ((err = snd_pcm_hw_params_any(handle, hw_params)) < 0 ||
         (err = snd_pcm_hw_params_set_access(handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0 ||
@@ -195,7 +195,7 @@ bool setup_alsa(snd_pcm_t*& handle) {
         (err = snd_pcm_hw_params_set_rate_near(handle, hw_params, &rate, 0)) < 0 ||
         (err = snd_pcm_hw_params_set_channels(handle, hw_params, CHANNELS)) < 0 ||
         (err = snd_pcm_hw_params_set_period_size_near(handle, hw_params, &period, 0)) < 0 ||
-        (err = snd_pcm_hw_params_set_buffer_size_near(handle, hw_params, &bufsz, 0)) < 0 ||
+        (err = snd_pcm_hw_params_set_buffer_size_near(handle, hw_params, &bufsz)) < 0 ||
         (err = snd_pcm_hw_params(handle, hw_params)) < 0 ||
         (err = snd_pcm_prepare(handle)) < 0) {
         std::cerr << "ALSA setup failed: " << snd_strerror(err) << "\n";
