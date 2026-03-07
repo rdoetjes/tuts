@@ -11,19 +11,19 @@ D	0	150	50
 #Wait for the answer
 ~
 #Clear the trunk
-C	CLEARFWD	50	50
+C	CLEARFWD	55	50
 #Signal international call
 C	KP2	100	50
-C	0	50	50
+C	0	55	50
 #Signal country code
-C	3	50	50
-C	1	50	50
+C	3	55	50
+C	1	55	50
 #Signal signifant number (no leading zero)
-C	3	50	50
-C	0	50	50
-C	6	50	50
-C	1	50	50
-C	3	50	50
-C	6	50	50
-C	1	50	50
-C	ST	50	50
+C	3	55	50
+C	0	55	50
+C	6	55	50
+C	1	55	50
+C	3	55	50
+C	6	55	50
+C	1	55	50
+C	ST	55	50
