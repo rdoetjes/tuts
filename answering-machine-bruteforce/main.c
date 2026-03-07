@@ -123,12 +123,12 @@ static char *build_batch_command(int num_digits, const char *phone, int start, i
     }
 
     size_t pos = 0;
-    int r = appendf(&buf, &cap, &pos, "ATDT%s;AT+VTD=1;", phone);
+    int r = appendf(&buf, &cap, &pos, "ATDT%s;+VTD=1;", phone);
     if (r < 0) { fprintf(stderr, "append error\n"); free(buf); return NULL; }
 
     for (int idx = start; idx < end; ++idx) {
         if (num_digits == 3) {
-            if (appendf(&buf, &cap, &pos, "AT+VTS=%d;AT+VTS=%d;AT+VTS=%d,;",
+            if (appendf(&buf, &cap, &pos, "+VTS=%d;+VTS=%d;+VTS=%d,;",
                         idx / 100, (idx / 10) % 10, idx % 10) < 0) {
                 free(buf);
                 return NULL;
