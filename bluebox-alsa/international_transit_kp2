@@ -1,22 +1,27 @@
-D	0	50	50
-D	6	50	50
-D	0	50	50
-D	2	50	50
-D	2	50	50
-D	0	50	50
-D	6	50	50
-D	3	50	50
-D	0	50	50
+#Wait for enter to start dialing toll free number
 ~
+#Dial the toll free number that ends in the USA
+D	0	150	50
+D	6	150	50
+D	0	150	50
+D	2	150	50
+D	2	150	50
+D	0	150	50
+D	6	150	50
+D	3	150	50
+D	0	150	50
+#Wait for the answer
+~
+#Clear the trunk
 C	CLEARFWD	50	50
+#Signal international call
 C	KP2	100	50
 C	0	50	50
+#Signal country code
 C	3	50	50
 C	1	50	50
+#Signal signifant number (no leading zero)
 C	3	50	50
-C	0	50	50
-C	0	50	50
-C	6	50	50
 C	0	50	50
 C	6	50	50
 C	1	50	50
