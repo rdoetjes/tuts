@@ -19,10 +19,10 @@
 constexpr unsigned SAMPLE_RATE         = 8000;
 constexpr unsigned CHANNELS            = 1;
 constexpr snd_pcm_format_t FORMAT      = SND_PCM_FORMAT_S16_LE;
-constexpr double   AMPLITUDE           = 32767 * 0.4;
-constexpr unsigned PERIOD_SIZE         = 128;
+constexpr double   AMPLITUDE           = INT16_MAX * 0.4;
+constexpr unsigned PERIOD_SIZE         = 128;               // ~16 ms @ 8 kHz
 constexpr unsigned BUFFER_MULTIPLIER   = 4;
-constexpr int      MIN_SILENCE_MS      = 5;
+constexpr int      MIN_SILENCE_MS      = 5;                 // force at least this much zero after each tone
 
 // Redefined struct to ensure we can use it in our new parser
 struct alignas(16) SequenceStep {
@@ -38,6 +38,7 @@ bool get_c5_freqs(const std::string& code, int& f1, int& f2);
 void generate_tone_buffer(int f1, int f2, int duration_ms, std::vector<int16_t>& buffer);
 bool setup_alsa(snd_pcm_t*& handle);
 bool write_frames(snd_pcm_t* handle, const int16_t* data, size_t frame_count);
+void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence);
 
 // New parsing logic supporting '~'
 bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequence) {
@@ -100,7 +101,7 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence)
         const auto& step = sequence[i];
 
         if (step.type == '~') {
-            std::cout << "Waiting for keypress... (Press Enter)\n";
+            std::cout << "Waiting for Enter.. (Press Enter)\n";
             std::cin.get();
             continue;
         }
@@ -170,48 +171,6 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-// Rename original symbols to avoid conflicts with the preserved code below
-#define SAMPLE_RATE         OLD_SAMPLE_RATE
-#define CHANNELS            OLD_CHANNELS
-#define FORMAT              OLD_FORMAT
-#define AMPLITUDE           OLD_AMPLITUDE
-#define PERIOD_SIZE         OLD_PERIOD_SIZE
-#define BUFFER_MULTIPLIER   OLD_BUFFER_MULTIPLIER
-#define MIN_SILENCE_MS      OLD_MIN_SILENCE_MS
-#define SequenceStep        OldSequenceStep
-#define parse_sequence_file old_parse_sequence_file
-#define play_sequence       old_play_sequence
-#define main                old_main
-#include <fstream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <algorithm>
-#include <cctype>
-#include <cmath>
-#include <chrono>
-#include <thread>
-
-#include <alsa/asoundlib.h>
-
-constexpr unsigned SAMPLE_RATE         = 8000;
-constexpr unsigned CHANNELS            = 1;
-constexpr snd_pcm_format_t FORMAT      = SND_PCM_FORMAT_S16_LE;
-constexpr double   AMPLITUDE           = INT16_MAX * 0.4;
-constexpr unsigned PERIOD_SIZE         = 128;               // ~16 ms @ 8 kHz
-constexpr unsigned BUFFER_MULTIPLIER   = 4;
-constexpr int      MIN_SILENCE_MS      = 5;                 // force at least this much zero after each tone
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Sequence step – reordered for better packing + explicit 16-byte alignment
-// ────────────────────────────────────────────────────────────────────────────────
-
-struct alignas(16) SequenceStep {
-    char        type;          // 'D' or 'C'                                 offset 0
-    int         duration_ms;   // tone duration in ms                        offset 4
-    int         pause_ms;      // inter-tone silence in ms                   offset 8
-    std::string tone;          // "5", "KP1", "ST", etc.                     offset 16
-};
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Tone frequency lookup
@@ -306,55 +265,6 @@ void generate_tone_buffer(int f1, int f2, int duration_ms, std::vector<int16_t>&
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
-// File parsing
-// ────────────────────────────────────────────────────────────────────────────────
-
-bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequence) {
-    std::ifstream file(filename);
-    if (!file) {
-        std::cerr << "Cannot open file: " << filename << "\n";
-        return false;
-    }
-
-    std::string line;
-    int lineno = 0;
-
-    while (std::getline(file, line)) {
-        ++lineno;
-
-        if (line.empty() || line[0] == '#' || line[0] == ';') continue;
-
-        std::istringstream iss(line);
-        std::string token;
-        SequenceStep step{};
-
-        // Type
-        if (!std::getline(iss, token, '\t') || token.length() != 1 ||
-            (token[0] != 'D' && token[0] != 'C')) {
-            std::cerr << "Line " << lineno << ": Invalid type\n";
-            continue;
-        }
-        step.type = token[0];
-
-        // Tone
-        if (!std::getline(iss, token, '\t')) continue;
-        step.tone = std::move(token);
-
-        // Duration
-        if (!std::getline(iss, token, '\t')) continue;
-        try { step.duration_ms = std::stoi(token); } catch (...) { continue; }
-
-        // Pause
-        if (!std::getline(iss, token, '\t')) continue;
-        try { step.pause_ms = std::stoi(token); } catch (...) { continue; }
-
-        sequence.push_back(std::move(step));
-    }
-
-    return true;
-}
-
-// ────────────────────────────────────────────────────────────────────────────────
 // ALSA setup
 // ────────────────────────────────────────────────────────────────────────────────
 
@@ -416,86 +326,4 @@ bool write_frames(snd_pcm_t* handle, const int16_t* data, size_t frame_count) {
     }
 
     return true;
-}
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Playback loop – tone → silence (no sleep_for for pauses)
-// ────────────────────────────────────────────────────────────────────────────────
-
-void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence) {
-    // Reusable small silence chunk (~32 ms)
-    std::vector<int16_t> silence_chunk(PERIOD_SIZE * 2, 0);
-
-    for (size_t i = 0; i < sequence.size(); ++i) {
-        const auto& step = sequence[i];
-
-        int f1 = 0, f2 = 0;
-        bool valid = false;
-
-        if (step.type == 'D') {
-            if (step.tone.length() == 1) {
-                valid = get_dtmf_freqs(step.tone[0], f1, f2);
-            }
-        } else {
-            valid = get_c5_freqs(step.tone, f1, f2);
-        }
-
-        if (!valid) {
-            std::cerr << "Step " << (i+1) << ": Invalid tone '" << step.tone
-                      << "' for type " << step.type << " → skipping tone\n";
-        } else if (step.duration_ms > 0) {
-            std::vector<int16_t> tone_buffer;
-            generate_tone_buffer(f1, f2, step.duration_ms, tone_buffer);
-            if (!tone_buffer.empty()) {
-                write_frames(handle, tone_buffer.data(), tone_buffer.size());
-            }
-        }
-
-        // Always play silence for the pause (or minimum amount)
-        int silence_ms = std::max(step.pause_ms, MIN_SILENCE_MS);
-        size_t silence_samples = static_cast<size_t>(silence_ms * SAMPLE_RATE / 1000.0 + 0.5);
-
-        size_t remaining = silence_samples;
-        while (remaining > 0) {
-            size_t chunk_frames = std::min(remaining, silence_chunk.size());
-            write_frames(handle, silence_chunk.data(), chunk_frames);
-            remaining -= chunk_frames;
-        }
-    }
-}
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Entry point
-// ────────────────────────────────────────────────────────────────────────────────
-
-int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " sequence.txt\n\n"
-                  << "Tab-delimited format (one line per step):\n"
-                  << "Type\tTone\tDuration_ms\tPause_ms\n"
-                  << "D\t5\t120\t80\n"
-                  << "C\tKP1\t100\t200\n"
-                  << "C\tST\t80\t50\n"
-                  << "# comments and blank lines ignored\n";
-        return 1;
-    }
-
-    std::vector<SequenceStep> sequence;
-    if (!parse_sequence_file(argv[1], sequence)) {
-        return 1;
-    }
-
-    std::cout << "Loaded " << sequence.size() << " steps.\n";
-
-    snd_pcm_t* handle = nullptr;
-    if (!setup_alsa(handle)) {
-        return 1;
-    }
-
-    play_sequence(handle, sequence);
-
-    snd_pcm_drain(handle);
-    snd_pcm_close(handle);
-
-    return 0;
 }
