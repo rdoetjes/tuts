@@ -1,5 +1,3 @@
-#Wait for enter to start dialing toll free number
-~
 #Dial the toll free number that ends in the USA
 D	0	150	50
 D	6	150	50
