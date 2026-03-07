@@ -387,7 +387,7 @@ bool setup_alsa(snd_pcm_t*& handle) {
     }
 
     //have also settle, to prevent partial begin note
-    std::this_thread::sleep_for(std::chrono::milliseconds(800));
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
     return true;
 }
 
