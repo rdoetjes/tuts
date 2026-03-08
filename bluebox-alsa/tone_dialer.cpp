@@ -65,7 +65,12 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
         // Handle wait command
         if (token == "~") {
             step.type = '~';
-            sequence.push_back(std::move(step));
+            if (!std::getline(iss, token, '\t'))
+                sequence.push_back(std::move(step));
+            else {
+                step.duration_ms = std::stoi(token);
+                sequence.push_back(std::move(step));
+            }
             continue;
         }
 
@@ -100,19 +105,20 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence)
     for (size_t i = 0; i < sequence.size(); ++i) {
         const auto& step = sequence[i];
 
-        if (step.type == '~') {
+        if (step.type == '~' && step.duration_ms == 0) {
             std::cout << "Waiting for Enter.. (Press Enter)\n";
             std::cin.get();
+            continue;
+        } else if (step.type == '~' && step.duration_ms > 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
             continue;
         }
 
         int f1 = 0, f2 = 0;
         bool valid = false;
 
-        if (step.type == 'D') {
-            if (step.tone.length() == 1) {
+        if (step.type == 'D' && step.tone.length() == 1) {
                 valid = get_dtmf_freqs(step.tone[0], f1, f2);
-            }
         } else if (step.type == 'C') {
             valid = get_c5_freqs(step.tone, f1, f2);
         }
