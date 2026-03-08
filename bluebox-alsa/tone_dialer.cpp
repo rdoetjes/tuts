@@ -53,7 +53,7 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
 
     while (std::getline(file, line)) {
         ++lineno;
-        if (line.empty() || line[0] == '#' || line[0] == ';') continue;
+        if (line.empty() || line[0] == '#' || line[0] == ';') continue; //comment lines
 
         std::istringstream iss(line);
         std::string token;
