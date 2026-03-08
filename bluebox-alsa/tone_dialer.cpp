@@ -195,8 +195,8 @@ bool get_c5_freqs(const std::string& code, int& f1, int& f2) {
     std::string upper = code;
     std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
 
-    if (upper == "KP1" || upper == "PK1")   { f1 = 1100; f2 = 1700; return true; }
-    if (upper == "KP2" || upper == "PK2")   { f1 = 1300; f2 = 1700; return true; }
+    if (upper == "KP1")                     { f1 = 1100; f2 = 1700; return true; }
+    if (upper == "KP2")                     { f1 = 1300; f2 = 1700; return true; }
     if (upper == "ST")                      { f1 = 1500; f2 = 1700; return true; }
     if (upper == "CODE11")                  { f1 =  700; f2 = 1700; return true; }
     if (upper == "CODE12")                  { f1 =  900; f2 = 1700; return true; }
