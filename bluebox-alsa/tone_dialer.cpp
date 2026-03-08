@@ -8,7 +8,6 @@
 #include <cmath>
 #include <chrono>
 #include <thread>
-#include <climits>
 #include <alsa/asoundlib.h>
 
 // ------------------------------------------------------------------------------------------------
