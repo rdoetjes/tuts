@@ -14,7 +14,7 @@ D	0	150	50
 ~
 #Clear the trunk
 C	CLEARFWD	250	50
-#Seize the trunk 2600Hz for 300 milliseconds
+#Seize the trunk wait for 2600Hz for 300 milliseconds
 #This is very timing specific you could use only ~ to wait and listen for 2600Hz confirmation tone
 C	SEIZE	250	300
 #Signal international call
