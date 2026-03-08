@@ -10,10 +10,6 @@
 #include <thread>
 #include <alsa/asoundlib.h>
 
-// ------------------------------------------------------------------------------------------------
-// FEATURE IMPLEMENTATION INJECTED AT TOP
-// ------------------------------------------------------------------------------------------------
-
 // Constants needed for the new implementation
 constexpr unsigned SAMPLE_RATE         = 8000;
 constexpr unsigned CHANNELS            = 1;
@@ -23,7 +19,7 @@ constexpr unsigned PERIOD_SIZE         = 128;               // ~16 ms @ 8 kHz
 constexpr unsigned BUFFER_MULTIPLIER   = 4;
 constexpr int      MIN_SILENCE_MS      = 5;                 // force at least this much zero after each tone
 
-// Redefined struct to ensure we can use it in our new parser
+// Structure that holds the parsed information
 struct alignas(16) SequenceStep {
     char        type;          // 'D', 'C', or '~'
     int         duration_ms;
