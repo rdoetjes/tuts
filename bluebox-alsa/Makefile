@@ -45,10 +45,10 @@ clean:
 rebuild: clean all
 
 run: release
-	./$(TARGET) example_sequence.txt
+	./$(TARGET) nation_call_kp1
 
 run-debug: debug
-	./$(TARGET)-debug example_sequence.txt
+	./$(TARGET)-debug nation_call_kp1
 
 help:
 	@echo "Available targets:"
