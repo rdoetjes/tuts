@@ -1,6 +1,6 @@
 # bluebox-alsa
 
-A small ALSA-based BlueBox for producing DTMF and CCITT (C5) MF tones. 
+A small ALSA-based BlueBox for producing DTMF and CCITT (C5) MF tones, as used in the 80s and 90s to seize control over C5 international trunks. Something us Dutch hackers did a lot until the mid 90s, when C5 trunks were superseeded by SS7.
 
 The program reads a simple tab-delimited "sequence" file and plays tones via the default ALSA playback device. It's useful for scripting tone sequences such as dialing procedures, signaling (KP1/KP2/ST), and other multi-frequency tones.
 
