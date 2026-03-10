@@ -47,7 +47,8 @@ The default build target here is `release`. The `Makefile` links against ALSA (`
 Usage:
 
 ```/dev/null/USAGE.md#L1-4
-./tone_dialer sequence_file.txt
+./tone_dialer <sequence file>
+./tone_dialer international_transit_kp2
 ```
 
 You can also use the Makefile helper targets:
@@ -60,7 +61,7 @@ make run-debug  # builds debug and runs a (local) example filename if present
 Note: The `make run` target in the included `Makefile` attempts to run `./tone_dialer nation_call_kp1`. Replace that example filename with any sequence file you want to play, e.g.:
 
 ```/dev/null/USAGE.md#L1-2
-./tone_dialer national_call_kp1
+./tone_dialer mary_had_alittle_lamb
 ```
 
 ## Sequence file format
