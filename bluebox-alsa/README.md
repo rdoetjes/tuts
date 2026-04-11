@@ -214,5 +214,6 @@ Example
 ```bash
 ./bruteforce_generate_pins_and_dial.sh 0306061361.txt 3 5 > brute_force_0306061361
 ```
+
 You need to redirect the output to a file that can be used by the tone_dialer.
 ---
