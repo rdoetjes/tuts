@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if (( $# < 1 )); then 
+if (( $# < 1 )); then
 	printf "Usage: %s <file_with_number_to_dial> [number of digits in pin] [redial after number of attempts]\n" "$0"
 	printf "Example: %s 0306061361.txt 3 5\n" "$0"
 	printf "Example: %s 0306061361.txt\n" "$0"
@@ -23,6 +23,16 @@ if (( $# == 3 )); then
 fi
 
 for ((i=0; i<=max; i++)); do
+    # Every 3rd iteration
+    if (( i  % attempts == 0 )); then
+        if [[ -f $1 ]]; then
+            cat "$1"
+        else
+            echo "Error: $1 not found!" >&2
+            exit 1
+        fi
+    fi
+
     # Format number with leading zeros
     if (( digits == 2 )); then
         a=$(printf "%02d" "$i")
@@ -38,13 +48,4 @@ for ((i=0; i<=max; i++)); do
 
     printf "~\t1000\n"
 
-    # Every 3rd iteration
-    if (( (i + 1) % attempts == 0 )); then
-        if [[ -f $1 ]]; then
-            cat "$1"
-        else
-            echo "Error: $1 not found!" >&2
-            exit 1
-        fi
-    fi
 done
