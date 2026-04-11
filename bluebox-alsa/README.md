@@ -203,9 +203,11 @@ There are also international examples: `international_transit_kp2`, `internation
   - `international_rusty-n-edy_kp1`
 
 ## Brute force dial file generator
+
 The tool bruteforce_generate_pins_and_dial.sh allows you to generate a bruteforce pin code hack file, that will brute force through a pin on a answering machine.
 The tool has the following options:
-bruteforce_generate_pins_and_dial.sh <dial_file_for_answering_machine> [number of combinations] [number of attempts]
-When the number of attempts is reached the <dial_file_for_answering_machine> is concatenated forcing the tone_dialer to redial the answering machine.
-The defaults for number_of_combinations is 2 and the default for attempts is 3; these are the most common combinations on answering machines of the day.
+- bruteforce_generate_pins_and_dial.sh <dial_file_for_answering_machine> [number of combinations] [number of attempts]
+- When the number of attempts is reached the <dial_file_for_answering_machine> is concatenated forcing the tone_dialer to redial the answering machine.
+- The defaults for number_of_combinations is 2 and the default for attempts is 3; these are the most common combinations on answering machines of the day.
+
 ---
