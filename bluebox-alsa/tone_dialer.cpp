@@ -105,6 +105,7 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence)
             std::cin.get();
             continue;
         } else if (step.type == '~' && step.duration_ms > 0) {
+            std::cout << "~ " << step.duration_ms << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
             continue;
         }
@@ -138,6 +139,7 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence)
             write_frames(handle, silence_chunk.data(), chunk_frames);
             remaining -= chunk_frames;
         }
+        std::cout << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
     }
 }
 
