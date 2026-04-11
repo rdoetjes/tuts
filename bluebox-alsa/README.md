@@ -209,6 +209,10 @@ The tool has the following options:
 - bruteforce_generate_pins_and_dial.sh <dial_file_for_answering_machine> [number of combinations] [number of attempts]
 - When the number of attempts is reached the <dial_file_for_answering_machine> is concatenated forcing the tone_dialer to redial the answering machine.
 - The defaults for number_of_combinations is 2 and the default for attempts is 3; these are the most common combinations on answering machines of the day.
-- Example ./bruteforce_generate_pins_and_dial.sh 0306061361.txt 3 5 > brute_force_0306061361
+
+Example 
+```bash
+./bruteforce_generate_pins_and_dial.sh 0306061361.txt 3 5 > brute_force_0306061361
+```
 You need to redirect the output to a file that can be used by the tone_dialer.
 ---
