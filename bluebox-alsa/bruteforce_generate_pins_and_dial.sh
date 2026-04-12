@@ -10,7 +10,7 @@ fi
 
 #Change timeouts accordingly to your requirement
 dial_string="D\t%s\t100\t100\n"
-#if no eol is rquired change to"
+#if no eol is rquired change to""
 eol_string="D\t#\t100\t100\n"
 
 # Default to 2 digits unless explicitly 3
