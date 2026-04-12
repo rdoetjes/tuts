@@ -13,6 +13,14 @@ digits=2
 max=99
 attempts=3
 
+if [[ -f $1 ]]; then
+    dial=$(cat "$1")
+else
+    echo "Error: $1 not found!" >&2
+    exit 1
+fi
+
+
 if (( $2 == 3 )); then
     digits=3
     max=999
@@ -25,12 +33,7 @@ fi
 for ((i=0; i<=max; i++)); do
     # Every 3rd iteration
     if (( i  % attempts == 0 )); then
-        if [[ -f $1 ]]; then
-            cat "$1"
-        else
-            echo "Error: $1 not found!" >&2
-            exit 1
-        fi
+        echo "$dial"
     fi
 
     # Format number with leading zeros
@@ -45,7 +48,7 @@ for ((i=0; i<=max; i++)); do
         char="${a:j:1}"
         printf "D\t%s\t50\t50\n" "$char"
     done
-
+    # Some answering machines require # as eol
+    printf "D\t#\t50\t50\n"
     printf "~\t1000\n"
-
 done
