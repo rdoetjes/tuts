@@ -13,6 +13,9 @@ digits=2
 max=99
 attempts=3
 
+# Parse arguments
+
+#read dial file with the phone number to dial
 if [[ -f $1 ]]; then
     dial=$(cat "$1")
 else
@@ -20,16 +23,18 @@ else
     exit 1
 fi
 
-
+# check whether to use 2 or 3 digit brute force
 if (( $2 == 3 )); then
     digits=3
     max=999
 fi
 
+# get the number of attempts before redial is required
 if (( $# == 3 )); then
   attempts=$3
 fi
 
+#Brute force all combo's
 for ((i=0; i<=max; i++)); do
     # Every 3rd iteration
     if (( i  % attempts == 0 )); then
