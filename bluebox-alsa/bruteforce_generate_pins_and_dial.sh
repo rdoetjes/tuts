@@ -8,7 +8,13 @@ if (( $# < 1 )); then
 	exit 1
 fi
 
+#Change timeouts accordingly to your requirement
+dial_string="D\t%s\t100\t100\n"
+#if no eol is rquired change to"
+eol_string="D\t#\t100\t100\n"
+
 # Default to 2 digits unless explicitly 3
+
 digits=2
 max=99
 attempts=3
@@ -51,9 +57,9 @@ for ((i=0; i<=max; i++)); do
     # Loop through each digit
     for ((j=0; j<digits; j++)); do
         char="${a:j:1}"
-        printf "D\t%s\t50\t50\n" "$char"
+        printf "$dial_string" "$char"
     done
     # Some answering machines require # as eol
-    printf "D\t#\t50\t50\n"
+    printf "$eol_string"
     printf "~\t1000\n"
 done
