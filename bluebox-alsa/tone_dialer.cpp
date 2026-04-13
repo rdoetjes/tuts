@@ -72,8 +72,8 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
         if (!std::getline(iss, token, '\t')) continue;
 
         // Handle wait command
-        if (token == "~") {
-            step.type = '~';
+        if (token == "~" || token== "H") {
+            step.type = (token=="~")?'~':'H';
             if (!std::getline(iss, token, '\t'))
                 sequence.push_back(std::move(step));
             else {
@@ -120,16 +120,18 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence,
             std::cin.get();
             continue;
         } else if (step.type == '~' && step.duration_ms > 0) {
+            std::cout << step.type << " " << step.duration_ms << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
             continue;
         }
 
         // Handle serial 'H' command: send 'H' over serial and wait up to 1000 ms for a response.
-        if (step.type == 'H') {
+        if (step.type == 'H' && step.duration_ms > 0) {
             if (serial_fd < 0) {
-                std::cerr << "Step " << (i+1) << ": H command requested but serial device not open; skipping\n";
+                std::cout << "Step " << (i+1) << ": H command requested but serial device not open; skipping\n";
             } else {
-                int resp = send_and_wait_serial(serial_fd, 'H', 1000);
+                std::cout << step.type << " " << step.duration_ms << std::endl;
+                int resp = send_and_wait_serial(serial_fd, 'H', step.duration_ms);
                 if (resp == 1) {
                     std::cout << "Step " << (i+1) << ": Serial response: OK\n";
                 } else if (resp == 0) {
@@ -171,6 +173,7 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence,
             write_frames(handle, silence_chunk.data(), chunk_frames);
             remaining -= chunk_frames;
         }
+        std::cout << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
     }
 }
 
@@ -422,12 +425,12 @@ int main(int argc, char* argv[]) {
                   << "Type\tTone\tDuration_ms\tPause_ms\n"
                   << "D\t5\t120\t80\n"
                   << "~\t\t\t\t(Wait for keypress)\n"
-                  << "Optional serial_device defaults to /dev/USB00 for 'H' commands\n";
+                  << "Optional serial_device defaults to /dev/ttyUSB0 for 'H' commands\n";
         return 1;
     }
 
     const char* sequence_file = argv[1];
-    const char* serial_device = (argc >= 3) ? argv[2] : "/dev/USB00";
+    const char* serial_device = (argc >= 3) ? argv[2] : "/dev/ttyUSB0";
 
     std::vector<SequenceStep> sequence;
     if (!parse_sequence_file(sequence_file, sequence)) {
