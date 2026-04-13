@@ -44,7 +44,8 @@ fi
 for ((i=0; i<=max; i++)); do
     # Every 3rd iteration
     if (( i  % attempts == 0 )); then
-        echo -e "H\t10000\t500"
+        #Disabled the hangup
+        #echo -e "H\t10000\t500"
         echo "$dial"
     fi
 
