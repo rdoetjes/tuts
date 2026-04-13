@@ -63,13 +63,13 @@ void parse_wait_command(std::istringstream& iss, SequenceStep& step, std::vector
 void parse_h_command(std::istringstream& iss, SequenceStep& step, std::vector<SequenceStep>& sequence, int lineno) {
     std::string token;
     if (!std::getline(iss, token, '\t')) {
-        std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
+        std::cout << "Line " << lineno << ": invalid duration_ms H command" << std::endl;
         return;
     }
     step.duration_ms = std::stoi(token);
 
     if (!std::getline(iss, token, '\t')) {
-        std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
+        std::cout << "Line " << lineno << ": invalid pause_ms H command" << std::endl;
         return;
     }
     step.pause_ms = std::stoi(token);
