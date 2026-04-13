@@ -50,6 +50,49 @@ int send_and_wait_serial(int fd, char cmd, int timeout_ms);
 void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence, int serial_fd);
 
 // New parsing logic supporting '~'
+void parse_wait_command(std::istringstream& iss, SequenceStep& step, std::vector<SequenceStep>& sequence) {
+    std::string token;
+    if (!std::getline(iss, token, '\t'))
+        sequence.push_back(std::move(step));
+    else {
+        step.duration_ms = std::stoi(token);
+        sequence.push_back(std::move(step));
+    }
+}
+
+void parse_h_command(std::istringstream& iss, SequenceStep& step, std::vector<SequenceStep>& sequence, int lineno) {
+    std::string token;
+    if (!std::getline(iss, token, '\t')) {
+        std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
+        return;
+    }
+    step.duration_ms = std::stoi(token);
+
+    if (!std::getline(iss, token, '\t')) {
+        std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
+        return;
+    }
+    step.pause_ms = std::stoi(token);
+    sequence.push_back(std::move(step));
+}
+
+void parse_tone_command(std::istringstream& iss, SequenceStep& step, std::vector<SequenceStep>& sequence) {
+    std::string token;
+    // Tone
+    if (!std::getline(iss, token, '\t')) return;
+    step.tone = std::move(token);
+
+    // Duration
+    if (!std::getline(iss, token, '\t')) return;
+    try { step.duration_ms = std::stoi(token); } catch (...) { return; }
+
+    // Pause
+    if (!std::getline(iss, token, '\t')) return;
+    try { step.pause_ms = std::stoi(token); } catch (...) { return; }
+
+    sequence.push_back(std::move(step));
+}
+
 bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequence) {
     std::ifstream file(filename);
     if (!file) {
@@ -78,47 +121,76 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
         }
         step.type = token[0];
 
-        // Handle wait command
         if (step.type == '~') {
-            if (!std::getline(iss, token, '\t'))
-                sequence.push_back(std::move(step));
-            else {
-                step.duration_ms = std::stoi(token);
-                sequence.push_back(std::move(step));
-            }
-            continue;
+            parse_wait_command(iss, step, sequence);
+        } else if (step.type == 'H') {
+            parse_h_command(iss, step, sequence, lineno);
+        } else {
+            parse_tone_command(iss, step, sequence);
         }
-
-        if (step.type== 'H'){
-            if (!std::getline(iss, token, '\t')) {
-                std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
-                continue;
-            }
-            step.duration_ms = std::stoi(token);
-
-            if (!std::getline(iss, token, '\t')) {
-                std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
-                continue;
-            }
-            step.pause_ms = std::stoi(token);
-            sequence.push_back(std::move(step));
-        }
-
-        // Tone
-        if (!std::getline(iss, token, '\t')) continue;
-        step.tone = std::move(token);
-
-        // Duration
-        if (!std::getline(iss, token, '\t')) continue;
-        try { step.duration_ms = std::stoi(token); } catch (...) { continue; }
-
-        // Pause
-        if (!std::getline(iss, token, '\t')) continue;
-        try { step.pause_ms = std::stoi(token); } catch (...) { continue; }
-
-        sequence.push_back(std::move(step));
     }
     return true;
+}
+
+void play_wait_enter() {
+    std::cout << "Waiting for Enter.. (Press Enter)\n";
+    std::cin.get();
+}
+
+void play_wait_time(const SequenceStep& step) {
+    std::cout << step.type << " " << step.duration_ms << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
+}
+
+void play_h_command(const SequenceStep& step, int serial_fd, size_t step_index) {
+    if (serial_fd < 0) {
+        std::cout << "serial not open" << std::endl;
+        std::exit(1);
+    } else {
+        std::cout << step.type << " " << step.duration_ms << " " << step.pause_ms << std::endl;
+        int resp = send_and_wait_serial(serial_fd, 'H', step.duration_ms);
+        if (resp == 0) {
+            std::cout << "Step " << (step_index+1) << ": Serial response: FAILED\n";
+            std::exit(1);
+        } else if (resp == -1) {
+            std::cout << "Step " << (step_index+1) << ": Serial response: TIMEOUT\n";
+            std::exit(1);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(step.pause_ms));
+    }
+}
+
+void play_tone_command(const SequenceStep& step, size_t step_index, snd_pcm_t* handle, const std::vector<int16_t>& silence_chunk) {
+    int f1 = 0, f2 = 0;
+    bool valid = false;
+
+    if (step.type == 'D' && step.tone.length() == 1) {
+        valid = get_dtmf_freqs(step.tone[0], f1, f2);
+    } else if (step.type == 'C') {
+        valid = get_c5_freqs(step.tone, f1, f2);
+    }
+
+    if (!valid) {
+        std::cerr << "Step " << (step_index+1) << ": Invalid tone '" << step.tone
+                  << "' for type " << step.type << " → skipping tone\n";
+    } else if (step.duration_ms > 0) {
+        std::vector<int16_t> tone_buffer;
+        generate_tone_buffer(f1, f2, step.duration_ms, tone_buffer);
+        if (!tone_buffer.empty()) {
+            write_frames(handle, tone_buffer.data(), tone_buffer.size());
+        }
+    }
+
+    int silence_ms = std::max(step.pause_ms, MIN_SILENCE_MS);
+    size_t silence_samples = static_cast<size_t>(silence_ms * SAMPLE_RATE / 1000.0 + 0.5);
+
+    size_t remaining = silence_samples;
+    while (remaining > 0) {
+        size_t chunk_frames = std::min(remaining, silence_chunk.size());
+        write_frames(handle, silence_chunk.data(), chunk_frames);
+        remaining -= chunk_frames;
+    }
+    std::cout << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
 }
 
 // New playback loop supporting '~'
@@ -128,70 +200,20 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence,
     for (size_t i = 0; i < sequence.size(); ++i) {
         const auto& step = sequence[i];
 
-        // Hande ~
-        if (step.type == '~' && step.duration_ms == 0) {
-            std::cout << "Waiting for Enter.. (Press Enter)\n";
-            std::cin.get();
-            continue;
-        } else if (step.type == '~' && step.duration_ms > 0) {
-            std::cout << step.type << " " << step.duration_ms << std::endl;
-            std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
-            continue;
-        }
-
-        // Handle serial 'H' command: send 'H' over serial and wait up to 1000 ms for a response.
-        if (step.type == 'H') {
-            if (serial_fd < 0) {
-                std::cout << "serial not open" << std::endl;
-                std::exit(1);
+        if (step.type == '~') {
+            if (step.duration_ms == 0) {
+                play_wait_enter();
             } else {
-                std::cout << step.type << " " << step.duration_ms << " " << step.pause_ms << std::endl;
-                int resp = send_and_wait_serial(serial_fd, 'H', step.duration_ms);
-                if (resp == 0) {
-                    std::cout << "Step " << (i+1) << ": Serial response: FAILED\n";
-                    std::exit(1);
-                } else if (resp == -1) {
-                    std::cout << "Step " << (i+1) << ": Serial response: TIMEOUT\n";
-                    std::exit(1);
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(step.pause_ms));
+                play_wait_time(step);
             }
-            continue;
+        } else if (step.type == 'H') {
+            play_h_command(step, serial_fd, i);
+        } else {
+            play_tone_command(step, i, handle, silence_chunk);
         }
-
-        // HANDLE D and C
-        int f1 = 0, f2 = 0;
-        bool valid = false;
-
-        if (step.type == 'D' && step.tone.length() == 1) {
-                valid = get_dtmf_freqs(step.tone[0], f1, f2);
-        } else if (step.type == 'C') {
-            valid = get_c5_freqs(step.tone, f1, f2);
-        }
-
-        if (!valid) {
-            std::cerr << "Step " << (i+1) << ": Invalid tone '" << step.tone
-                      << "' for type " << step.type << " → skipping tone\n";
-        } else if (step.duration_ms > 0) {
-            std::vector<int16_t> tone_buffer;
-            generate_tone_buffer(f1, f2, step.duration_ms, tone_buffer);
-            if (!tone_buffer.empty()) {
-                write_frames(handle, tone_buffer.data(), tone_buffer.size());
-            }
-        }
-
-        int silence_ms = std::max(step.pause_ms, MIN_SILENCE_MS);
-        size_t silence_samples = static_cast<size_t>(silence_ms * SAMPLE_RATE / 1000.0 + 0.5);
-
-        size_t remaining = silence_samples;
-        while (remaining > 0) {
-            size_t chunk_frames = std::min(remaining, silence_chunk.size());
-            write_frames(handle, silence_chunk.data(), chunk_frames);
-            remaining -= chunk_frames;
-        }
-        std::cout << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
     }
 }
+
 
 
 // ────────────────────────────────────────────────────────────────────────────────
