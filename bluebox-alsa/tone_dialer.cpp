@@ -8,6 +8,14 @@
 #include <cmath>
 #include <chrono>
 #include <thread>
+#include <cstring>
+#include <cerrno>
+#include <fcntl.h>
+#include <unistd.h>
+#include <termios.h>
+#include <sys/select.h>
+#include <sys/types.h>
+#include <sys/time.h>
 #include <alsa/asoundlib.h>
 
 // Constants needed for the new implementation
@@ -33,7 +41,13 @@ bool get_c5_freqs(const std::string& code, int& f1, int& f2);
 void generate_tone_buffer(int f1, int f2, int duration_ms, std::vector<int16_t>& buffer);
 bool setup_alsa(snd_pcm_t*& handle);
 bool write_frames(snd_pcm_t* handle, const int16_t* data, size_t frame_count);
-void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence);
+
+// Serial helpers
+int open_serial(const char* path);
+int send_and_wait_serial(int fd, char cmd, int timeout_ms);
+
+// Play routine now receives a serial fd (or -1 if none)
+void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence, int serial_fd);
 
 // New parsing logic supporting '~'
 bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequence) {
@@ -70,7 +84,7 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
         }
 
         // Type
-        if (token.length() != 1 || (token[0] != 'D' && token[0] != 'C')) {
+        if (token.length() != 1 || (token[0] != 'D' && token[0] != 'C' && token[0] != 'H')) {
             std::cerr << "Line " << lineno << ": Invalid type >" << token[0] << "< \n";
             continue;
         }
@@ -94,22 +108,40 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
 }
 
 // New playback loop supporting '~'
-void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence) {
+void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence, int serial_fd) {
     std::vector<int16_t> silence_chunk(PERIOD_SIZE * 2, 0);
 
     for (size_t i = 0; i < sequence.size(); ++i) {
         const auto& step = sequence[i];
 
+        // Hande ~
         if (step.type == '~' && step.duration_ms == 0) {
             std::cout << "Waiting for Enter.. (Press Enter)\n";
             std::cin.get();
             continue;
         } else if (step.type == '~' && step.duration_ms > 0) {
-            std::cout << "~ " << step.duration_ms << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
             continue;
         }
 
+        // Handle serial 'H' command: send 'H' over serial and wait up to 1000 ms for a response.
+        if (step.type == 'H') {
+            if (serial_fd < 0) {
+                std::cerr << "Step " << (i+1) << ": H command requested but serial device not open; skipping\n";
+            } else {
+                int resp = send_and_wait_serial(serial_fd, 'H', 1000);
+                if (resp == 1) {
+                    std::cout << "Step " << (i+1) << ": Serial response: OK\n";
+                } else if (resp == 0) {
+                    std::cout << "Step " << (i+1) << ": Serial response: FAILED\n";
+                } else {
+                    std::cout << "Step " << (i+1) << ": Serial response: TIMEOUT\n";
+                }
+            }
+            continue;
+        }
+
+        // HANDLE D and C
         int f1 = 0, f2 = 0;
         bool valid = false;
 
@@ -139,7 +171,6 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence)
             write_frames(handle, silence_chunk.data(), chunk_frames);
             remaining -= chunk_frames;
         }
-        std::cout << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
     }
 }
 
@@ -300,31 +331,127 @@ bool write_frames(snd_pcm_t* handle, const int16_t* data, size_t frame_count) {
 }
 
 
-// New main
+// New main + serial helpers
+int open_serial(const char* path) {
+    int fd = open(path, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (fd < 0) {
+        std::cerr << "Cannot open serial device " << path << ": " << std::strerror(errno) << "\n";
+        return -1;
+    }
+
+    struct termios tty;
+    if (tcgetattr(fd, &tty) != 0) {
+        std::cerr << "tcgetattr failed: " << std::strerror(errno) << "\n";
+        close(fd);
+        return -1;
+    }
+
+    cfsetospeed(&tty, B9600);
+    cfsetispeed(&tty, B9600);
+
+    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;
+    tty.c_cflag &= ~PARENB;
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag &= ~CRTSCTS;
+    tty.c_cflag |= CLOCAL | CREAD;
+
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+    tty.c_oflag &= ~OPOST;
+
+    // Non-blocking read behavior with select-based timeout, no character-level blocking
+    tty.c_cc[VMIN] = 0;
+    tty.c_cc[VTIME] = 0;
+
+    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+        std::cerr << "tcsetattr failed: " << std::strerror(errno) << "\n";
+        close(fd);
+        return -1;
+    }
+
+    return fd;
+}
+
+// Send a single-byte command and wait up to timeout_ms for a single-byte response.
+// Returns: 1 for '1', 0 for '0', -1 for timeout or other errors.
+int send_and_wait_serial(int fd, char cmd, int timeout_ms) {
+    if (fd < 0) return -1;
+
+    ssize_t w = write(fd, &cmd, 1);
+    if (w != 1) {
+        std::cerr << "Failed to write serial command: " << std::strerror(errno) << "\n";
+        return -1;
+    }
+
+    // Wait for data with select()
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    FD_SET(fd, &rfds);
+
+    struct timeval tv;
+    tv.tv_sec = timeout_ms / 1000;
+    tv.tv_usec = (timeout_ms % 1000) * 1000;
+
+    int sel = select(fd + 1, &rfds, nullptr, nullptr, &tv);
+    if (sel <= 0) {
+        // timeout or error
+        if (sel < 0) std::cerr << "select failed on serial fd: " << std::strerror(errno) << "\n";
+        return -1;
+    }
+
+    if (FD_ISSET(fd, &rfds)) {
+        char buf = 0;
+        ssize_t r = read(fd, &buf, 1);
+        if (r == 1) {
+            if (buf == '1') return 1;
+            if (buf == '0') return 0;
+            // unexpected payload — return -1 but still print
+            std::cerr << "Serial responded with unexpected byte: " << buf << "\n";
+            return -1;
+        }
+    }
+
+    return -1;
+}
+
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " sequence.txt\n\n"
+    // Allow optional serial device as the second argument: program sequence.txt [serial_device]
+    if (argc < 2 || argc > 3) {
+        std::cerr << "Usage: " << argv[0] << " sequence.txt [serial_device]\n\n"
                   << "Tab-delimited format (one line per step):\n"
                   << "Type\tTone\tDuration_ms\tPause_ms\n"
                   << "D\t5\t120\t80\n"
-                  << "~\t\t\t\t(Wait for keypress)\n";
+                  << "~\t\t\t\t(Wait for keypress)\n"
+                  << "Optional serial_device defaults to /dev/USB00 for 'H' commands\n";
         return 1;
     }
 
+    const char* sequence_file = argv[1];
+    const char* serial_device = (argc >= 3) ? argv[2] : "/dev/USB00";
+
     std::vector<SequenceStep> sequence;
-    if (!parse_sequence_file(argv[1], sequence)) {
+    if (!parse_sequence_file(sequence_file, sequence)) {
         return 1;
     }
 
     std::cout << "Loaded " << sequence.size() << " steps.\n";
 
+    // Open ALSA
     snd_pcm_t* handle = nullptr;
     if (!setup_alsa(handle)) {
         return 1;
     }
 
-    play_sequence(handle, sequence);
+    // Try to open serial device (optional). If it fails we continue but H commands will be skipped.
+    int serial_fd = open_serial(serial_device);
+    if (serial_fd < 0) {
+        std::cerr << "Warning: serial device not available; 'H' commands will be skipped.\n";
+    }
 
+    play_sequence(handle, sequence, serial_fd);
+
+    // Cleanup
+    if (serial_fd >= 0) close(serial_fd);
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
 
