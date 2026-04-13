@@ -71,9 +71,15 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
         // Check first token
         if (!std::getline(iss, token, '\t')) continue;
 
+        // Type
+        if (token.length() != 1 || (token[0] != 'D' && token[0] != 'C' && token[0] != 'H' && token[0] != '~')) {
+            std::cerr << "Line " << lineno << ": Invalid type >" << token[0] << "< \n";
+            continue;
+        }
+        step.type = token[0];
+
         // Handle wait command
-        if (token == "~" || token== "H") {
-            step.type = (token=="~")?'~':'H';
+        if (step.type == '~') {
             if (!std::getline(iss, token, '\t'))
                 sequence.push_back(std::move(step));
             else {
@@ -83,12 +89,20 @@ bool parse_sequence_file(const char* filename, std::vector<SequenceStep>& sequen
             continue;
         }
 
-        // Type
-        if (token.length() != 1 || (token[0] != 'D' && token[0] != 'C' && token[0] != 'H')) {
-            std::cerr << "Line " << lineno << ": Invalid type >" << token[0] << "< \n";
-            continue;
+        if (step.type== 'H'){
+            if (!std::getline(iss, token, '\t')) {
+                std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
+                continue;
+            }
+            step.duration_ms = std::stoi(token);
+
+            if (!std::getline(iss, token, '\t')) {
+                std::cout << "Error in line " << lineno << "H command duartion_ms" << std::endl;
+                continue;
+            }
+            step.pause_ms = std::stoi(token);
+            sequence.push_back(std::move(step));
         }
-        step.type = token[0];
 
         // Tone
         if (!std::getline(iss, token, '\t')) continue;
@@ -126,19 +140,21 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence,
         }
 
         // Handle serial 'H' command: send 'H' over serial and wait up to 1000 ms for a response.
-        if (step.type == 'H' && step.duration_ms > 0) {
+        if (step.type == 'H') {
             if (serial_fd < 0) {
-                std::cout << step.type << " " << step.duration_ms;
+                std::cout << "serial not open" << std::endl;
+                std::exit(1);
             } else {
-                std::cout << step.type << " " << step.duration_ms << std::endl;
+                std::cout << step.type << " " << step.duration_ms << " " << step.pause_ms << std::endl;
                 int resp = send_and_wait_serial(serial_fd, 'H', step.duration_ms);
-                if (resp == 1) {
-                    std::cout << "Step " << (i+1) << ": Serial response: OK\n";
-                } else if (resp == 0) {
+                if (resp == 0) {
                     std::cout << "Step " << (i+1) << ": Serial response: FAILED\n";
-                } else {
+                    std::exit(1);
+                } else if (resp == -1) {
                     std::cout << "Step " << (i+1) << ": Serial response: TIMEOUT\n";
+                    std::exit(1);
                 }
+                std::this_thread::sleep_for(std::chrono::milliseconds(step.pause_ms));
             }
             continue;
         }
@@ -406,7 +422,7 @@ int send_and_wait_serial(int fd, char cmd, int timeout_ms) {
         char buf = 0;
         ssize_t r = read(fd, &buf, 1);
         if (r == 1) {
-            if (buf == '1') return 1;
+            if (buf == 'H') return 1;
             if (buf == '0') return 0;
             // unexpected payload — return -1 but still print
             std::cerr << "Serial responded with unexpected byte: " << buf << "\n";

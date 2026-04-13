@@ -79,14 +79,14 @@ Type<TAB>Tone<TAB>Duration_ms<TAB>Pause_ms
   - `C<TAB>KP1<TAB>100<TAB>50` — play C5 code `KP1` for 100 ms, pause 50 ms.
   - `~<TAB><TAB><TAB>` — a wait entry. If the duration field is is empty it waits for you to press Enter. 
   - `~<TAB>300<TAB><TAB>` — wait for 300 milliseconds before continuing to the next stop of the sequence.
-  - `H<TAB>1000<TAB><TAB>` — SEND the H command over the serial port and wait a maximum of 1000ms as timeout 
+  - `H<TAB>1000<TAB>2000<TAB>` — SEND the H command over the serial port and wait a maximum of 1000ms as timeout and wait 2000 before continue to the next step
 
 Detailed meaning of fields:
 - `Type`:
   - `D` — DTMF digit. `Tone` must be a single character: `0-9`, `*`, `#`, or `A-D`.
   - `C` — C5 / CCITT5 tone. `Tone` may be a single digit (`0-9`) mapped to preset freq pairs, or a named tone like `KP1`, `KP2`, `ST`, `SEIZE`, etc.
   - `~` — Wait/interactive. If a duration is provided and >0, the program sleeps that many ms. If duration is 0 or missing, the program waits for you to press Enter.
-  - 'H' — This communicates over the serial port (default /dev/ttyUSB0 can be set as 2nd argument). It will send the H command to a microcontroller over serial, that controller will then toggle a relat in line with A or B, to hang up the phone and return 0 for fail 1 for success.
+  - 'H' — This communicates over the serial port (default /dev/ttyUSB0 can be set as 2nd argument). It will send the H command to a microcontroller over serial, that controller will then toggle a relay in line with A or B wire, to hang up the phone. The microcontroller will return 0 for fail H for success.
 - `Tone`:
   - For `D`: single DTMF character.
   - For `C`: numeric 0–9 or strings like `KP1`, `KP2`, `ST`, `CODE11`, `CODE12`, `SEIZE`, `PROCEED` (or `PK`), `ANSWER`, `BUSY` (or `BUSYFLASH`), `CLEARBACK`, `CLEARFWD` (or `RELGUARD`).
