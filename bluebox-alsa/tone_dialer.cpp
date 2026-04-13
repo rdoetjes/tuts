@@ -128,7 +128,7 @@ void play_sequence(snd_pcm_t* handle, const std::vector<SequenceStep>& sequence,
         // Handle serial 'H' command: send 'H' over serial and wait up to 1000 ms for a response.
         if (step.type == 'H' && step.duration_ms > 0) {
             if (serial_fd < 0) {
-                std::cout << "Step " << (i+1) << ": H command requested but serial device not open; skipping\n";
+                std::cout << step.type << " " << step.duration_ms;
             } else {
                 std::cout << step.type << " " << step.duration_ms << std::endl;
                 int resp = send_and_wait_serial(serial_fd, 'H', step.duration_ms);
