@@ -1,2 +1,15 @@
+# Object files
 *.o
+*.obj
+
+# Common native executables
+*.exe
+*.out
+
+# Binaries produced by this project
 tone_dialer
+tone_dialer-debug
+main
+
+# macOS debug bundles
+*.dSYM
