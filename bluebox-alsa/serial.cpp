@@ -25,6 +25,18 @@
 
 namespace bluebox {
 namespace serial {
+/*
+    *  * Parameters:
+    *  - fd:     Open serial file descriptor (as returned from open_serial).
+    *  - cmd:    Single command byte to write (e.g. 'H').
+    *  - timeout_ms: Maximum time to wait for a 1-byte response in milliseconds.
+    *
+    *   Response interpretation:
+    *  - Returns  1 if the device responded with ASCII '1' (success/OK).
+    *  - Returns  0 if the device responded with ASCII '0' (failure).
+    *  - Returns -1 on timeout, write/read error, or unexpected response.
+    */
+int wait_and_read(int fd, int timeout_ms);
 
 int open_serial(const char* path) {
     if (path == nullptr) path = DEFAULT_DEVICE;
