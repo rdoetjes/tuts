@@ -119,7 +119,7 @@ int send_and_wait_serial(int fd, char cmd, int timeout_ms) {
         char resp = 0;
         ssize_t r = ::read(fd, &resp, 1);
         if (r == 1) {
-            if (resp == '1') return 1;
+            if (resp == 'H') return 1;
             if (resp == '0') return 0;
             // Some devices may append newline; trim common whitespace and re-evaluate.
             // If unexpected byte, attempt to read until newline or timeout quickly (best-effort)

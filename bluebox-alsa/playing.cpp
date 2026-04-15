@@ -128,8 +128,10 @@ void play_sequence(snd_pcm_t* handle, const std::vector<parsing::SequenceStep>& 
                 std::cout << "Waiting for Enter.. (Press Enter)\n";
                 // Ensure any pending input doesn't leak; simple blocking getline is fine.
                 std::string tmp;
+                std::cout << "step: " << (i+1) << " " << step.type << std::endl;
                 std::getline(std::cin, tmp);
             } else {
+                std::cout << "step: " << (i+1) << " " << step.type << " " << step.duration_ms << " " << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
             }
             continue;
@@ -142,11 +144,10 @@ void play_sequence(snd_pcm_t* handle, const std::vector<parsing::SequenceStep>& 
             } else {
                 // Use serial module to send 'H' and wait up to 1000 ms
                 int resp = bluebox::serial::send_and_wait_serial(serial_fd, 'H', 1000);
-                if (resp == 1) {
-                    std::cout << "Step " << (i+1) << ": Serial response: OK\n";
-                } else if (resp == 0) {
+                std::cout << "step: " << (i+1) << " " << step.type << " " << step.duration_ms << " " << step.pause_ms << std::endl;
+                if (resp == 0) {
                     std::cout << "Step " << (i+1) << ": Serial response: FAILED\n";
-                } else {
+                } else if (resp == -1) {
                     std::cout << "Step " << (i+1) << ": Serial response: TIMEOUT/ERROR\n";
                 }
             }
@@ -201,6 +202,7 @@ void play_sequence(snd_pcm_t* handle, const std::vector<parsing::SequenceStep>& 
             write_frames(handle, silence_chunk.data(), chunk);
             remaining -= chunk;
         }
+        std::cout << "step: " << (i+1) << " " << step.type << " " << " " << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
     } // for sequence
 }
 
