@@ -110,6 +110,78 @@ void generate_tone_buffer(int f1, int f2, int duration_ms, std::vector<int16_t>&
     }
 }
 
+static void play_wait_step(const parsing::SequenceStep& step, size_t index) {
+    if (step.duration_ms == 0) {
+        std::cout << "Waiting for Enter.. (Press Enter)\n";
+        std::string tmp;
+        std::cout << "step: " << (index+1) << " " << step.type << std::endl;
+        std::getline(std::cin, tmp);
+    } else {
+        std::cout << "step: " << (index+1) << " " << step.type << " " << step.duration_ms << " " << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
+    }
+}
+
+static void play_h_step(snd_pcm_t* handle, const parsing::SequenceStep& step, size_t index, int serial_fd, const std::vector<int16_t>& silence_chunk) {
+    if (serial_fd < 0) {
+        std::cerr << "play_sequence: H command requested but no serial device open; skipping\n";
+    } else {
+        int resp = bluebox::serial::send_and_wait_serial(serial_fd, 'H', 1000);
+        std::cout << "step: " << (index+1) << " " << step.type << " " << step.duration_ms << " " << step.pause_ms << std::endl;
+        if (resp == 0) {
+            std::cout << "Step " << (index+1) << ": Serial response: FAILED\n";
+        } else if (resp == -1) {
+            std::cout << "Step " << (index+1) << ": Serial response: TIMEOUT/ERROR\n";
+        }
+    }
+
+    int silence_ms = std::max(step.pause_ms, MIN_SILENCE_MS);
+    size_t silence_samples = static_cast<size_t>(silence_ms * SAMPLE_RATE / 1000.0 + 0.5);
+    size_t remaining = silence_samples;
+    while (remaining > 0) {
+        size_t chunk = std::min(remaining, silence_chunk.size());
+        write_frames(handle, silence_chunk.data(), chunk);
+        remaining -= chunk;
+    }
+}
+
+static void play_tone_step(snd_pcm_t* handle, const parsing::SequenceStep& step, size_t index, const std::vector<int16_t>& silence_chunk) {
+    int f1 = 0, f2 = 0;
+    bool valid = false;
+
+    if (step.type == 'D' && !step.tone.empty()) {
+        char d = step.tone[0];
+        valid = bluebox::dtmf::get_dtmf_freqs(d, f1, f2);
+    } else if (step.type == 'C' && !step.tone.empty()) {
+        valid = bluebox::c5::get_c5_freqs(step.tone, f1, f2);
+    } else {
+        valid = false;
+    }
+
+    if (!valid) {
+        std::cerr << "play_sequence: Step " << (index+1) << ": Invalid or unsupported tone for type "
+                  << step.type << " (\"" << step.tone << "\"); skipping tone\n";
+    } else if (step.duration_ms > 0) {
+        std::vector<int16_t> tone_buffer;
+        generate_tone_buffer(f1, f2, step.duration_ms, tone_buffer);
+        if (!tone_buffer.empty()) {
+            if (!write_frames(handle, tone_buffer.data(), tone_buffer.size())) {
+                std::cerr << "play_sequence: failed to write tone frames for step " << (index+1) << "\n";
+            }
+        }
+    }
+
+    int silence_ms = std::max(step.pause_ms, MIN_SILENCE_MS);
+    size_t silence_samples = static_cast<size_t>(silence_ms * SAMPLE_RATE / 1000.0 + 0.5);
+    size_t remaining = silence_samples;
+    while (remaining > 0) {
+        size_t chunk = std::min(remaining, silence_chunk.size());
+        write_frames(handle, silence_chunk.data(), chunk);
+        remaining -= chunk;
+    }
+    std::cout << "step: " << (index+1) << " " << step.type << " " << " " << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
+}
+
 // Execute a parsed sequence. Uses dtmf, c5 and serial helpers as needed.
 //
 // serial_fd may be -1 to indicate no serial device is available; H steps will
@@ -122,88 +194,14 @@ void play_sequence(snd_pcm_t* handle, const std::vector<parsing::SequenceStep>& 
     for (size_t i = 0; i < sequence.size(); ++i) {
         const auto& step = sequence[i];
 
-        // Wait / interactive step
         if (step.type == '~') {
-            if (step.duration_ms == 0) {
-                std::cout << "Waiting for Enter.. (Press Enter)\n";
-                // Ensure any pending input doesn't leak; simple blocking getline is fine.
-                std::string tmp;
-                std::cout << "step: " << (i+1) << " " << step.type << std::endl;
-                std::getline(std::cin, tmp);
-            } else {
-                std::cout << "step: " << (i+1) << " " << step.type << " " << step.duration_ms << " " << std::endl;
-                std::this_thread::sleep_for(std::chrono::milliseconds(step.duration_ms));
-            }
-            continue;
-        }
-
-        // Serial H command
-        if (step.type == 'H') {
-            if (serial_fd < 0) {
-                std::cerr << "play_sequence: H command requested but no serial device open; skipping\n";
-            } else {
-                // Use serial module to send 'H' and wait up to 1000 ms
-                int resp = bluebox::serial::send_and_wait_serial(serial_fd, 'H', 1000);
-                std::cout << "step: " << (i+1) << " " << step.type << " " << step.duration_ms << " " << step.pause_ms << std::endl;
-                if (resp == 0) {
-                    std::cout << "Step " << (i+1) << ": Serial response: FAILED\n";
-                } else if (resp == -1) {
-                    std::cout << "Step " << (i+1) << ": Serial response: TIMEOUT/ERROR\n";
-                }
-            }
-
-            // Always honor pause_ms after H step (but enforce minimum silence)
-            int silence_ms = std::max(step.pause_ms, MIN_SILENCE_MS);
-            size_t silence_samples = static_cast<size_t>(silence_ms * SAMPLE_RATE / 1000.0 + 0.5);
-            size_t remaining = silence_samples;
-            while (remaining > 0) {
-                size_t chunk = std::min(remaining, silence_chunk_frames);
-                write_frames(handle, silence_chunk.data(), chunk);
-                remaining -= chunk;
-            }
-            continue;
-        }
-
-        // Tone-producing steps: DTMF or C5
-        int f1 = 0, f2 = 0;
-        bool valid = false;
-
-        if (step.type == 'D' && !step.tone.empty()) {
-            // expect a single character tone
-            char d = step.tone[0];
-            valid = bluebox::dtmf::get_dtmf_freqs(d, f1, f2);
-        } else if (step.type == 'C' && !step.tone.empty()) {
-            valid = bluebox::c5::get_c5_freqs(step.tone, f1, f2);
+            play_wait_step(step, i);
+        } else if (step.type == 'H') {
+            play_h_step(handle, step, i, serial_fd, silence_chunk);
         } else {
-            valid = false;
+            play_tone_step(handle, step, i, silence_chunk);
         }
-
-        if (!valid) {
-            std::cerr << "play_sequence: Step " << (i+1) << ": Invalid or unsupported tone for type "
-                      << step.type << " (\"" << step.tone << "\"); skipping tone\n";
-        } else if (step.duration_ms > 0) {
-            std::vector<int16_t> tone_buffer;
-            generate_tone_buffer(f1, f2, step.duration_ms, tone_buffer);
-            if (!tone_buffer.empty()) {
-                // write the generated frames (samples are mono int16)
-                if (!write_frames(handle, tone_buffer.data(), tone_buffer.size())) {
-                    std::cerr << "play_sequence: failed to write tone frames for step " << (i+1) << "\n";
-                    // continue to attempt remaining steps
-                }
-            }
-        }
-
-        // Enforce minimum silence after each step
-        int silence_ms = std::max(step.pause_ms, MIN_SILENCE_MS);
-        size_t silence_samples = static_cast<size_t>(silence_ms * SAMPLE_RATE / 1000.0 + 0.5);
-        size_t remaining = silence_samples;
-        while (remaining > 0) {
-            size_t chunk = std::min(remaining, silence_chunk_frames);
-            write_frames(handle, silence_chunk.data(), chunk);
-            remaining -= chunk;
-        }
-        std::cout << "step: " << (i+1) << " " << step.type << " " << " " << step.tone << " " << step.duration_ms << " " << step.pause_ms << std::endl;
-    } // for sequence
+    }
 }
 
 } // namespace playing

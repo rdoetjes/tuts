@@ -12,7 +12,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <algorithm>
 #include <cctype>
 
 namespace bluebox {
@@ -36,6 +35,76 @@ inline bool is_comment_or_empty(const std::string& s) {
 
 } // anonymous
 
+
+static void parse_wait_step(std::istringstream& iss, SequenceStep& step) {
+    step.type = '~';
+    std::string token;
+    if (std::getline(iss, token, '\t')) {
+        try {
+            size_t pos = token.find_first_not_of(" \t\r\n");
+            if (pos != std::string::npos) {
+                step.duration_ms = std::stoi(token);
+            } else {
+                step.duration_ms = 0;
+            }
+        } catch (...) {
+            step.duration_ms = 0;
+        }
+    } else {
+        step.duration_ms = 0;
+    }
+}
+
+static bool parse_tone_or_h_step(std::istringstream& iss, SequenceStep& step, char t, int lineno) {
+    if (t != 'D' && t != 'C' && t != 'H') {
+        std::cerr << "Line " << lineno << ": unsupported type '" << t << "'\n";
+        return false;
+    }
+    step.type = t;
+    std::string token;
+
+    if (!std::getline(iss, token, '\t')) {
+        step.tone.clear();
+    } else {
+        step.tone = token;
+    }
+
+    if (std::getline(iss, token, '\t')) {
+        try {
+            size_t first = token.find_first_not_of(" \t\r\n");
+            size_t last  = token.find_last_not_of(" \t\r\n");
+            if (first != std::string::npos && last != std::string::npos) {
+                std::string sub = token.substr(first, last - first + 1);
+                step.duration_ms = std::stoi(sub);
+            } else {
+                step.duration_ms = 0;
+            }
+        } catch (...) {
+            step.duration_ms = 0;
+        }
+    } else {
+        step.duration_ms = 0;
+    }
+
+    if (std::getline(iss, token, '\t')) {
+        try {
+            size_t first = token.find_first_not_of(" \t\r\n");
+            size_t last  = token.find_last_not_of(" \t\r\n");
+            if (first != std::string::npos && last != std::string::npos) {
+                std::string sub = token.substr(first, last - first + 1);
+                step.pause_ms = std::stoi(sub);
+            } else {
+                step.pause_ms = 0;
+            }
+        } catch (...) {
+            step.pause_ms = 0;
+        }
+    } else {
+        step.pause_ms = 0;
+    }
+    return true;
+}
+
 bool parse_sequence_stream(std::istream& in, std::vector<SequenceStep>& out_steps) {
     out_steps.clear();
 
@@ -54,99 +123,26 @@ bool parse_sequence_stream(std::istream& in, std::vector<SequenceStep>& out_step
         std::string token;
 
         SequenceStep step{};
-        // Read first token (Type) up to tab
         if (!std::getline(iss, token, '\t')) {
-            // nothing to parse on this line
             continue;
         }
 
         if (token == "~") {
-            step.type = '~';
-            // optional duration field after the '~'
-            if (std::getline(iss, token, '\t')) {
-                // token may be empty or whitespace; try to parse integer
-                try {
-                    // trim whitespace
-                    size_t pos = token.find_first_not_of(" \t\r\n");
-                    if (pos != std::string::npos) {
-                        step.duration_ms = std::stoi(token);
-                    } else {
-                        step.duration_ms = 0;
-                    }
-                } catch (...) {
-                    // leave duration as 0 if parse fails
-                    step.duration_ms = 0;
-                }
-            } else {
-                step.duration_ms = 0;
-            }
-            // pause_ms remains default (0) for wait entries
+            parse_wait_step(iss, step);
             out_steps.push_back(std::move(step));
             continue;
         }
 
-        // Type must be a single character and one of D, C, H
         if (token.length() != 1) {
             std::cerr << "Line " << lineno << ": invalid type token '" << token << "'\n";
             continue;
         }
 
-        char t = token[0];
-        if (t != 'D' && t != 'C' && t != 'H') {
-            std::cerr << "Line " << lineno << ": unsupported type '" << t << "'\n";
-            continue;
+        if (parse_tone_or_h_step(iss, step, token[0], lineno)) {
+            out_steps.push_back(std::move(step));
         }
-        step.type = t;
+    }
 
-        // Tone field (may be empty for some types)
-        if (!std::getline(iss, token, '\t')) {
-            // no tone token, treat as empty string
-            step.tone.clear();
-        } else {
-            step.tone = token;
-        }
-
-        // Duration field (optional; default 0)
-        if (std::getline(iss, token, '\t')) {
-            try {
-                // trim leading/trailing whitespace
-                size_t first = token.find_first_not_of(" \t\r\n");
-                size_t last  = token.find_last_not_of(" \t\r\n");
-                if (first != std::string::npos && last != std::string::npos) {
-                    std::string sub = token.substr(first, last - first + 1);
-                    step.duration_ms = std::stoi(sub);
-                } else {
-                    step.duration_ms = 0;
-                }
-            } catch (...) {
-                step.duration_ms = 0;
-            }
-        } else {
-            step.duration_ms = 0;
-        }
-
-        // Pause field (optional; default 0)
-        if (std::getline(iss, token, '\t')) {
-            try {
-                size_t first = token.find_first_not_of(" \t\r\n");
-                size_t last  = token.find_last_not_of(" \t\r\n");
-                if (first != std::string::npos && last != std::string::npos) {
-                    std::string sub = token.substr(first, last - first + 1);
-                    step.pause_ms = std::stoi(sub);
-                } else {
-                    step.pause_ms = 0;
-                }
-            } catch (...) {
-                step.pause_ms = 0;
-            }
-        } else {
-            step.pause_ms = 0;
-        }
-
-        out_steps.push_back(std::move(step));
-    } // while getline
-
-    // If stream had an error other than EOF, report failure.
     if (in.bad()) {
         std::cerr << "parse_sequence_stream: I/O error while reading stream\n";
         return false;
