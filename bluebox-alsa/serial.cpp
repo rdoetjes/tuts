@@ -85,18 +85,7 @@ int open_serial(const char* path) {
     return fd;
 }
 
-int send_and_wait_serial(int fd, char cmd, int timeout_ms) {
-    if (fd < 0) {
-        return -1;
-    }
-
-    // Write the single byte command
-    ssize_t w = ::write(fd, &cmd, 1);
-    if (w != 1) {
-        std::cerr << "send_and_wait_serial: write failed: " << std::strerror(errno) << "\n";
-        return -1;
-    }
-
+int wait_and_read(int fd, int timeout_ms){
     // Prepare select() to wait for a readable byte
     fd_set rfds;
     FD_ZERO(&rfds);
@@ -137,6 +126,22 @@ int send_and_wait_serial(int fd, char cmd, int timeout_ms) {
     }
 
     return -1;
+}
+
+int send_and_wait_serial(int fd, char cmd, int timeout_ms) {
+    if (fd < 0) {
+        return -1;
+    }
+
+    // Write the single byte command
+    ssize_t w = ::write(fd, &cmd, 1);
+    if (w != 1) {
+        std::cerr << "send_and_wait_serial: write failed: " << std::strerror(errno) << "\n";
+        return -1;
+    }
+
+    return wait_and_read(fd, timeout_ms);
+
 }
 
 } // namespace serial
