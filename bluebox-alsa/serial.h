@@ -10,7 +10,7 @@ namespace serial {
 /*
  * Default serial device path used when none is supplied on the CLI.
  */
-inline constexpr const char* DEFAULT_DEVICE = "/dev/USB00";
+inline constexpr const char* DEFAULT_DEVICE = "/dev/ttyUSB0";
 
 /*
  * Open and configure a serial device for simple command/response usage.
