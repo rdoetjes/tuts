@@ -62,20 +62,7 @@ namespace dtmf {
  */
 bool get_dtmf_freqs(char digit, int& f1, int& f2);
 
-/*
- * Helper: return true if the character is a supported DTMF digit.
- * Implemented inline since it's a trivial check.
- */
-inline bool is_valid_dtmf(char digit) {
-    switch (std::toupper(static_cast<unsigned char>(digit))) {
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
-        case '*': case '#': case 'A': case 'B': case 'C': case 'D':
-            return true;
-        default:
-            return false;
-    }
-}
+bool is_valid_dtmf(char digit);
 
 } // namespace dtmf
 } // namespace bluebox
