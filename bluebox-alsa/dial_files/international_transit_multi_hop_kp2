@@ -1,0 +1,45 @@
+#MULTI HOP RELIES ON ROUTING TABLES IN REMOTE PBXes
+#IF THERE'S AN OVERLAP WITH AN AREA CODE AND COUNTRY CODE
+#THAT AREA COULD WOULD ROUTE TO THE SIGNIFICANT NUMBER
+#MOST LIKELY THE CALL WOULD'VE FAILED
+#
+#Wait 300 milliseconds before dialing
+~	300
+#Dial the toll free number that ends in the USA
+D	0	150	50
+D	6	150	50
+D	0	150	50
+D	2	150	50
+D	2	150	50
+D	0	150	50
+D	6	150	50
+D	3	150	50
+D	0	150	50
+#Wait for the answer
+~
+#Clear the trunk
+C	CLEARFWD	250	50
+#Seize the trunk wait for 2600Hz for 300 milliseconds
+#This is very timing specific you could use only ~ to wait and listen for 2600Hz confirmation tone
+C	SEIZE	250	300
+#Signal international call
+C	KP2	100	50
+C	0	55	50
+#Signal 1st country code (UK)
+C	4	55	50
+C	4	55	50
+#signal 2nd country code (D)
+C	4	55	50
+C	9	55	50
+#signal final country code (NL)
+C	3	55	50
+C	1	55	50
+#Signal signifant number (no leading zero)
+C	3 	55	50
+C	0	55	50
+C	6	55	50
+C	1	55	50
+C	3	55	50
+C	6	55	50
+C	1	55	50
+C	ST	55	50
