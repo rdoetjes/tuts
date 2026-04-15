@@ -74,7 +74,7 @@ Sequence file format (tab-delimited)
 - Example lines:
   - `D<TAB>5<TAB>120<TAB>80` — play DTMF `5` for 120 ms and pause 80 ms.
   - `C<TAB>KP1<TAB>100<TAB>50` — play C5 `KP1` for 100 ms and pause 50 ms.
-  - `H<TAB><TAB>0<TAB>100` — send `H`, wait for response (1000 ms internally), then pause 100 ms.
+  - `H<TAB>1000<TAB>100<TAB>` — send `H`, wait for response (1000 ms internally), then pause 100 ms.
   - `~<TAB><TAB><TAB>` — wait for Enter.
 
 Included example sequence files
