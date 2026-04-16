@@ -33,7 +33,7 @@ namespace bluebox {
 namespace playing {
 
 /* Audio configuration constants (compatible with existing implementation) */
-inline constexpr unsigned SAMPLE_RATE       = 8000;
+inline constexpr unsigned SAMPLE_RATE       = 8000;             // 8Khz is more than enough since the highest frequency is 2600Hz twice the maxiumum frequcy is nminal
 inline constexpr unsigned CHANNELS          = 1;
 inline constexpr snd_pcm_format_t FORMAT    = SND_PCM_FORMAT_S16_LE;
 inline constexpr double AMPLITUDE           = static_cast<double>(INT16_MAX) * 0.4;
