@@ -97,10 +97,23 @@ void generate_tone_buffer(int f1, int f2, int duration_ms, std::vector<int16_t>&
     double incr1 = (f1 > 0) ? tau * f1 / SAMPLE_RATE : 0.0;
     double incr2 = (f2 > 0) ? tau * f2 / SAMPLE_RATE : 0.0;
 
+    const size_t ramp_samples = std::min((size_t)40, num_samples / 4);  // ~5 ms attack/decay at 8000 Hz
+
     for (size_t i = 0; i < num_samples; ++i) {
+        double env = 1.0;
+
+        // Attack ramp (fade-in at start)
+        if (i < ramp_samples) {
+            env = (double)i / ramp_samples;
+        }
+        // Decay ramp (fade-out at end)
+        else if (i > num_samples - ramp_samples) {
+            env = (double)(num_samples - i) / ramp_samples;
+        }
+        // Middle part stays at env = 1.0 (full volume)
         double sample = 0.0;
-        if (f1 > 0) sample += AMPLITUDE * std::sin(phase1);
-        if (f2 > 0) sample += AMPLITUDE * std::sin(phase2);
+        if (f1 > 0) sample += AMPLITUDE * std::sin(phase1) * env;
+        if (f2 > 0) sample += AMPLITUDE * std::sin(phase2) * env;
         // clamp to int16_t range
         double clamped = std::max(-32768.0, std::min(32767.0, sample));
         buffer[i] = static_cast<int16_t>(clamped);
