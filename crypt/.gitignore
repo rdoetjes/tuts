@@ -17,5 +17,8 @@
 !**/*.h
 !*.py
 !*.md
+!*.wav
+!*.bin
+
 
 # NOTE: everything else will be ignored (binaries, build artifacts, editor files, etc.)
