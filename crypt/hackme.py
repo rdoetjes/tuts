@@ -87,7 +87,9 @@ def run_cmd(cmd, cwd: Optional[Path] = None, timeout: Optional[float] = None):
         raise
 
 
-def to_wav_from_raw(in_raw: Path, out_wav: Path, sample_rate: int = 20000, fmt: str = "8u"):
+def to_wav_from_raw(
+    in_raw: Path, out_wav: Path, sample_rate: int = 20000, fmt: str = "8u"
+):
     """
     Convert a raw plaintext file (as produced by our tools) into a WAV file.
     Supports formats: '8u' (unsigned 8-bit PCM), '8s' (signed 8-bit), '16le'.
@@ -126,26 +128,56 @@ def to_wav_from_raw(in_raw: Path, out_wav: Path, sample_rate: int = 20000, fmt: 
 def locate_or_fail(name: str):
     exe = find_executable(name)
     if not exe:
-        print(f"Required tool '{name}' not found (expected in {HERE} or PATH).", file=sys.stderr)
+        print(
+            f"Required tool '{name}' not found (expected in {HERE} or PATH).",
+            file=sys.stderr,
+        )
         sys.exit(2)
     return exe
 
 
 def main():
-    ap = argparse.ArgumentParser(description="End-to-end demo: generate cipher, recover, crack, produce WAVs")
-    ap.add_argument("--sr", type=int, default=20000, help="sample rate to write WAV files (default 20000)")
+    ap = argparse.ArgumentParser(
+        description="End-to-end demo: generate cipher, recover, crack, produce WAVs"
+    )
+    ap.add_argument(
+        "--sr",
+        type=int,
+        default=20000,
+        help="sample rate to write WAV files (default 20000)",
+    )
     ap.add_argument(
         "--fmt",
         choices=["8u", "8s", "16le", "mulaw", "alaw"],
         default="8u",
         help="assumed sample format for producing WAVs and scoring (default 8u)",
     )
-    ap.add_argument("--time", type=int, default=600, help="total time budget (seconds) for audio cracker (default 600)")
-    ap.add_argument("--cores", type=int, default=0, help="cores to use (0 => auto / all cores)")
-    ap.add_argument("--keylen-min", type=int, default=32, help="min key length to try (default 32)")
-    ap.add_argument("--keylen-max", type=int, default=160, help="max key length to try (default 160)")
-    ap.add_argument("--prefer-printable", action="store_true", help="prefer printable keys in auto-resolve")
-    ap.add_argument("--no-clean", action="store_true", help="don't remove intermediate files")
+    ap.add_argument(
+        "--time",
+        type=int,
+        default=600,
+        help="total time budget (seconds) for audio cracker (default 600)",
+    )
+    ap.add_argument(
+        "--cores", type=int, default=0, help="cores to use (0 => auto / all cores)"
+    )
+    ap.add_argument(
+        "--keylen-min", type=int, default=32, help="min key length to try (default 32)"
+    )
+    ap.add_argument(
+        "--keylen-max",
+        type=int,
+        default=160,
+        help="max key length to try (default 160)",
+    )
+    ap.add_argument(
+        "--prefer-printable",
+        action="store_true",
+        help="prefer printable keys in auto-resolve",
+    )
+    ap.add_argument(
+        "--no-clean", action="store_true", help="don't remove intermediate files"
+    )
     opts = ap.parse_args()
 
     # Locate tools
@@ -168,7 +200,13 @@ def main():
     # Use the same cipher_out across calls (make_cipher writes same plaintext -> cipher each time)
     for off in crib_offsets:
         crib_out = HERE / f"crib{off}.bin"
-        cmd = [str(make_cipher), str(cipher_out), str(crib_out), str(off), str(crib_len)]
+        cmd = [
+            str(make_cipher),
+            str(cipher_out),
+            str(crib_out),
+            str(off),
+            str(crib_len),
+        ]
         run_cmd(cmd, cwd=HERE)
 
     # Step 2: Determine key length to try for recover_key: use original_key.bin if present
@@ -184,7 +222,9 @@ def main():
     # Step 3: run recover_key with the generated crib pairs
     print("Step 2: Running recover_key to produce candidate lists...")
     # build the pair tokens: cipher:crib:offset
-    pair_tokens = [f"{cipher_out.name}:{'crib'+str(off)+'.bin'}:{off}" for off in crib_offsets]
+    pair_tokens = [
+        f"{cipher_out.name}:{'crib' + str(off) + '.bin'}:{off}" for off in crib_offsets
+    ]
     # The recover_key binary expects paths relative to its cwd; ensure we call with cwd=HERE
     recover_args = [str(recover_key)]
     if keylen is not None:
@@ -194,8 +234,22 @@ def main():
     run_cmd(recover_args, cwd=HERE)
 
     # Step 4: auto-resolve printable candidates (auto_resolve.py)
-    print("Step 3: Running auto_resolve to produce an auto-resolved key and plaintext...")
-    ar_cmd = [sys.executable, str(auto_resolve), "--key", "recovered_key_final", "--candidates", "recovered_key_final_text", "--out-key", "recovered_key_auto", "--out-plain", "recovered_plain", "--show"]
+    print(
+        "Step 3: Running auto_resolve to produce an auto-resolved key and plaintext..."
+    )
+    ar_cmd = [
+        sys.executable,
+        str(auto_resolve),
+        "--key",
+        "recovered_key_final",
+        "--candidates",
+        "recovered_key_final_text",
+        "--out-key",
+        "recovered_key_auto",
+        "--out-plain",
+        "recovered_plain",
+        "--show",
+    ]
     run_cmd(ar_cmd, cwd=HERE)
 
     # Step 5: run audio_cracker.py to attempt to refine (time-limited, multithreaded)
@@ -227,15 +281,17 @@ def main():
     ]
     if opts.prefer_printable:
         cracker_cmd.append("--prefer-printable")
-    if opts.per_index_limit := 8:
-        cracker_cmd += ["--per-index-limit", "8"]
+    # always pass per-index-limit=8 (do not use walrus assignment to an attribute)
+    cracker_cmd += ["--per-index-limit", "8"]
     run_cmd(cracker_cmd, cwd=HERE, timeout=opts.time + 30)
 
     # Step 6: Collect best outputs for the key length(s) we most care about
     # Prefer using the auto_resolve key length if available; else use original key length; else try candidate files produced by cracker.
     candidates = list(HERE.glob("best_plain_*_0.raw"))
     if not candidates:
-        print("No best_plain_*.raw files found from audio_cracker. Trying recovered_plain ...")
+        print(
+            "No best_plain_*.raw files found from audio_cracker. Trying recovered_plain ..."
+        )
         if (HERE / "recovered_plain").exists():
             candidates = [HERE / "recovered_plain"]
     else:
@@ -270,10 +326,16 @@ def main():
         print("  (no WAVs produced; check the raw outputs in the repo root)")
 
     if not opts.no_clean:
-        print("\nYou can keep the outputs or run `git clean -f` if you want to remove them.")
+        print(
+            "\nYou can keep the outputs or run `git clean -f` if you want to remove them."
+        )
     print("To inspect a recovered key textually:")
-    print("  python3 tools.py show-key best_key_<klen>_0.bin --text recovered_key_final_text")
-    print("To play a produced WAV on macOS: `afplay <wav>`; on Linux: `aplay <wav>` or `play <wav>` (sox).")
+    print(
+        "  python3 tools.py show-key best_key_<klen>_0.bin --text recovered_key_final_text"
+    )
+    print(
+        "To play a produced WAV on macOS: `afplay <wav>`; on Linux: `aplay <wav>` or `play <wav>` (sox)."
+    )
 
     return 0
 
