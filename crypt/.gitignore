@@ -1,0 +1,19 @@
+# Ignore everything in this directory tree...
+*
+
+# ...but allow directory traversal so we can whitelist files inside subdirs
+!*/
+
+# Keep this .gitignore so it isn't ignored
+!.gitignore
+
+# Keep the Makefile
+!Makefile
+
+# Keep C source and header files (top-level and in subdirectories)
+!*.c
+!*.h
+!**/*.c
+!**/*.h
+
+# NOTE: everything else will be ignored (binaries, build artifacts, editor files, etc.)
