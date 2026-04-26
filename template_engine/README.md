@@ -123,6 +123,12 @@ If the template contains `$wiki_ulr$` while your key is `wiki_url`, the output w
 
 ---
 
+## Example with the HTML template
+
+```
+./template_engine templates/html_example/index_configs.json p templates/html_example/index.template.html index.html
+```
+
 ## Validation and detection tips
 
 Common mistakes and how to detect/fix them:
@@ -193,11 +199,3 @@ Run:
 ```/dev/null/test.sh#L1-1
 go test ./...
 ```
-
----
-
-If you'd like, I can:
-- add a post-render warning that prints any unreplaced placeholders, or
-- provide an optional `-strict-placeholders` flag that fails the run if unreplaced placeholders remain.
-
-Tell me which behavior you prefer and I'll add it.
