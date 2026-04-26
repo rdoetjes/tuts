@@ -21,7 +21,7 @@
       "sku": {
         "name": "[variables('storageSku')]"
       },
-      "kind": "StorageV2",
+      "kind": "$sku$",
       "properties": {
         "supportsHttpsTrafficOnly": true
       }
