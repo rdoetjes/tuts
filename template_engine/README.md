@@ -86,6 +86,25 @@ Notes:
 - Trailing commas are not permitted in strict JSON. If your editor inserts trailing commas on save, configure it not to or use the Prettier config suggested below.
 - The program expects strict JSON for the config only. Templates are not validated as JSON.
 
+- Include files from defaults:
+  - You may include additional defaults by adding keys under `defaults` that start with `include_` and whose value is the path to a JSON file. Example:
+  ```json
+  {
+    "defaults": {
+      "include_global": "templates/global.json",
+      "sku": "Standard_GRS"
+    }
+  }
+  ```
+  - Included files may be either:
+    - a full config JSON that contains a top-level `"defaults"` object, or
+    - a plain JSON object containing key/value pairs (treated as defaults).
+  - Include paths are resolved relative to the config file's directory when a relative path is provided.
+  - When merging, keys already present in the main config `defaults` take precedence and are not overridden by values from included files.
+  - Include directives (`include_*` keys) are removed after processing so they do not remain as runtime defaults.
+  - For security, included files must have a `.json` extension; other extensions will be rejected.
+  - Cyclic includes are detected and prevented.
+
 ---
 
 ## Placeholder syntax and behavior
