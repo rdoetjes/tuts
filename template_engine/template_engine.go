@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,21 +9,38 @@ import (
 
 // usage prints a short help message and exits with code 2.
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: %s <config.json> <environment> <template.file> <output.file>\n", filepath.Base(os.Args[0]))
+	fmt.Fprintf(os.Stderr, "usage: %s -c <config.json> -e <environment> -t <template.file> -o <output.file>\n", filepath.Base(os.Args[0]))
 	os.Exit(2)
 }
 
 // main is a thin CLI glue layer that delegates parsing, validation and rendering
-// to helper functions in other files.
+// to helper functions in other files. It now uses named flags for clarity:
+// -c/--config, -e/--environment, -t/--template, -o/--out
 func main() {
-	if len(os.Args) != 5 {
+	var configPath string
+	var env string
+	var templatePath string
+	var outPath string
+
+	// define short and long flags (both point to the same variables)
+	flag.StringVar(&configPath, "c", "", "path to config JSON (required)")
+	flag.StringVar(&configPath, "config", "", "path to config JSON (required)")
+	flag.StringVar(&env, "e", "", "environment name (required)")
+	flag.StringVar(&env, "environment", "", "environment name (required)")
+	flag.StringVar(&templatePath, "t", "", "template file path (required)")
+	flag.StringVar(&templatePath, "template", "", "template file path (required)")
+	flag.StringVar(&outPath, "o", "", "output file path (required)")
+	flag.StringVar(&outPath, "out", "", "output file path (required)")
+
+	// keep the same usage behavior
+	flag.Usage = func() { usage() }
+
+	flag.Parse()
+
+	// require all flags
+	if configPath == "" || env == "" || templatePath == "" || outPath == "" {
 		usage()
 	}
-
-	configPath := os.Args[1]
-	env := os.Args[2]
-	templatePath := os.Args[3]
-	outPath := os.Args[4]
 
 	cfg, err := ParseConfig(configPath)
 	if err != nil {

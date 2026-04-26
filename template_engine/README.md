@@ -21,16 +21,16 @@ go build
 Run (argument order matters):
 
 ```/dev/null/run.sh#L1-1
-./template_engine <config.json> <environment> <template.file> <output.file>
+./template_engine -c <config.json> -e <environment> -t <template.file> -o <output.file>
 ```
 
 Example:
 
 ```/dev/null/run-example.sh#L1-1
-./template_engine storage_account_configs.json d templates/html_example/index.template.html out.html
+./template_engine -c storage_account_configs.json -e d -t templates/html_example/index.template.html -o out.html
 ```
 
-Important: the first argument must be the JSON config file. If you pass the template file as the first argument by mistake, the program will attempt to parse the template as JSON and fail with errors like `invalid character '<' looking for beginning of value`. See "Argument order gotcha" below.
+Important: the `-c`/`--config` flag must point to the JSON config file. If you pass the template file as the config (or forget to set `-c`), the program will attempt to parse the template as JSON and fail with errors like `invalid character '<' looking for beginning of value`. See "Argument order gotcha" below.
 
 ---
 
