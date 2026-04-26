@@ -69,6 +69,14 @@ func expandIncludes(cfg *Config, baseDir string, visited map[string]struct{}) er
 			includePath = filepath.Join(baseDir, includePath)
 		}
 
+		// Security: only allow includes with a .json extension
+		ext := strings.ToLower(filepath.Ext(includePath))
+		if ext != ".json" {
+			// remove the include directive and fail loudly to avoid silently accepting unexpected formats
+			delete(cfg.Defaults, incKey)
+			return fmt.Errorf("included defaults file %s has disallowed extension %q; only .json is allowed", includePath, ext)
+		}
+
 		// Prevent cycles
 		if _, seen := visited[includePath]; seen {
 			// remove the include key and skip
