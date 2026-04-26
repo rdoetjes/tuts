@@ -198,7 +198,13 @@ If you'd like to make the tool more permissive or integrate with other formats:
 - Feel free to open issues or PRs if you want additional features, CI setup, or if you want the program to accept different input formats.
 - Tests are small and straightforward — adding coverage for any new behavior is welcome.
 
----
+## Jinja equivalent
+In Jinja2 it's equivalent to the:
 
-License
-- No license file is included by default. If you intend to share this project, add a LICENSE to the repository describing the intended license.
+Template Inheritance
+For structural overrides, Jinja2 supports template inheritance.  A base template defines a structure with {% block %} placeholders. Child templates use {% extends 'base.j2' %} to inherit the parent structure and can override specific blocks. Using {{ super() }} within a child block allows you to extend the parent's content rather than completely replacing it. 
+
+A reason to use this template_engine over (the far more feature rich Jinja2) is simplicity and you just need a single binary and does a lot already. Sometimes simple and single binary can be an advantage. This was written because at a customer of mine, their build agents did not have Jinja2 installed, hence I wrote this, which could compile with the go compiler on the build agents.
+
+### less permisive than Jinja2
+Also you have the added benefit of making sure that the default (for your production) environment needs to have a value set in order to override it. This forces explicit generation of resulting files giving a more consistent result -- we like explicitness in our CI/CD.
