@@ -5,7 +5,7 @@
     "location": "westeurope"
   },
   "overrides": [
-    { "environment": "t", "values": { "sku": "Standard_LRS" } },
-    { "environment": "a", "values": { "sku": "Standard_LRS" } }
+    { "environment": "d", "values": { "sku": "Standard_LRS" } },
+    { "environment": "t", "values": { "sku": "Standard_LRS" } }
   ]
 }
