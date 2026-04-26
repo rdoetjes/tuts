@@ -1,0 +1,29 @@
+{
+  "defaults": {
+    "wiki_host": "wiki.mydomain.com",
+    "env": "Production"
+  },
+  "overrides": [
+    {
+      "environment": "d",
+      "values": {
+        "wiki_host": "somehost_xyx.azure.net",
+        "env": "Development"
+      }
+    },
+    {
+      "environment": "t",
+      "values": {
+        "wiki_host": "somehost_test2xyx.azure.net",
+        "env": "Test"
+      }
+    },
+    {
+      "environment": "a",
+      "values": {
+        "wiki_host": "somehost_acc32xyx.azure.net",
+        "env": "Acceptance"
+      }
+    }
+  ]
+}
