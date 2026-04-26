@@ -1,0 +1,11 @@
+{
+  "defaults": {
+    "sku": "Standard_GRS",
+    "kind": "StorageV2",
+    "location": "westeurope"
+  },
+  "overrides": [
+    { "environment": "t", "values": { "sku": "Standard_LRS" } },
+    { "environment": "a", "values": { "sku": "Standard_LRS" } }
+  ]
+}

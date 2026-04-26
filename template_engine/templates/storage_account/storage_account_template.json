@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountPrefix": {
+      "type": "string",
+      "metadata": { "description": "Prefix for the storage account name" }
+    }
+  },
+  "variables": {
+    "uniqueStorageName": "[concat(parameters('storageAccountPrefix'), uniqueString(resourceGroup().id))]",
+    "storageSku": "$sku$",
+    "location": "$location$"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[variables('uniqueStorageName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[variables('storageSku')]"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      }
+    }
+  ]
+}
