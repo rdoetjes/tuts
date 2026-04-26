@@ -49,7 +49,7 @@ func parseArguments(args *Args) {
 // to helper functions in other files. It now uses named flags for clarity:
 // -c/--config, -e/--environment, -t/--template, -o/--out
 func main() {
-	var args = Args{}
+	args := Args{}
 	parseArguments(&args)
 
 	cfg, err := ParseConfig(args.ConfigPath)
