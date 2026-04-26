@@ -21,6 +21,7 @@ func main() {
 	var env string
 	var templatePath string
 	var outPath string
+	var strict bool
 
 	// define short and long flags (both point to the same variables)
 	flag.StringVar(&configPath, "c", "", "path to config JSON (required)")
@@ -31,6 +32,8 @@ func main() {
 	flag.StringVar(&templatePath, "template", "", "template file path (required)")
 	flag.StringVar(&outPath, "o", "", "output file path (required)")
 	flag.StringVar(&outPath, "out", "", "output file path (required)")
+	flag.BoolVar(&strict, "s", false, "fail if unreplaced placeholders remain")
+	flag.BoolVar(&strict, "strict-placeholders", false, "fail if unreplaced placeholders remain")
 
 	// keep the same usage behavior
 	flag.Usage = func() { usage() }
@@ -85,6 +88,14 @@ func main() {
 	}
 
 	rendered := ReplaceTemplatePlaceholders(templateStr, finalMap)
+
+	if strict {
+		placeholders := DetectUnreplacedPlaceholders(rendered)
+		if len(placeholders) > 0 {
+			fmt.Fprintf(os.Stderr, "error: unreplaced placeholders: %v\n", placeholders)
+			os.Exit(1)
+		}
+	}
 
 	if err := WriteOutput(outPath, rendered); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)

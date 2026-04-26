@@ -202,3 +202,47 @@ func TestIntegration_MissingOverrideFallsBack(t *testing.T) {
 		t.Fatalf("expected location westeurope for missing override, got %q", final["location"])
 	}
 }
+
+func TestDetectUnreplacedPlaceholders(t *testing.T) {
+	// Template contains three placeholders; only two are provided in final map.
+	tpl := "Welcome $name$, check $<missing>$ and $present$."
+	final := map[string]string{
+		"name":    "Alice",
+		"present": "yes",
+	}
+	rendered := ReplaceTemplatePlaceholders(tpl, final)
+
+	got := DetectUnreplacedPlaceholders(rendered)
+	// Expect exactly one unreplaced placeholder: "missing"
+	if len(got) != 1 || got[0] != "missing" {
+		t.Fatalf("expected unreplaced placeholders [\"missing\"], got %#v; rendered: %q", got, rendered)
+	}
+}
+
+func TestStrictModeSimulation(t *testing.T) {
+	// Simulate strict placeholders behavior: when placeholders remain after rendering,
+	// strict mode should be considered a failure. We test the detection logic here.
+	tpl := "A:$a$ B:$b$ C:$c$"
+	final := map[string]string{
+		"a": "1",
+		"c": "3",
+		// "b" is intentionally missing
+	}
+	rendered := ReplaceTemplatePlaceholders(tpl, final)
+
+	placeholders := DetectUnreplacedPlaceholders(rendered)
+	if len(placeholders) == 0 {
+		t.Fatalf("expected unreplaced placeholders, got none; rendered: %q", rendered)
+	}
+	// ensure the missing placeholder is reported
+	found := false
+	for _, p := range placeholders {
+		if p == "b" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected placeholder 'b' to be reported, got %#v", placeholders)
+	}
+}

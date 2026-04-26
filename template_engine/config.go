@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -107,6 +109,34 @@ func ReplaceTemplatePlaceholders(tpl string, finalMap map[string]string) string 
 		tpl = strings.ReplaceAll(tpl, "$<"+k+">$", v)
 	}
 	return tpl
+}
+
+// DetectUnreplacedPlaceholders scans the rendered template and returns a sorted,
+// unique list of placeholder names that remain in the text. It recognizes both
+// $key$ and $<key>$ forms. This function is useful for a "strict placeholders"
+// mode where the program should fail if anything remains unreplaced.
+func DetectUnreplacedPlaceholders(tpl string) []string {
+	// regex captures either the <name> form in group 1 or the plain name in group 2
+	re := regexp.MustCompile(`\$(?:<([^>]+)>|([A-Za-z0-9_]+))\$`)
+	matches := re.FindAllStringSubmatch(tpl, -1)
+	set := make(map[string]struct{}, len(matches))
+	for _, m := range matches {
+		var name string
+		if m[1] != "" {
+			name = m[1]
+		} else {
+			name = m[2]
+		}
+		if name != "" {
+			set[name] = struct{}{}
+		}
+	}
+	out := make([]string, 0, len(set))
+	for k := range set {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
 }
 
 // WriteOutput writes the rendered template to the specified output path using
