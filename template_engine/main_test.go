@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -244,5 +245,90 @@ func TestStrictModeSimulation(t *testing.T) {
 	}
 	if !found {
 		t.Fatalf("expected placeholder 'b' to be reported, got %#v", placeholders)
+	}
+}
+
+func TestExpandIncludes_SimpleInclude(t *testing.T) {
+	td := t.TempDir()
+
+	// Create a base include file containing defaults
+	baseJSON := `{
+  "sku": "Included_Sku",
+  "location": "included-loc"
+}`
+	basePath := writeFile(t, td, "base.json", baseJSON)
+
+	// Main config references the include; also overrides sku to ensure override precedence.
+	cfgJSON := fmt.Sprintf(`{
+  "defaults": {
+    "include_base": "%s",
+    "sku": "Main_Sku"
+  }
+}`, basePath)
+	cfgPath := writeFile(t, td, "config.json", cfgJSON)
+
+	cfg, err := ParseConfig(cfgPath)
+	if err != nil {
+		t.Fatalf("ParseConfig failed for include test: %v", err)
+	}
+
+	// include_* directive should be removed after expansion
+	if _, ok := cfg.Defaults["include_base"]; ok {
+		t.Fatalf("include key should have been removed from defaults after expansion")
+	}
+
+	// sku should reflect the main config override
+	if got := fmt.Sprintf("%v", cfg.Defaults["sku"]); got != "Main_Sku" {
+		t.Fatalf("expected sku to be Main_Sku, got %q", got)
+	}
+
+	// location should be pulled from the included file
+	if got := fmt.Sprintf("%v", cfg.Defaults["location"]); got != "included-loc" {
+		t.Fatalf("expected location from included defaults, got %q", got)
+	}
+}
+
+func TestExpandIncludes_RecursiveInclude(t *testing.T) {
+	td := t.TempDir()
+
+	// more.json provides b
+	moreJSON := `{
+  "b": "value-b"
+}`
+	morePath := writeFile(t, td, "more.json", moreJSON)
+
+	// base.json includes more.json and provides a
+	baseJSON := fmt.Sprintf(`{
+  "include_more": "%s",
+  "a": "value-a"
+}`, morePath)
+	basePath := writeFile(t, td, "base1.json", baseJSON)
+
+	// main config includes base1.json
+	cfgJSON := fmt.Sprintf(`{
+  "defaults": {
+    "include_base": "%s"
+  }
+}`, basePath)
+	cfgPath := writeFile(t, td, "config.json", cfgJSON)
+
+	cfg, err := ParseConfig(cfgPath)
+	if err != nil {
+		t.Fatalf("ParseConfig failed for recursive include test: %v", err)
+	}
+
+	// ensure both a and b are present after recursive expansion
+	if got := fmt.Sprintf("%v", cfg.Defaults["a"]); got != "value-a" {
+		t.Fatalf("expected a from included base, got %q", got)
+	}
+	if got := fmt.Sprintf("%v", cfg.Defaults["b"]); got != "value-b" {
+		t.Fatalf("expected b from recursive include, got %q", got)
+	}
+
+	// include_* directives should have been removed
+	for k := range cfg.Defaults {
+		if strings.HasPrefix(k, "include_") {
+			t.Fatalf("expected include_* keys to be removed after expansion, found %q", k)
+		}
 	}
 }

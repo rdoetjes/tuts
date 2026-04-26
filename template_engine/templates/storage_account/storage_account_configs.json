@@ -1,11 +1,13 @@
 {
   "defaults": {
+    "include_global": "../global.json",
     "sku": "Standard_GRS",
     "kind": "StorageV2",
     "location": "westeurope"
   },
   "overrides": [
-    { "environment": "d", "values": { "sku": "Standard_LRS" } },
-    { "environment": "t", "values": { "sku": "Standard_LRS" } }
+    { "environment": "d", "values": { "sku": "Standard_LRS", "env": "dev" } },
+    { "environment": "t", "values": { "sku": "Standard_LRS", "env": "tst" } },
+    { "environment": "a", "values": { "env": "acc" } }
   ]
 }

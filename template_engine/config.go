@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -26,7 +27,114 @@ func ParseConfig(configPath string) (*Config, error) {
 		return nil, fmt.Errorf("config json missing 'defaults' object")
 	}
 
+	// Expand "include_*" keys in defaults: load included files and merge their defaults.
+	if err := expandIncludes(&cfg, filepath.Dir(configPath), make(map[string]struct{})); err != nil {
+		return nil, err
+	}
+
 	return &cfg, nil
+}
+
+// expandIncludes looks for keys in cfg.Defaults that start with "include_"
+// and treats their string value as a path to another JSON file containing
+// defaults to merge in. Included files can be either a full config JSON
+// (with a "defaults" object) or a plain object containing key/value pairs.
+// Includes are resolved relative to baseDir if not absolute. We track visited
+// files to avoid cycles. When merging, values from the included file are only
+// added when the key does not already exist in the current cfg.Defaults
+// (i.e. explicit defaults in the main config override included values).
+func expandIncludes(cfg *Config, baseDir string, visited map[string]struct{}) error {
+	// Collect include keys up-front to avoid mutating the map while iterating.
+	includeKeys := make([]string, 0, 4)
+	for k := range cfg.Defaults {
+		if strings.HasPrefix(k, "include_") {
+			includeKeys = append(includeKeys, k)
+		}
+	}
+
+	for _, incKey := range includeKeys {
+		rawVal, ok := cfg.Defaults[incKey]
+		if !ok {
+			continue
+		}
+		includePath, ok := rawVal.(string)
+		if !ok || includePath == "" {
+			// ignore non-string include values
+			delete(cfg.Defaults, incKey)
+			continue
+		}
+
+		// Resolve relative paths against baseDir
+		if !filepath.IsAbs(includePath) {
+			includePath = filepath.Join(baseDir, includePath)
+		}
+
+		// Prevent cycles
+		if _, seen := visited[includePath]; seen {
+			// remove the include key and skip
+			delete(cfg.Defaults, incKey)
+			continue
+		}
+		visited[includePath] = struct{}{}
+
+		// Read included file
+		b, err := os.ReadFile(includePath)
+		if err != nil {
+			return fmt.Errorf("error reading included defaults file %s: %w", includePath, err)
+		}
+
+		// Try to parse as a full Config with "defaults", otherwise treat as a raw map of defaults.
+		// Note: json.Unmarshal may succeed when unmarshalling a plain object into a struct
+		// (it will simply not populate the `Defaults` field). Therefore we must check both
+		// cases: (a) unmarshal into Config produced Defaults, or (b) treat the JSON as a raw map.
+		var incCfg Config
+		if err := json.Unmarshal(b, &incCfg); err != nil {
+			// If unmarshalling into Config failed, fallback to parsing as a raw map.
+			var raw map[string]interface{}
+			if err2 := json.Unmarshal(b, &raw); err2 != nil {
+				return fmt.Errorf("error parsing included defaults json %s: %w", includePath, err)
+			}
+			// If the file contains a top-level "defaults" object, use it; otherwise treat the object as defaults directly.
+			if d, ok := raw["defaults"].(map[string]interface{}); ok {
+				incCfg.Defaults = d
+			} else {
+				incCfg.Defaults = raw
+			}
+		} else {
+			// Unmarshal into Config succeeded. If Defaults is still nil it means the file
+			// was probably a plain object (not wrapped in "defaults"). Try to parse into
+			// a raw map and use it as defaults in that case.
+			if incCfg.Defaults == nil {
+				var raw map[string]interface{}
+				if err2 := json.Unmarshal(b, &raw); err2 == nil {
+					if d, ok := raw["defaults"].(map[string]interface{}); ok {
+						incCfg.Defaults = d
+					} else {
+						incCfg.Defaults = raw
+					}
+				}
+			}
+		}
+
+		// If included file has its own includes, expand them recursively.
+		if incCfg.Defaults != nil {
+			if err := expandIncludes(&incCfg, filepath.Dir(includePath), visited); err != nil {
+				return err
+			}
+		}
+
+		// Merge: do not override existing keys in the main cfg.Defaults
+		for k, v := range incCfg.Defaults {
+			if _, exists := cfg.Defaults[k]; !exists {
+				cfg.Defaults[k] = v
+			}
+		}
+
+		// Remove the include_* directive after processing so it does not remain a default key.
+		delete(cfg.Defaults, incKey)
+	}
+
+	return nil
 }
 
 // FindOverride returns the override entry for the requested environment.

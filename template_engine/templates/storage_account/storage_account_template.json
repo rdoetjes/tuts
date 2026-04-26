@@ -16,7 +16,7 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-04-01",
-      "name": "[variables('uniqueStorageName')]",
+      "name": "$appname$$env$",
       "location": "[variables('location')]",
       "sku": {
         "name": "[variables('storageSku')]"
