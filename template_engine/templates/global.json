@@ -2,6 +2,6 @@
   "appname": "myapp",
   "organization": "mycompany",
   "env": "prd",
-  "dbname": "$appname$$env$",
+  "dbname": "db$appname$$env$",
   "saname": "sa$appname$$env$00"
 }
