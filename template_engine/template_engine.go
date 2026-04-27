@@ -88,12 +88,18 @@ func main() {
 		}
 	}
 
+	// Resolve placeholders that may appear inside map values (multi-pass).
+	// This allows derived values like "dbname": "$appname$$env$" to be expanded
+	// before using the map to render the template.
+	finalMap = ResolveMapValues(finalMap)
+
 	templateStr, err := ReadTemplate(args.TemplatePath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
+	// Use the resolved finalMap for rendering so value-level placeholders are expanded.
 	rendered := ReplaceTemplatePlaceholders(templateStr, finalMap)
 
 	if args.Strict {
@@ -109,6 +115,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Print results to stdout for visibility (same behavior as original)
+	// Print results to stdout for visibility (show resolved map)
 	PrintResults(finalMap, rendered)
 }

@@ -219,10 +219,26 @@ func ReadTemplate(templatePath string) (string, error) {
 
 // ReplaceTemplatePlaceholders replaces placeholders in the template with values from finalMap.
 // It supports both $key$ and $<key>$ variants (i.e. $<key>$).
+// This implementation performs multiple passes: it reapplies all replacements
+// until no further changes occur (or a safe pass limit is reached). This handles
+// cases where replacing one placeholder can introduce another placeholder that
+// should be replaced in a subsequent pass.
 func ReplaceTemplatePlaceholders(tpl string, finalMap map[string]string) string {
-	for k, v := range finalMap {
-		tpl = strings.ReplaceAll(tpl, "$"+k+"$", v)
-		tpl = strings.ReplaceAll(tpl, "$<"+k+">$", v)
+	if len(finalMap) == 0 {
+		return tpl
+	}
+
+	const maxPasses = 10
+	for pass := 0; pass < maxPasses; pass++ {
+		prev := tpl
+		for k, v := range finalMap {
+			tpl = strings.ReplaceAll(tpl, "$"+k+"$", v)
+			tpl = strings.ReplaceAll(tpl, "$<"+k+">$", v)
+		}
+		// If nothing changed this pass, we're done.
+		if tpl == prev {
+			break
+		}
 	}
 	return tpl
 }
@@ -252,6 +268,67 @@ func DetectUnreplacedPlaceholders(tpl string) []string {
 		out = append(out, k)
 	}
 	sort.Strings(out)
+	return out
+}
+
+// ResolveMapValues performs a multi-pass expansion of placeholders that appear
+// inside the values of the provided map. This lets you express derived values
+// inside configuration defaults/overrides such as:
+//
+//	"appname": "myapp",
+//	"env": "dev",
+//	"dbname": "$appname$$env$"
+//
+// ResolveMapValues will iteratively substitute placeholders of the form `$key$`
+// and `$<key>$` inside every value until no further substitutions occur or a
+// safe pass limit is reached. If a placeholder refers to a missing key the
+// placeholder is left as-is.
+func ResolveMapValues(in map[string]string) map[string]string {
+	if in == nil {
+		return nil
+	}
+
+	// Make a working copy so we don't mutate the caller's map.
+	out := make(map[string]string, len(in))
+	for k, v := range in {
+		out[k] = v
+	}
+
+	// Regex to find placeholders. We'll use a simple string-based extraction when
+	// replacing to avoid re-running submatch extraction repeatedly.
+	re := regexp.MustCompile(`\$(?:<([^>]+)>|([A-Za-z0-9_]+))\$`)
+
+	const maxPasses = 10
+	for pass := 0; pass < maxPasses; pass++ {
+		changed := false
+		for key, val := range out {
+			// Replace placeholders in val using current out map.
+			newVal := re.ReplaceAllStringFunc(val, func(ph string) string {
+				// Extract name: handle $<name>$ and $name$
+				if strings.HasPrefix(ph, "$<") && strings.HasSuffix(ph, ">$") {
+					name := ph[2 : len(ph)-2]
+					if v, ok := out[name]; ok {
+						return v
+					}
+					return ph
+				}
+				// plain $name$
+				name := ph[1 : len(ph)-1]
+				if v, ok := out[name]; ok {
+					return v
+				}
+				return ph
+			})
+
+			if newVal != val {
+				out[key] = newVal
+				changed = true
+			}
+		}
+		if !changed {
+			break
+		}
+	}
 	return out
 }
 
