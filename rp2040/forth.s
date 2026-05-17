@@ -52,7 +52,7 @@ _L\@:
 .macro ENTER; push {lr}; .endm
 .macro EXIT;  pop {pc}; .endm
 
-@ Push a literal number onto the Forth data stack
+@ Macro for literal numbers (renamed from PUSH to avoid conflict)
 .macro LIT val
     ldr r0, =\val
     subs r5, #4
@@ -65,6 +65,7 @@ _L\@:
 .macro DROP;   bl "DROP";   .endm
 .macro SWAP;   bl "SWAP";   .endm
 .macro OVER;   bl "OVER";   .endm
+.macro SLASH;  bl "/";      .endm
 
 @ -----------------------------------------------------------------------------
 @ HARDWARE VECTORS & RESET
@@ -127,7 +128,7 @@ k1: ldr r2, [r1, #CMSDK_UART_STATE_OFFSET]; movs r3, #2; tst r2, r3; beq k1
 _print_dec:
     push {r4, r5, r6, lr}; mov r4, r0; ldr r6, =powers_of_10; movs r5, #0
     cmp r4, #0; bge pd1
-    mov r0, r4; mvns r0, r0; adds r0, #1; mov r4, r0; movs r0, #45; bl _emit @ '-'
+    mov r0, r4; rsbs r0, r0, #0; mov r4, r0; movs r0, #45; bl _emit @ '-'
 pd1:ldr r2, [r6]; cmp r2, #0; beq pd5; movs r0, #0
 pd2:cmp r4, r2; blo pd3; subs r4, r2; adds r0, #1; b pd2
 pd3:cmp r0, #0; bne pd4; cmp r5, #0; bne pd4; cmp r2, #1; beq pd4; b pd6
@@ -163,6 +164,15 @@ defcode "-", 1
 defcode "*", 1
     ldr r0, [r5]; muls r4, r0, r4; adds r5, #4; bx lr
 
+defcode "/", 1
+    push {lr}
+    ldr r0, [r5]    @ dividend
+    mov r1, r4      @ divisor
+    bl _idiv
+    mov r4, r0      @ quotient to TOS
+    adds r5, #4     @ drop dividend
+    pop {pc}
+
 @ -----------------------------------------------------------------------------
 @ HIGH-LEVEL DEFINITIONS
 @ -----------------------------------------------------------------------------
@@ -172,7 +182,11 @@ defcode "*", 1
 
 : 4DROP 2DROP 2DROP ;
 
-: DILDO 12 13 * ;
+: DILDO
+  12
+  13
+  *
+;
 
 @ -----------------------------------------------------------------------------
 @ MEMORY AND LOGIC PRIMITIVES
@@ -400,9 +414,50 @@ _num:
     movs r4, #1; adds r2, #1
 n1: ldrb r3, [r0, r2]; subs r3, #48; cmp r3, #9; bhi n2
     movs r7, #10; muls r1, r7, r1; adds r1, r3; adds r2, #1; cmp r2, r6; blt n1
-    cmp r4, #0; beq n3; mov r0, r1; mvns r0, r0; adds r0, #1; mov r1, r0
+    cmp r4, #0; beq n3; mov r0, r1; rsbs r0, r0, #0; mov r1, r0
 n3: mov r0, r1; movs r1, #1; pop {r4, r5, r6, r7, pc}
     n2: movs r1, #0; pop {r4, r5, r6, r7, pc}
+
+@ Signed division: r0 / r1 -> quotient in r0
+_idiv:
+    push {r4, lr}
+    movs r4, #0     @ Sign tracker
+    cmp r0, #0
+    bge 1f
+    rsbs r0, r0, #0 @ Absolute value
+    adds r4, #1
+1:  cmp r1, #0
+    bge 2f
+    rsbs r1, r1, #0 @ Absolute value
+    adds r4, #1
+2:  bl _udiv       @ Unsigned division
+    lsrs r4, r4, #1 @ If signs were different (odd count), result is negative
+    bcc 3f
+    rsbs r0, r0, #0
+3:  pop {r4, pc}
+
+@ Unsigned division: r0 / r1 -> quotient in r0
+_udiv:
+    cmp r1, #0
+    beq 4f          @ Division by zero check
+    movs r2, #0     @ Quotient
+    movs r3, #1     @ Bit mask
+1:  lsls r1, #1
+    lsls r3, #1
+    cmp r1, r0
+    bls 1b
+2:  lsrs r1, #1
+    lsrs r3, #1
+    cmp r0, r1
+    blo 3f
+    subs r0, r0, r1
+    orrs r2, r2, r3
+3:  cmp r3, #1
+    bhi 2b
+    mov r0, r2
+    bx lr
+4:  movs r0, #0     @ Return 0 for div-by-zero
+    bx lr
 
 .align 2
 .ltorg
