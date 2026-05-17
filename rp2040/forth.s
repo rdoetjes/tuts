@@ -17,6 +17,11 @@ _link_\label:
 \label:
 .endm
 
+@ Forth Assembly Macros
+.macro ENTER; push {lr}; .endm
+.macro EXIT; pop {pc}; .endm
+.macro OVER; bl f_over; .endm
+
 .section .vectors, "ax"
     .word _stack_top
     .word _reset + 1
@@ -37,25 +42,21 @@ _reset:
 
 .thumb_func
 _emit:
-    push {r1, r2, r3, lr}; ldr r1, =CMSDK_UART0_BASE
+    push {r1, r2, lr}; ldr r1, =CMSDK_UART0_BASE
 e1: ldr r2, [r1, #CMSDK_UART_STATE_OFFSET]; movs r3, #1; tst r2, r3; bne e1
-    str r0, [r1, #CMSDK_UART_DATA_OFFSET]; pop {r1, r2, r3, pc}
+    str r0, [r1, #CMSDK_UART_DATA_OFFSET]; pop {r1, r2, pc}
 
 .thumb_func
 _key:
-    push {r1, r2, r3, lr}
-    ldr r1, =CMSDK_UART0_BASE
+    push {r1, r2, lr}; ldr r1, =CMSDK_UART0_BASE
 k1: ldr r2, [r1, #CMSDK_UART_STATE_OFFSET]; movs r3, #2; tst r2, r3; beq k1
-    ldr r0, [r1, #CMSDK_UART_DATA_OFFSET];
-    movs r1, #255; ands r0, r1
-    pop {r1, r2, r3, pc}
+    ldr r0, [r1, #CMSDK_UART_DATA_OFFSET]; movs r1, #255; ands r0, r1; pop {r1, r2, pc}
 
 .thumb_func
 _print_dec:
     push {r4, r5, r6, lr}; mov r4, r0; ldr r6, =powers_of_10; movs r5, #0
     cmp r4, #0; bge pd1
-    mov r0, r4; mvns r0, r0; adds r0, #1; mov r4, r0
-    movs r0, #45; bl _emit
+    mov r0, r4; mvns r0, r0; adds r0, #1; mov r4, r0; movs r0, #45; bl _emit
 pd1:ldr r2, [r6]; cmp r2, #0; beq pd5; movs r0, #0
 pd2:cmp r4, r2; blo pd3; subs r4, r2; adds r0, #1; b pd2
 pd3:cmp r0, #0; bne pd4; cmp r5, #0; bne pd4; cmp r2, #1; beq pd4; b pd6
@@ -73,12 +74,21 @@ defh "DROP", f_drop, 4
     ldr r4, [r5]; adds r5, #4; bx lr
 defh "SWAP", f_swap, 4
     ldr r0, [r5]; str r4, [r5]; mov r4, r0; bx lr
+defh "OVER", f_over, 4
+    ldr r0, [r5]; subs r5, #4; str r4, [r5]; mov r4, r0; bx lr
 defh "+", f_plus, 1
     ldr r0, [r5]; adds r4, r4, r0; adds r5, #4; bx lr
 defh "-", f_minus, 1
     ldr r0, [r5]; subs r4, r0, r4; adds r5, #4; bx lr
 defh "*", f_star, 1
     ldr r0, [r5]; muls r4, r0, r4; adds r5, #4; bx lr
+
+@ High-level Forth word built with primitives!
+defh "2DUP", f_2dup, 4
+    ENTER
+    OVER
+    OVER
+    EXIT
 
 defh "=", f_equal, 1
     ldr r0, [r5]; adds r5, #4; cmp r0, r4; bne eq1
@@ -96,10 +106,10 @@ defh ".", f_dot, 1
 
 defh ".S", f_dot_s, 2
     push {r4, r5, r6, r7, lr}
-    movs r0, #60; bl _emit @ '<'
+    movs r0, #60; bl _emit
     ldr r6, =_data_stack_base; subs r0, r6, r5; lsrs r0, r0, #2
     bl _print_dec
-    movs r0, #62; bl _emit @ '>'
+    movs r0, #62; bl _emit
     movs r0, #32; bl _emit
     ldr r6, =_data_stack_base; subs r6, #8
 ds1:cmp r6, r5; blo ds2; ldr r0, [r6]; bl _print_dec; movs r0, #32; bl _emit; subs r6, #4; b ds1
@@ -137,56 +147,33 @@ defh ";", f_semicolon, 1, 1
     ldr r0, =_state; movs r1, #0; str r1, [r0]; bx lr
 
 defh "IF", f_if, 2, 1
-    push {lr}
-    ldr r0, =_here; ldr r1, [r0]
-    adds r1, #1; lsrs r1, #1; lsls r1, #1
-
+    push {lr}; ldr r0, =_here; ldr r1, [r0]; adds r1, #1; lsrs r1, #1; lsls r1, #1
     ldr r2, =0x4620; strh r2, [r1]; adds r1, #2 @ mov r0, r4
     ldr r2, =0x682c; strh r2, [r1]; adds r1, #2 @ ldr r4, [r5]
     ldr r2, =0x3504; strh r2, [r1]; adds r1, #2 @ adds r5, #4
     ldr r2, =0x2800; strh r2, [r1]; adds r1, #2 @ cmp r0, #0
     ldr r2, =0xd100; strh r2, [r1]; adds r1, #2 @ bne +0
     ldr r2, =0xe000; strh r2, [r1]              @ b <forward>
-
-    subs r5, #4; str r4, [r5]; mov r4, r1
-    adds r1, #2; str r1, [r0]
-    pop {pc}
+    subs r5, #4; str r4, [r5]; mov r4, r1; adds r1, #2; str r1, [r0]; pop {pc}
 
 defh "THEN", f_then, 4, 1
-    push {lr}
-    ldr r0, =_here; ldr r1, [r0]
-    subs r2, r1, r4; subs r2, #4; asrs r2, #1
+    push {lr}; ldr r0, =_here; ldr r1, [r0]; subs r2, r1, r4; subs r2, #4; asrs r2, #1
     ldr r3, =0x7ff; ands r2, r3; ldr r3, =0xe000; orrs r2, r3; strh r2, [r4]
-    ldr r4, [r5]; adds r5, #4
-    pop {pc}
+    ldr r4, [r5]; adds r5, #4; pop {pc}
 
 defh "ELSE", f_else, 4, 1
-    push {lr}
-    ldr r0, =_here; ldr r1, [r0]
-    adds r1, #1; lsrs r1, #1; lsls r1, #1
-    ldr r2, =0xe000; strh r2, [r1] @ b <forward>
-    mov r7, r1
-    adds r1, #2; str r1, [r0]
-    
-    ldr r1, [r0]
-    subs r2, r1, r4; subs r2, #4; asrs r2, #1
+    push {lr}; ldr r0, =_here; ldr r1, [r0]; adds r1, #1; lsrs r1, #1; lsls r1, #1
+    ldr r2, =0xe000; strh r2, [r1]; mov r7, r1; adds r1, #2; str r1, [r0]
+    ldr r1, [r0]; subs r2, r1, r4; subs r2, #4; asrs r2, #1
     ldr r3, =0x7ff; ands r2, r3; ldr r3, =0xe000; orrs r2, r3; strh r2, [r4]
-    
-    mov r4, r7
-    pop {pc}
+    mov r4, r7; pop {pc}
 
 defh "BEGIN", f_begin, 5, 1
-    push {lr}
-    ldr r0, =_here; ldr r1, [r0]
-    adds r1, #1; lsrs r1, #1; lsls r1, #1
-    str r1, [r0]
-    subs r5, #4; str r4, [r5]; mov r4, r1
-    pop {pc}
+    push {lr}; ldr r0, =_here; ldr r1, [r0]; adds r1, #1; lsrs r1, #1; lsls r1, #1
+    str r1, [r0]; subs r5, #4; str r4, [r5]; mov r4, r1; pop {pc}
 
 defh "UNTIL", f_until, 5, 1
-    push {lr}
-    ldr r0, =_here; ldr r1, [r0]
-    adds r1, #1; lsrs r1, #1; lsls r1, #1
+    push {lr}; ldr r0, =_here; ldr r1, [r0]; adds r1, #1; lsrs r1, #1; lsls r1, #1
     ldr r2, =0x4620; strh r2, [r1]; adds r1, #2
     ldr r2, =0x682c; strh r2, [r1]; adds r1, #2
     ldr r2, =0x3504; strh r2, [r1]; adds r1, #2
@@ -194,26 +181,19 @@ defh "UNTIL", f_until, 5, 1
     ldr r2, =0xd100; strh r2, [r1]; adds r1, #2
     subs r2, r4, r1; subs r2, #4; asrs r2, #1
     ldr r3, =0x7ff; ands r2, r3; ldr r3, =0xe000; orrs r2, r3; strh r2, [r1]; adds r1, #2
-    str r1, [r0]; ldr r4, [r5]; adds r5, #4
-    pop {pc}
+    str r1, [r0]; ldr r4, [r5]; adds r5, #4; pop {pc}
 
 defh "DO", f_do, 2, 1
-    push {lr}
-    ldr r0, =_here; ldr r1, [r0]
-    adds r1, #1; lsrs r1, #1; lsls r1, #1
+    push {lr}; ldr r0, =_here; ldr r1, [r0]; adds r1, #1; lsrs r1, #1; lsls r1, #1
     ldr r2, =0x6828; strh r2, [r1]; adds r1, #2
     ldr r2, =0xb411; strh r2, [r1]; adds r1, #2
     ldr r2, =0x3504; strh r2, [r1]; adds r1, #2
     ldr r2, =0x682c; strh r2, [r1]; adds r1, #2
     ldr r2, =0x3504; strh r2, [r1]; adds r1, #2
-    str r1, [r0]
-    subs r5, #4; str r4, [r5]; mov r4, r1
-    pop {pc}
+    str r1, [r0]; subs r5, #4; str r4, [r5]; mov r4, r1; pop {pc}
 
 defh "LOOP", f_loop, 4, 1
-    push {lr}
-    ldr r0, =_here; ldr r1, [r0]
-    adds r1, #1; lsrs r1, #1; lsls r1, #1
+    push {lr}; ldr r0, =_here; ldr r1, [r0]; adds r1, #1; lsrs r1, #1; lsls r1, #1
     ldr r2, =0xbc03; strh r2, [r1]; adds r1, #2
     ldr r2, =0x3101; strh r2, [r1]; adds r1, #2
     ldr r2, =0x4281; strh r2, [r1]; adds r1, #2
@@ -221,53 +201,10 @@ defh "LOOP", f_loop, 4, 1
     ldr r2, =0xb403; strh r2, [r1]; adds r1, #2
     subs r2, r4, r1; subs r2, #4; asrs r2, #1
     ldr r3, =0x7ff; ands r2, r3; ldr r3, =0xe000; orrs r2, r3; strh r2, [r1]; adds r1, #2
-    str r1, [r0]; ldr r4, [r5]; adds r5, #4
-    pop {pc}
+    str r1, [r0]; ldr r4, [r5]; adds r5, #4; pop {pc}
 
 defh "I", f_i, 1
     subs r5, #4; str r4, [r5]; ldr r4, [sp, #4]; bx lr
-
-defh ".\"", f_dot_quote, 2, 1
-    push {lr}
-    ldr r0, =_state; ldr r0, [r0]; cmp r0, #0; beq .L_interp_dot_quote
-    ldr r2, =_here; ldr r3, [r2]
-    adds r3, #1; lsrs r3, #1; lsls r3, #1
-    
-    ldr r1, =0x4801; strh r1, [r3]      @ ldr r0, [pc, #4] (CHANGED FROM #8)
-    ldr r1, =0x4780; strh r1, [r3, #2]  @ blx r0
-    
-    mov r6, r3  @ save r3
-    adds r3, #12
-    
-.L_comp_dq_loop:
-    bl _key
-    push {r0, r1, r2, r3, r6}; bl _emit; pop {r0, r1, r2, r3, r6}
-    cmp r0, #34 @ '"'
-    beq .L_comp_dq_done
-    strb r0, [r3]; adds r3, #1; b .L_comp_dq_loop
-    
-.L_comp_dq_done:
-    movs r0, #0; strb r0, [r3]; adds r3, #1
-    adds r3, #1; lsrs r3, #1; lsls r3, #1
-    
-    subs r1, r3, r6; subs r1, #8; asrs r1, #1
-    ldr r0, =0x7ff; ands r1, r0; ldr r0, =0xe000; orrs r1, r0
-    strh r1, [r6, #4]
-    ldr r1, =0xbf00; strh r1, [r6, #6]
-    ldr r1, =_print_str; str r1, [r6, #8]
-    
-    ldr r2, =_here; str r3, [r2]; pop {pc}
-    
-.L_interp_dot_quote:
-1:  bl _key; push {r0, r1, r2, r3}; bl _emit; pop {r0, r1, r2, r3}
-    cmp r0, #34; beq 2f; b 1b
-2:  pop {pc}
-
-.thumb_func
-_print_str:
-    push {r4, r5, lr}; mov r4, lr; movs r0, #1; bics r4, r0; adds r4, #8
-1:  ldrb r0, [r4]; cmp r0, #0; beq 2f; bl _emit; adds r4, #1; b 1b
-2:  pop {r4, r5, pc}
 
 defh "\\", f_bs, 1, 1
 b1: bl _key; cmp r0, #10; beq b2; cmp r0, #13; beq b2; b b1
@@ -279,21 +216,14 @@ b2: bx lr
 .set _link_builtins, _link
 
 _getw:
-    push {r4, r5, lr}
-    ldr r4, =_tib
-    movs r5, #0
-g1: bl _key
-    mov r7, r0
-    bl _emit
-    cmp r7, #32
-    bls g2
-    strb r7, [r4, r5]
-    adds r5, #1
-    b g1
-g2: cmp r5, #0
-    beq g1
-    mov r0, r5
-    pop {r4, r5, pc}
+    push {r4, r5, lr}; ldr r4, =_tib; movs r5, #0
+g1: bl _key; mov r7, r0; push {r0, r1, r2, r3, r4, r5}; mov r0, r7; bl _emit; pop {r0, r1, r2, r3, r4, r5}
+    cmp r7, #13; beq g_nl; cmp r7, #10; beq g_nl; cmp r7, #32; bls g2
+    strb r7, [r4, r5]; adds r5, #1; b g1
+g_nl:
+    ldr r0, =_nl_flag; movs r1, #1; strb r1, [r0]
+g2: cmp r5, #0; beq g3; mov r0, r5; pop {r4, r5, pc}
+g3: mov r0, r5; pop {r4, r5, pc}
 
 _find:
     push {r4, r5, r6, r7, lr}; ldr r2, =_latest; ldr r2, [r2]
@@ -311,8 +241,7 @@ _num:
     movs r4, #1; adds r2, #1
 n1: ldrb r3, [r0, r2]; subs r3, #48; cmp r3, #9; bhi n2
     movs r7, #10; muls r1, r7, r1; adds r1, r3; adds r2, #1; cmp r2, r6; blt n1
-    cmp r4, #0; beq n3
-    mov r0, r1; mvns r0, r0; adds r0, #1; mov r1, r0
+    cmp r4, #0; beq n3; mov r0, r1; mvns r0, r0; adds r0, #1; mov r1, r0
 n3: mov r0, r1; movs r1, #1; pop {r4, r5, r6, r7, pc}
 n2: movs r1, #0; pop {r4, r5, r6, r7, pc}
 
@@ -321,38 +250,42 @@ n2: movs r1, #0; pop {r4, r5, r6, r7, pc}
 
 QUIT:
     movs r0, #10; bl _emit; movs r0, #111; bl _emit; movs r0, #107; bl _emit; movs r0, #32; bl _emit
+    ldr r0, =_nl_flag; movs r1, #0; strb r1, [r0]
 qloop:
-    bl _getw; mov r6, r0; mov r1, r6; bl _find
+    bl _getw; mov r6, r0; cmp r6, #0; beq q_prompt_check
+    mov r1, r6; bl _find
     cmp r0, #0; beq qnum
     mov r7, r0; mov r2, r1; ldr r1, =_state; ldr r1, [r1]
     cmp r1, #0; beq qexec
     movs r1, #1; tst r2, r1; bne qexec
     ldr r2, =_here; ldr r3, [r2]
     adds r3, #3; lsrs r3, #2; lsls r3, #2
-    ldr r1, =0x4801; strh r1, [r3]
-    ldr r1, =0x4780; strh r1, [r3, #2]
-    ldr r1, =0xe002; strh r1, [r3, #4]
-    ldr r1, =0xbf00; strh r1, [r3, #6]
+    ldr r1, =0x4801; strh r1, [r3]; ldr r1, =0x4780; strh r1, [r3, #2]
+    ldr r1, =0xe002; strh r1, [r3, #4]; ldr r1, =0xbf00; strh r1, [r3, #6]
     str r7, [r3, #8]
-    adds r3, #12; str r3, [r2]; b qloop
+    adds r3, #12; str r3, [r2]; b q_prompt_check
 qexec:
-    blx r7; ldr r1, =_state; ldr r1, [r1]; cmp r1, #0; beq QUIT; b qloop
+    blx r7; ldr r1, =_state; ldr r1, [r1]; cmp r1, #0; beq QUIT; b q_prompt_check
 qnum:
     mov r1, r6; bl _num; cmp r1, #0; beq qerr
     mov r7, r0; ldr r1, =_state; ldr r1, [r1]
     cmp r1, #0; beq qpush
     ldr r2, =_here; ldr r3, [r2]
     adds r3, #3; lsrs r3, #2; lsls r3, #2
-    ldr r1, =0x4801; strh r1, [r3]
-    ldr r1, =0x4780; strh r1, [r3, #2]
-    ldr r1, =0xe004; strh r1, [r3, #4]
-    ldr r1, =0xbf00; strh r1, [r3, #6]
+    ldr r1, =0x4801; strh r1, [r3]; ldr r1, =0x4780; strh r1, [r3, #2]
+    ldr r1, =0xe004; strh r1, [r3, #4]; ldr r1, =0xbf00; strh r1, [r3, #6]
     ldr r0, =_clit; str r0, [r3, #8]
-    str r7, [r3, #12]; adds r3, #16; str r3, [r2]; b qloop
+    str r7, [r3, #12]; adds r3, #16; str r3, [r2]; b q_prompt_check
 qpush:
-    subs r5, #4; str r4, [r5]; mov r4, r7; b QUIT
+    subs r5, #4; str r4, [r5]; mov r4, r7; b q_prompt_check
 qerr:
     movs r0, #63; bl _emit; b QUIT
+q_prompt_check:
+    ldr r0, =_nl_flag; ldrb r1, [r0]
+    cmp r1, #0; beq qloop
+    movs r1, #0; strb r1, [r0]
+    movs r0, #10; bl _emit; movs r0, #111; bl _emit; movs r0, #107; bl _emit; movs r0, #32; bl _emit
+    b qloop
 
 .thumb_func
 _clit:
@@ -376,3 +309,5 @@ _state: .word 0
 _data_stack_lim: .space 512
 _data_stack_base:
 _tib: .space 64
+_tib_print: .space 64
+_nl_flag: .byte 0
