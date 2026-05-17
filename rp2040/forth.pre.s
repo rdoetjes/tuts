@@ -113,13 +113,18 @@ defcode "*", 1
     ldr r0, [r5]; muls r4, r0, r4; adds r5, #4; bx lr
 
 @ High Level Definitions (Processed by Preprocessor)
-: 2DUP OVER OVER ;
+defcode "2DUP", 4
+    ENTER
+bl "OVER"
+bl "OVER"
+    EXIT
 
-: DILDO
-  12
-  13
-  *
-;
+defcode "DILDO", 5
+    ENTER
+    LIT 12
+    LIT 13
+bl "*"
+    EXIT
 
 defcode "2DROP", 5
     ldr r4, [r5, #4]
