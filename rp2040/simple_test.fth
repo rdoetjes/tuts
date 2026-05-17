@@ -1,1 +1,15 @@
 1 2 + .
+10 5 - .
+6 7 * .
+: DOUBLE DUP + ;
+21 DOUBLE .
+10 20 30 .S
+WORDS
+
+: TEST-IF 0 = IF 111 ELSE 222 THEN . ;
+0 TEST-IF
+5 TEST-IF
+
+: IS-NEG 0 < IF 333 . THEN ;
+0 5 - IS-NEG
+5 IS-NEG
