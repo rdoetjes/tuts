@@ -1,62 +1,65 @@
 
-ok  
+ok
 
-ok 1 2 + 
+ok 1 2 +
 ok .
-3 
-ok 10 5 - 
+3
+ok 10 5 -
 ok .
-5 
-ok 6 7 * 
+5
+ok 6 7 *
 ok .
-42 
+42
 ok : DOUBLE DUP + ;
 
-ok 21 DOUBLE 
+ok 21 DOUBLE
 ok .
-42 
+42
 ok 10 20 30 .S
-<3> 10 20 30 
-ok DROP 
-ok DROP 
+<3> 10 20 30
+ok DROP
+ok DROP
 ok DROP
 
 ok : TEST-IF 0 = IF 111 ELSE 222 THEN . ;
 
 ok 0 TEST-IF
-111 
+111
 ok 5 TEST-IF
-222 
+222
 ok : IS-NEG 0 < IF 333 . THEN ;
 
-ok 0 5 - 
+ok 0 5 -
 ok IS-NEG
-333 
+333
 ok 5 IS-NEG
 
 ok : TEST-DO 10 0 DO I . LOOP ;
 
 ok TEST-DO
-0 1 2 3 4 5 6 7 8 9 
+0 1 2 3 4 5 6 7 8 9
 ok : TEST-UNTIL 5 BEGIN DUP . 1 - DUP 0 = UNTIL DROP ;
 
 ok TEST-UNTIL
-5 4 3 2 1 
+5 4 3 2 1
 ok VARIABLE COUNT
 
-ok 10 COUNT 
+ok 10 COUNT
 ok !
 
-ok COUNT 
-ok @ 
+ok COUNT
+ok @
 ok .
-10 
-ok 55 66 2DUP 
-ok . 66 
-ok . 55 
-ok . 66 
+10
+ok 55 66 2DUP
+ok . 66
+ok . 55
+ok . 66
 ok .
-55 
-ok  
+55
+ok 12 13 2DROP
+ok .S
+<0>
+ok
 
-ok 
+ok

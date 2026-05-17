@@ -16,9 +16,11 @@ ok 21 DOUBLE
 ok .
 42 
 ok 10 20 30 .S
-<3> 10 20 30 
-ok DROP 
-ok DROP 
+<3> 10 20 30
+ok DROP
+
+ok DROP
+
 ok DROP
 
 ok : TEST-IF 0 = IF 111 ELSE 222 THEN . ;
@@ -29,7 +31,8 @@ ok 5 TEST-IF
 222 
 ok : IS-NEG 0 < IF 333 . THEN ;
 
-ok 0 5 - 
+ok 0 5 -
+
 ok IS-NEG
 333 
 ok 5 IS-NEG
@@ -51,12 +54,23 @@ ok COUNT
 ok @ 
 ok .
 10 
-ok 55 66 2DUP 
+ok 55 66 2DUP
+
 ok . 66 
+ok 66
+
+ok . 66 
+ok 55
+
 ok . 55 
-ok . 66 
+ok 66
+
 ok .
-55 
+66 
+ok 12 13 2DROP
+
+ok .S
+<3> 55 66 55
 ok  
 
 ok 

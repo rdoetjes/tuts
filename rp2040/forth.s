@@ -21,6 +21,7 @@ _link_\label:
 .macro ENTER; push {lr}; .endm
 .macro EXIT; pop {pc}; .endm
 .macro OVER; bl f_over; .endm
+.macro DROP; bl f_drop; .endm
 
 .section .vectors, "ax"
     .word _stack_top
@@ -89,6 +90,11 @@ defh "2DUP", f_2dup, 4
     OVER
     EXIT
 
+defh "2DROP", f_2drop, 5
+    ldr r4, [r5, #4]
+    adds r5, #8
+    bx lr
+
 defh "=", f_equal, 1
     ldr r0, [r5]; adds r5, #4; cmp r0, r4; bne eq1
     movs r4, #0; mvns r4, r4; bx lr
@@ -121,10 +127,9 @@ defh ".S", f_dot_s, 2
     ldr r6, =_data_stack_base; subs r0, r6, r5; lsrs r0, r0, #2
     bl _print_dec
     movs r0, #62; bl _emit
-    movs r0, #32; bl _emit
     ldr r6, =_data_stack_base; subs r6, #8
-ds1:cmp r6, r5; blo ds2; ldr r0, [r6]; bl _print_dec; movs r0, #32; bl _emit; subs r6, #4; b ds1
-ds2:ldr r6, =_data_stack_base; cmp r5, r6; beq ds3; mov r0, r4; bl _print_dec; movs r0, #32; bl _emit
+ds1:cmp r6, r5; blo ds2; movs r0, #32; bl _emit; ldr r0, [r6]; bl _print_dec; subs r6, #4; b ds1
+ds2:ldr r6, =_data_stack_base; cmp r5, r6; beq ds3; movs r0, #32; bl _emit; mov r0, r4; bl _print_dec
 ds3:pop {r4, r5, r6, r7, pc}
 
 defh "WORDS", f_words, 5
