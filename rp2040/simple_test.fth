@@ -1,17 +1,12 @@
-1 2 + .
-10 5 - .
-6 7 * .
-: DOUBLE DUP + ;
-21 DOUBLE .
-10 20 30 .S
-DROP DROP DROP
 : TEST-IF 0 = IF 111 ELSE 222 THEN . ;
 0 TEST-IF
 5 TEST-IF
+
 : IS-NEG 0 < IF 333 . THEN ;
 0 5 - IS-NEG
 5 IS-NEG
-: TEST-DO 10 0 DO I . LOOP ;
-TEST-DO
-: TEST-UNTIL 5 BEGIN DUP . 1 - DUP 0 = UNTIL DROP ;
-TEST-UNTIL
+
+: TEST-PRINT ." Hello world" ;
+TEST-PRINT
+
+." Interpretation test"
