@@ -184,13 +184,7 @@ bl "OVER"
 bl "OVER"
     EXIT
 
-defcode "4DROP", 5
-    ENTER
-bl "2DROP"
-bl "2DROP"
-    EXIT
-
-defcode "DILDO", 5
+defcode "TEST-WORD", 9
     ENTER
     LIT 12
     LIT 13

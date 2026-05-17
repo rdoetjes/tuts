@@ -180,9 +180,7 @@ defcode "/", 1
 
 : 2DUP OVER OVER ;
 
-: 4DROP 2DROP 2DROP ;
-
-: DILDO
+: TEST-WORD
   12
   13
   *

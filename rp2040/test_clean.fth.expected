@@ -1,0 +1,110 @@
+
+ok  
+
+ok VARIABLE X
+
+ok VARIABLE Y
+
+ok 5 X 
+ok !
+
+ok 10 Y 
+ok !
+
+ok X 
+ok @ 
+ok .
+5 
+ok Y 
+ok @ 
+ok .
+10 
+ok X 
+ok @ 
+ok Y 
+ok @ 
+ok + 
+ok X 
+ok !
+
+ok X 
+ok @ 
+ok .
+15 
+ok 
+
+ok VARIABLE CH
+
+ok 255 CH 
+ok !
+
+ok 65 CH 
+ok C!
+
+ok CH 
+ok @ 
+ok .
+65 
+ok CH 
+ok C@ 
+ok .
+65 
+ok 
+
+ok HERE 
+ok .
+536871568 
+ok 10 ALLOT
+
+ok ALIGN
+
+ok HERE 
+ok .
+536871580 
+ok 
+
+ok HERE
+
+ok 123 ,
+
+ok 456 ,
+
+ok 789 ,
+
+ok DUP 
+ok @ 
+ok .
+123 
+ok DUP 
+ok 4 + 
+ok @ 
+ok .
+456 
+ok 8 + 
+ok @ 
+ok .
+789 
+ok 
+
+ok VARIABLE COUNTER
+
+ok : RUN_LOOP
+
+ok   10 0 DO
+
+ok     COUNTER @ 1 + COUNTER !
+
+ok   LOOP ;
+
+ok 0 COUNTER 
+ok !
+
+ok RUN_LOOP
+
+ok COUNTER 
+ok @ 
+ok .
+10 
+ok  
+
+ok 

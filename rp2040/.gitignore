@@ -3,3 +3,4 @@
 *.bin
 *.elf
 *.uf2
+*.clean

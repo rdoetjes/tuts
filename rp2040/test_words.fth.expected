@@ -1,0 +1,194 @@
+
+ok  
+
+ok \ ?
+ok RP2040 ?
+ok Forth ?
+ok Test ?
+ok Script
+?
+ok \ ?
+ok Use ?
+ok this ?
+ok to ?
+ok verify ?
+ok the ?
+ok implementation ?
+ok via ?
+ok the ?
+ok serial ?
+ok REPL
+?
+ok 
+
+ok \ ?
+ok 1. ?
+ok Test ?
+ok Basic ?
+ok Arithmetic ?
+ok (Outputs ?
+ok in ?
+ok Hex)
+?
+ok \ ?
+ok 10 + 
+ok 20 = 
+ok 30 (0x1E)
+?
+ok 10 20 + 
+ok .
+30 
+ok 
+
+ok \ ?
+ok 5 * 
+ok 5 = 
+ok 25 (0x19)
+?
+ok 5 5 * 
+ok .
+25 
+ok 
+
+ok \ ?
+ok 2. ?
+ok Test ?
+ok Stack ?
+ok Manipulation
+?
+ok \ ?
+ok Should ?
+ok print ?
+ok 00000002 00000001
+
+ok 1 2 SWAP 
+ok . 1 
+ok .
+2 
+ok 
+
+ok \ ?
+ok 3. ?
+ok Test ?
+ok Dictionary ?
+ok Listing
+?
+ok \ ?
+ok This ?
+ok should ?
+ok show ?
+ok all ?
+ok built-in ?
+ok words: ?
+ok DUP, ?
+ok DROP, ?
+ok SWAP, ?
+ok +, ?
+ok -, ?
+ok *, ?
+ok WORDS, ?
+ok etc.
+?
+ok WORDS
+I LOOP DO UNTIL BEGIN ELSE THEN IF ALIGN , ALLOT HERE VARIABLE ; : WORDS .S . C! ! C@ @ < = 2DROP TEST-WORD 2DUP / * - + OVER SWAP DROP DUP 
+ok 
+
+ok \ ?
+ok 4. ?
+ok Test ?
+ok Runtime ?
+ok Compilation
+?
+ok \ ?
+ok Define ?
+ok a ?
+ok word ?
+ok that ?
+ok doubles ?
+ok a ?
+ok number
+?
+ok : DOUBLE DUP + ;
+
+ok 
+
+ok \ ?
+ok Verify ?
+ok it ?
+ok works ?
+ok (Should ?
+ok print ?
+ok 0000002A ?
+ok for ?
+ok 42)
+?
+ok 21 DOUBLE 
+ok .
+42 
+ok 
+
+ok \ ?
+ok 5. ?
+ok Verify ?
+ok the ?
+ok new ?
+ok word ?
+ok is ?
+ok in ?
+ok the ?
+ok dictionary
+?
+ok WORDS
+DOUBLE I LOOP DO UNTIL BEGIN ELSE THEN IF ALIGN , ALLOT HERE VARIABLE ; : WORDS .S . C! ! C@ @ < = 2DROP TEST-WORD 2DUP / * - + OVER SWAP DROP DUP 
+ok 
+
+ok \ ?
+ok 6. ?
+ok Test ?
+ok logic
+?
+ok \ ?
+ok 1 AND ?
+ok 2 = 
+ok 0
+
+ok 1 2 AND ?
+ok .
+2 
+ok \ ?
+ok 1 OR ?
+ok 2 = 
+ok 3
+
+ok 1 2 OR ?
+ok .
+2 
+ok 
+
+ok \ ?
+ok 7. ?
+ok Test ?
+ok nested ?
+ok definitions
+?
+ok : SQUARE DUP * ;
+
+ok : SUM-SQUARES SQUARE SWAP SQUARE + ;
+
+ok 
+
+ok \ ?
+ok 3^2 ?
+ok + 
+ok 4^2 ?
+ok = 
+ok 9 + 
+ok 16 = 
+ok 25 (0x19)
+?
+ok 3 4 SUM-SQUARES 
+ok .
+25 
+ok  
+
+ok 

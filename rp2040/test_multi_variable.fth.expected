@@ -1,0 +1,31 @@
+
+ok  
+
+ok VARIABLE VAR1
+
+ok VARIABLE VAR2
+
+ok 123 VAR1 
+ok !
+
+ok 456 VAR2 
+ok !
+
+ok VAR1 
+ok @ 
+ok .
+123 
+ok VAR2 
+ok @ 
+ok .
+456 
+ok VAR1 
+ok @ 
+ok VAR2 
+ok @ 
+ok + 
+ok .
+579 
+ok  
+
+ok 
