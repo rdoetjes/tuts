@@ -1,0 +1,36 @@
+VARIABLE X
+VARIABLE Y
+5 X !
+10 Y !
+X @ .
+Y @ .
+X @ Y @ + X !
+X @ .
+
+VARIABLE CH
+255 CH !
+65 CH C!
+CH @ .
+CH C@ .
+
+HERE .
+10 ALLOT
+ALIGN
+HERE .
+
+HERE
+123 ,
+456 ,
+789 ,
+DUP @ .
+DUP 4 + @ .
+8 + @ .
+
+VARIABLE COUNTER
+: RUN_LOOP
+  10 0 DO
+    COUNTER @ 1 + COUNTER !
+  LOOP ;
+0 COUNTER !
+RUN_LOOP
+COUNTER @ .
