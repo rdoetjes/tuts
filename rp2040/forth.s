@@ -142,12 +142,14 @@ defh "IF", f_if, 2, 1
     @ align to halfword just in case
     adds r1, #1; lsrs r1, #1; lsls r1, #1
 
-    @ cmp r4, #0
-    ldr r2, =0x2c00; strh r2, [r1]; adds r1, #2
+    @ mov r0, r4
+    ldr r2, =0x4620; strh r2, [r1]; adds r1, #2
     @ ldr r4, [r5]
     ldr r2, =0x682c; strh r2, [r1]; adds r1, #2
     @ adds r5, #4
     ldr r2, =0x3504; strh r2, [r1]; adds r1, #2
+    @ cmp r0, #0
+    ldr r2, =0x2800; strh r2, [r1]; adds r1, #2
     @ beq <forward> - jump if condition is false
     ldr r2, =0xd000; strh r2, [r1]
 
@@ -170,11 +172,11 @@ defh "ELSE", f_else, 4, 1
     ldr r2, =0xe000; strh r2, [r1] @ b <forward>
     mov r7, r1
     adds r1, #2; str r1, [r0]
-    
+
     ldr r1, [r0]
     subs r2, r1, r4; subs r2, #4; asrs r2, #1
     strb r2, [r4]
-    
+
     mov r4, r7
     pop {pc}
 

@@ -36,7 +36,7 @@ ok TEST-IF
 111 
 ok 5 
 ok TEST-IF
-111 
+222 
 ok 
 : IS-NEG 0 < IF 333 . THEN ;
 
@@ -47,5 +47,5 @@ ok IS-NEG
 333 
 ok 5 
 ok IS-NEG
-333 
+
 ok  
