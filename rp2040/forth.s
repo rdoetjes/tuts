@@ -42,9 +42,9 @@ _reset:
 
 .thumb_func
 _emit:
-    push {r1, r2, lr}; ldr r1, =CMSDK_UART0_BASE
+    push {r1, r2, r3, lr}; ldr r1, =CMSDK_UART0_BASE
 e1: ldr r2, [r1, #CMSDK_UART_STATE_OFFSET]; movs r3, #1; tst r2, r3; bne e1
-    str r0, [r1, #CMSDK_UART_DATA_OFFSET]; pop {r1, r2, pc}
+    str r0, [r1, #CMSDK_UART_DATA_OFFSET]; pop {r1, r2, r3, pc}
 
 .thumb_func
 _key:
@@ -83,7 +83,6 @@ defh "-", f_minus, 1
 defh "*", f_star, 1
     ldr r0, [r5]; muls r4, r0, r4; adds r5, #4; bx lr
 
-@ High-level Forth word built with primitives!
 defh "2DUP", f_2dup, 4
     ENTER
     OVER
@@ -99,6 +98,18 @@ defh "<", f_less, 1
     ldr r0, [r5]; adds r5, #4; cmp r0, r4; bge lt1
     movs r4, #0; mvns r4, r4; bx lr
 lt1:movs r4, #0; bx lr
+
+defh "@", f_fetch, 1
+    ldr r4, [r4]; bx lr
+
+defh "C@", f_cfetch, 2
+    ldrb r4, [r4]; bx lr
+
+defh "!", f_store, 1
+    ldr r0, [r5]; str r0, [r4]; ldr r4, [r5, #4]; adds r5, #8; bx lr
+
+defh "C!", f_cstore, 2
+    ldr r0, [r5]; strb r0, [r4]; ldr r4, [r5, #4]; adds r5, #8; bx lr
 
 defh ".", f_dot, 1
     push {lr}; mov r0, r4; bl _print_dec; movs r0, #32; bl _emit
@@ -146,14 +157,50 @@ defh ";", f_semicolon, 1, 1
     adds r1, #3; lsrs r1, #2; lsls r1, #2; str r1, [r0]
     ldr r0, =_state; movs r1, #0; str r1, [r0]; bx lr
 
+defh "VARIABLE", f_variable, 8
+    push {lr}; bl _getw; ldr r2, =_here; ldr r3, [r2]
+    adds r3, #3; lsrs r3, #2; lsls r3, #2
+    ldr r7, =_latest; ldr r1, [r7]; str r1, [r3]; str r3, [r7]
+    adds r3, #4; movs r1, #0; strb r1, [r3]; strb r0, [r3, #1]; adds r3, #2
+    ldr r1, =_tib; movs r7, #0
+v1: ldrb r6, [r1, r7]; strb r6, [r3, r7]; adds r7, #1; cmp r7, r0; blt v1
+    add r3, r0; adds r3, #3; lsrs r3, #2; lsls r3, #2
+    @ Code for the new variable (12 bytes):
+    @ adds r5, # -4     (0x3d04)
+    @ str  r4, [r5]     (0x602c)
+    @ adr  r4, data     (0xa400)  ; PC + 0 (points to data at r3+8)
+    @ bx   lr           (0x4770)
+    @ data (4 bytes)    (0x00000000)
+    ldr r6, =0x3d04; strh r6, [r3]
+    ldr r6, =0x602c; strh r6, [r3, #2]
+    ldr r6, =0xa400; strh r6, [r3, #4]
+    ldr r6, =0x4770; strh r6, [r3, #6]
+    movs r6, #0; str r6, [r3, #8]   @ Initialize variable to 0
+    adds r3, #12
+    str r3, [r2]; pop {pc}
+
+defh "HERE", f_here, 4
+    subs r5, #4; str r4, [r5]; ldr r0, =_here; ldr r4, [r0]; bx lr
+
+defh "ALLOT", f_allot, 5
+    ldr r0, =_here; ldr r1, [r0]; add r1, r4; str r1, [r0]
+    ldr r4, [r5]; adds r5, #4; bx lr
+
+defh ",", f_comma, 1
+    ldr r0, =_here; ldr r1, [r0]; str r4, [r1]; adds r1, #4; str r1, [r0]
+    ldr r4, [r5]; adds r5, #4; bx lr
+
+defh "ALIGN", f_align, 5
+    ldr r0, =_here; ldr r1, [r0]; adds r1, #3; lsrs r1, #2; lsls r1, #2; str r1, [r0]; bx lr
+
 defh "IF", f_if, 2, 1
     push {lr}; ldr r0, =_here; ldr r1, [r0]; adds r1, #1; lsrs r1, #1; lsls r1, #1
-    ldr r2, =0x4620; strh r2, [r1]; adds r1, #2 @ mov r0, r4
-    ldr r2, =0x682c; strh r2, [r1]; adds r1, #2 @ ldr r4, [r5]
-    ldr r2, =0x3504; strh r2, [r1]; adds r1, #2 @ adds r5, #4
-    ldr r2, =0x2800; strh r2, [r1]; adds r1, #2 @ cmp r0, #0
-    ldr r2, =0xd100; strh r2, [r1]; adds r1, #2 @ bne +0
-    ldr r2, =0xe000; strh r2, [r1]              @ b <forward>
+    ldr r2, =0x4620; strh r2, [r1]; adds r1, #2
+    ldr r2, =0x682c; strh r2, [r1]; adds r1, #2
+    ldr r2, =0x3504; strh r2, [r1]; adds r1, #2
+    ldr r2, =0x2800; strh r2, [r1]; adds r1, #2
+    ldr r2, =0xd100; strh r2, [r1]; adds r1, #2
+    ldr r2, =0xe000; strh r2, [r1]
     subs r5, #4; str r4, [r5]; mov r4, r1; adds r1, #2; str r1, [r0]; pop {pc}
 
 defh "THEN", f_then, 4, 1
@@ -205,10 +252,6 @@ defh "LOOP", f_loop, 4, 1
 
 defh "I", f_i, 1
     subs r5, #4; str r4, [r5]; ldr r4, [sp, #4]; bx lr
-
-defh "\\", f_bs, 1, 1
-b1: bl _key; cmp r0, #10; beq b2; cmp r0, #13; beq b2; b b1
-b2: bx lr
 
 .align 2
 .ltorg
@@ -309,5 +352,4 @@ _state: .word 0
 _data_stack_lim: .space 512
 _data_stack_base:
 _tib: .space 64
-_tib_print: .space 64
 _nl_flag: .byte 0

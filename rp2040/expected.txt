@@ -42,6 +42,15 @@ ok : TEST-UNTIL 5 BEGIN DUP . 1 - DUP 0 = UNTIL DROP ;
 
 ok TEST-UNTIL
 5 4 3 2 1 
+ok VARIABLE COUNT
+
+ok 10 COUNT 
+ok !
+
+ok COUNT 
+ok @ 
+ok .
+10 
 ok 55 66 2DUP 
 ok . 66 
 ok . 55 
