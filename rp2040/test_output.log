@@ -26,10 +26,11 @@ ok 20
 ok 30 
 ok .S
 <3> 10 20 30 
-ok WORDS
-DOUBLE \ ELSE THEN IF ; : WORDS .S . < = * - + SWAP DROP DUP 
-ok 
-: TEST-IF 0 = IF 111 ELSE 222 THEN . ;
+ok DROP 
+ok DROP 
+ok DROP
+
+ok : TEST-IF 0 = IF 111 ELSE 222 THEN . ;
 
 ok 0 
 ok TEST-IF
@@ -37,8 +38,7 @@ ok TEST-IF
 ok 5 
 ok TEST-IF
 222 
-ok 
-: IS-NEG 0 < IF 333 . THEN ;
+ok : IS-NEG 0 < IF 333 . THEN ;
 
 ok 0 
 ok 5 
@@ -48,4 +48,12 @@ ok IS-NEG
 ok 5 
 ok IS-NEG
 
+ok : TEST-DO 10 0 DO I . LOOP ;
+
+ok TEST-DO
+0 1 2 3 4 5 6 7 8 9 
+ok : TEST-UNTIL 5 BEGIN DUP . 1 - DUP 0 = UNTIL DROP ;
+
+ok TEST-UNTIL
+5 4 3 2 1 
 ok  

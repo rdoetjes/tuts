@@ -139,19 +139,14 @@ defh ";", f_semicolon, 1, 1
 defh "IF", f_if, 2, 1
     push {lr}
     ldr r0, =_here; ldr r1, [r0]
-    @ align to halfword just in case
     adds r1, #1; lsrs r1, #1; lsls r1, #1
 
-    @ mov r0, r4
-    ldr r2, =0x4620; strh r2, [r1]; adds r1, #2
-    @ ldr r4, [r5]
-    ldr r2, =0x682c; strh r2, [r1]; adds r1, #2
-    @ adds r5, #4
-    ldr r2, =0x3504; strh r2, [r1]; adds r1, #2
-    @ cmp r0, #0
-    ldr r2, =0x2800; strh r2, [r1]; adds r1, #2
-    @ beq <forward> - jump if condition is false
-    ldr r2, =0xd000; strh r2, [r1]
+    ldr r2, =0x4620; strh r2, [r1]; adds r1, #2 @ mov r0, r4
+    ldr r2, =0x682c; strh r2, [r1]; adds r1, #2 @ ldr r4, [r5]
+    ldr r2, =0x3504; strh r2, [r1]; adds r1, #2 @ adds r5, #4
+    ldr r2, =0x2800; strh r2, [r1]; adds r1, #2 @ cmp r0, #0
+    ldr r2, =0xd100; strh r2, [r1]; adds r1, #2 @ bne +0
+    ldr r2, =0xe000; strh r2, [r1]              @ b <forward>
 
     subs r5, #4; str r4, [r5]; mov r4, r1
     adds r1, #2; str r1, [r0]
@@ -161,7 +156,9 @@ defh "THEN", f_then, 4, 1
     push {lr}
     ldr r0, =_here; ldr r1, [r0]
     subs r2, r1, r4; subs r2, #4; asrs r2, #1
-    strb r2, [r4]
+    ldr r3, =0x7ff; ands r2, r3
+    ldr r3, =0xe000; orrs r2, r3
+    strh r2, [r4]
     ldr r4, [r5]; adds r5, #4
     pop {pc}
 
@@ -172,13 +169,83 @@ defh "ELSE", f_else, 4, 1
     ldr r2, =0xe000; strh r2, [r1] @ b <forward>
     mov r7, r1
     adds r1, #2; str r1, [r0]
-
+    
     ldr r1, [r0]
     subs r2, r1, r4; subs r2, #4; asrs r2, #1
-    strb r2, [r4]
-
+    ldr r3, =0x7ff; ands r2, r3
+    ldr r3, =0xe000; orrs r2, r3
+    strh r2, [r4]
+    
     mov r4, r7
     pop {pc}
+
+defh "BEGIN", f_begin, 5, 1
+    push {lr}
+    ldr r0, =_here; ldr r1, [r0]
+    adds r1, #1; lsrs r1, #1; lsls r1, #1
+    str r1, [r0]
+    subs r5, #4; str r4, [r5]; mov r4, r1
+    pop {pc}
+
+defh "UNTIL", f_until, 5, 1
+    push {lr}
+    ldr r0, =_here; ldr r1, [r0]
+    adds r1, #1; lsrs r1, #1; lsls r1, #1
+    
+    ldr r2, =0x4620; strh r2, [r1]; adds r1, #2 @ mov r0, r4
+    ldr r2, =0x682c; strh r2, [r1]; adds r1, #2 @ ldr r4, [r5]
+    ldr r2, =0x3504; strh r2, [r1]; adds r1, #2 @ adds r5, #4
+    ldr r2, =0x2800; strh r2, [r1]; adds r1, #2 @ cmp r0, #0
+    ldr r2, =0xd100; strh r2, [r1]; adds r1, #2 @ bne +0
+    
+    subs r2, r4, r1; subs r2, #4; asrs r2, #1   @ b <BEGIN>
+    ldr r3, =0x7ff; ands r2, r3
+    ldr r3, =0xe000; orrs r2, r3
+    strh r2, [r1]; adds r1, #2
+    
+    str r1, [r0]
+    ldr r4, [r5]; adds r5, #4
+    pop {pc}
+
+defh "DO", f_do, 2, 1
+    push {lr}
+    ldr r0, =_here; ldr r1, [r0]
+    adds r1, #1; lsrs r1, #1; lsls r1, #1
+    
+    ldr r2, =0x6828; strh r2, [r1]; adds r1, #2 @ ldr r0, [r5]
+    ldr r2, =0xb411; strh r2, [r1]; adds r1, #2 @ push {r0, r4}
+    ldr r2, =0x3504; strh r2, [r1]; adds r1, #2 @ adds r5, #4
+    ldr r2, =0x682c; strh r2, [r1]; adds r1, #2 @ ldr r4, [r5]
+    ldr r2, =0x3504; strh r2, [r1]; adds r1, #2 @ adds r5, #4
+    
+    str r1, [r0]
+    subs r5, #4; str r4, [r5]; mov r4, r1
+    pop {pc}
+
+defh "LOOP", f_loop, 4, 1
+    push {lr}
+    ldr r0, =_here; ldr r1, [r0]
+    adds r1, #1; lsrs r1, #1; lsls r1, #1
+    
+    ldr r2, =0xbc03; strh r2, [r1]; adds r1, #2 @ pop {r0, r1}
+    ldr r2, =0x3101; strh r2, [r1]; adds r1, #2 @ adds r1, #1
+    ldr r2, =0x4281; strh r2, [r1]; adds r1, #2 @ cmp r1, r0
+    ldr r2, =0xda01; strh r2, [r1]; adds r1, #2 @ bge +2
+    ldr r2, =0xb403; strh r2, [r1]; adds r1, #2 @ push {r0, r1}
+    
+    subs r2, r4, r1; subs r2, #4; asrs r2, #1   @ b <DO>
+    ldr r3, =0x7ff; ands r2, r3
+    ldr r3, =0xe000; orrs r2, r3
+    strh r2, [r1]; adds r1, #2
+    
+    str r1, [r0]
+    ldr r4, [r5]; adds r5, #4
+    pop {pc}
+
+defh "I", f_i, 1
+    subs r5, #4; str r4, [r5]
+    ldr r4, [sp, #4]
+    bx lr
 
 defh "\\", f_bs, 1, 1
 b1: bl _key; cmp r0, #10; beq b2; cmp r0, #13; beq b2; b b1

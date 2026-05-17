@@ -32,7 +32,7 @@ $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 
 clean:
-	rm -f $(OBJS) $(ELF) $(BIN) test_output.log
+	rm -f $(OBJS) $(ELF) $(BIN) test_output.log test_clean.log
 
 # Interactive test: Run Forth in QEMU and connect your keyboard to the serial port
 test: $(ELF)
@@ -49,9 +49,17 @@ auto-test: $(ELF)
 		(echo " "; cat $(TEST_SCRIPT); sleep 1; echo " ") | $(QEMU) -machine mps2-an385 -cpu cortex-m3 -kernel $(ELF) -nographic -serial stdio -monitor none > test_output.log 2>&1 & \
 		sleep 4; \
 		pkill -P $$! || true; \
+		grep -v "qemu:" test_output.log | grep -v "R00=" | grep -v "XPSR=" | grep -v "FPSCR:" > test_clean.log || cp test_output.log test_clean.log; \
 		echo "--- Test Output Start ---"; \
-		grep -v "qemu:" test_output.log | grep -v "R00=" | grep -v "XPSR=" | grep -v "FPSCR:" || cat test_output.log; \
+		cat test_clean.log; \
 		echo "--- Test Output End ---"; \
+		if cmp -s test_clean.log expected.txt; then \
+			echo "Tests Passed: Output matches expected."; \
+		else \
+			echo "Tests Failed: Output does not match expected!"; \
+			diff -u expected.txt test_clean.log; \
+			exit 1; \
+		fi \
 	else \
 		echo "Error: $(TEST_SCRIPT) not found."; \
 		exit 1; \
