@@ -146,6 +146,8 @@ skip_hw_init:
     ldr r0, =QUIT
     bx r0
 
+.ltorg
+
 @ -----------------------------------------------------------------------------
 @ SERIAL I/O SUBROUTINES
 @ -----------------------------------------------------------------------------
@@ -273,6 +275,8 @@ defcode "/", 1
     adds r5, #4
     pop {pc}
 
+.ltorg
+
 @ -----------------------------------------------------------------------------
 @ HIGH-LEVEL DEFINITIONS
 @ -----------------------------------------------------------------------------
@@ -341,6 +345,16 @@ defcode "<", 1
 @ Sets a GPIO pin to High (1) or Low (0).
 @ This handles the SIO bitmasks and Output Enable automatically.
 defcode "SET_PIN_TO", 10
+    push {lr}
+    @ QEMU safety check
+    ldr r0, =0xe000ed00
+    ldr r1, [r0]
+    ldr r2, =0x410cc600    @ M0+
+    ldr r3, =0xffffff00
+    ands r1, r3
+    cmp r1, r2
+    bne 3f                 @ Skip if in QEMU
+
     ldr r0, [r5]           @ Get pin number from stack
     movs r1, #1
     lsls r1, r1, r0        @ r1 = bitmask (1 << pin)
@@ -359,7 +373,40 @@ defcode "SET_PIN_TO", 10
     str r1, [r2, #SIO_GPIO_OUT_CLR_OFFSET]
 2:  ldr r4, [r5, #4]       @ Drop pin and state from stack, get new TOS
     adds r5, #8
+    pop {pc}
+3:  ldr r4, [r5, #4]       @ QEMU exit path
+    adds r5, #8
+    pop {pc}
+
+.ltorg
+
+@ --- Word: READ_PIN ( pin -- 1|0 ) ---
+@ Reads the state of a GPIO pin. Returns 1 for High, 0 for Low.
+defcode "READ_PIN", 8
+    @ QEMU safety check
+    ldr r0, =0xe000ed00
+    ldr r1, [r0]
+    ldr r2, =0x410cc600    @ M0+
+    ldr r3, =0xffffff00
+    ands r1, r3
+    cmp r1, r2
+    beq 1f
+    movs r4, #0            @ Return 0 in QEMU
     bx lr
+
+1:  mov r0, r4             @ Pin number
+    ldr r1, =SIO_BASE
+    ldr r2, [r1, #SIO_GPIO_IN_OFFSET]
+    movs r3, #1
+    lsls r3, r3, r0        @ Bitmask
+    tst r2, r3
+    beq 2f
+    movs r4, #1            @ High
+    bx lr
+2:  movs r4, #0            @ Low
+    bx lr
+
+.ltorg
 
 @ --- Word: MS_SLEEP ( ms -- ) ---
 @ Wait for the specified number of milliseconds using the hardware timer.
@@ -413,6 +460,8 @@ defcode "GET_MILIS", 9
     bl _udiv               @ Divide by 1000 to get milliseconds
     mov r4, r0             @ Put result in TOS
     pop {pc}
+
+.ltorg
 
 defcode "@", 1
     ldr r4, [r4]
