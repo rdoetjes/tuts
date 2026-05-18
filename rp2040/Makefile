@@ -56,7 +56,9 @@ forth_pico.elf: $(BOOT2_OBJS) forth_pico.o linker_pico.ld
 forth_pico.bin: forth_pico.elf
 	$(OBJCOPY) -O binary $< $@
 
-forth_pico.uf2: forth_pico.bin
+forth_pico.uf2: forth_pico.bin pad_checksum.py
+	@echo "Calculating and injecting Boot Stage 2 CRC..."
+	$(PYTHON) pad_checksum.py $<
 	@echo "Generating UF2 file..."
 	$(PYTHON) uf2conv.py -f 0xe48bff56 -b 0x10000000 -c $< -o $@
 
