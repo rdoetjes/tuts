@@ -37,12 +37,10 @@ $(ELF): $(OBJS) linker.ld
 
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
-
-$(UF2): $(BIN)
 	python3 uf2conv.py $(BIN) -c -b 0x10000000 -o $(UF2)
 
 clean:
-	rm -f $(OBJS) $(ELF) $(BIN) $(PREPROCESSED) *.log *.clean *.pre.s
+	rm -f $(OBJS) $(ELF) $(BIN) $(PREPROCESSED) *.log *.clean *.pre.s *.uf2
 
 # Interactive test: Run Forth in QEMU and connect your keyboard to the serial port
 test: $(ELF)
