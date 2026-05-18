@@ -29,10 +29,10 @@ def main():
 
     # Compute CRC over the first 252 bytes of boot2
     checksum = crc32_rp2040(data[:252])
+    print(f"{checksum:#x}")
 
     # Write the checksum into the last 4 bytes of the 256-byte boot2 block
     struct.pack_into("<I", data, 252, checksum)
-
     with open(sys.argv[1], "wb") as f:
         f.write(data)
 
