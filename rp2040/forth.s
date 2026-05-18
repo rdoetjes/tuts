@@ -311,6 +311,30 @@ defcode "<", 1
 1:  movs r4, #0
     bx lr
 
+@ --- Word: SET_PIN_TO ( pin state -- ) ---
+@ Sets a GPIO pin to High (1) or Low (0).
+@ This handles the SIO bitmasks and Output Enable automatically.
+defcode "SET_PIN_TO", 10
+    ldr r0, [r5]           @ Get pin number from stack
+    movs r1, #1
+    lsls r1, r1, r0        @ r1 = bitmask (1 << pin)
+
+    ldr r2, =SIO_BASE
+    @ Ensure the pin is enabled for output
+    str r1, [r2, #SIO_GPIO_OE_SET_OFFSET]
+
+    @ Check if we want to set it High or Low
+    cmp r4, #0
+    beq 1f                 @ If state is 0, jump to clear logic
+    @ Set pin High
+    str r1, [r2, #SIO_GPIO_OUT_SET_OFFSET]
+    b 2f
+1:  @ Set pin Low
+    str r1, [r2, #SIO_GPIO_OUT_CLR_OFFSET]
+2:  ldr r4, [r5, #4]       @ Drop pin and state from stack, get new TOS
+    adds r5, #8
+    bx lr
+
 defcode "@", 1
     ldr r4, [r4]
     bx lr
