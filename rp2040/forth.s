@@ -1185,7 +1185,7 @@ qpush:
     mov r4, r7
     b q_prompt_check
 qerr:                   @ just print ? to console
-    movs r0, #63
+    movs r0, #'?'
     bl _emit
     b QUIT
 q_prompt_check:
@@ -1195,13 +1195,13 @@ q_prompt_check:
     beq qloop
     movs r1, #0
     strb r1, [r0]
-    movs r0, #10
+    movs r0, #'\n'
     bl _emit
-    movs r0, #111
+    movs r0, #'o'
     bl _emit
-    movs r0, #107
+    movs r0, #'k'
     bl _emit
-    movs r0, #32
+    movs r0, #' '
     bl _emit
     b qloop
 
