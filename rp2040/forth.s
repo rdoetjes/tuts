@@ -1184,7 +1184,7 @@ qpush:
     str r4, [r5]
     mov r4, r7
     b q_prompt_check
-qerr:
+qerr:                   @ just print ? to console
     movs r0, #63
     bl _emit
     b QUIT
