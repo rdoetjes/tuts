@@ -436,6 +436,19 @@ w3: pop {r4, pc}
 @ -----------------------------------------------------------------------------
 
 @ Start compiling a new word: : NAME ... ;
+@ --- Word: \ ---
+@ Immediate word that skips the rest of the line.
+defcode "\\", 1, 1
+1:  bl _key
+    cmp r0, #10
+    beq 2f
+    cmp r0, #13
+    beq 2f
+    cmp r0, #0
+    beq 2f
+    b 1b
+2:  bx lr
+
 defcode ":", 1
     push {lr}
     bl _getw
