@@ -371,6 +371,17 @@ defcode "<", 1
 1:  movs r4, #0
     bx lr
 
+defcode ">", 1
+    ldr r0, [r5]
+    adds r5, #4
+    cmp r0, r4
+    ble 1f
+    movs r4, #0
+    mvns r4, r4
+    bx lr
+1:  movs r4, #0
+    bx lr
+
 @ --- Word: SET_PIN_TO ( pin state -- ) ---
 @ Sets a GPIO pin to High (1) or Low (0).
 @ This handles the SIO bitmasks and Output Enable automatically.
