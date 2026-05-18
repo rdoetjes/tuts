@@ -82,9 +82,10 @@ _reset:
     @ Detect if we are on real RP2040 (Cortex-M0+) or QEMU (Cortex-M3)
     ldr r0, =0xe000ed00    @ CPUID base
     ldr r1, [r0]
-    ldr r2, =0x410cc600    @ ARM, Cortex-M0+ (RP2040)
+    ldr r2, =0x410cc600
     ldr r3, =0xffffff00
     ands r1, r3
+    ands r2, r3
     cmp r1, r2
     bne skip_hw_init       @ Skip GPIO init if in QEMU (M3)
     //bl _gpio_init
@@ -120,8 +121,8 @@ skip_hw_init:
     str r0, [r2, #RESETS_RESET_OFFSET]
     movs r0, #1
 10: ldr r2, [r1, #RESETS_RESET_DONE_OFFSET]
-    cmp r2, r0
-    bne 10b
+    tst r2, r0
+    beq 10b
 
     @ 2. Initialize Onboard LED (GPIO 25)
     @ Set function to SIO
@@ -133,7 +134,7 @@ skip_hw_init:
     @ Set SIO direction to output and set pin high
     ldr r1, =SIO_BASE
     movs r0, #1
-    lsls r0, r0, #25        @ Bitmask for GPIO 25
+    ldr r0, =(1 << 25)  @ Bitmask for GPIO 25
     str r0, [r1, #SIO_GPIO_OE_SET_OFFSET]
     str r0, [r1, #SIO_GPIO_OUT_SET_OFFSET]
 

@@ -1,19 +1,20 @@
 MEMORY
 {
-    FLASH(rx) : ORIGIN = 0x10000000, LENGTH = 2048k
-    SRAM(rwx) : ORIGIN = 0x20000000, LENGTH = 256k
+    FLASH(rx)  : ORIGIN = 0x10000000, LENGTH = 2048k
+    SRAM(rwx)  : ORIGIN = 0x20000000, LENGTH = 256k
 }
 
-ENTRY(_boot2)
+ENTRY(_reset)
 
 SECTIONS
 {
-    .boot2 : {
+    .boot2 ORIGIN(FLASH) : {
         KEEP(*(.boot2))
     } > FLASH
 
+    ASSERT(SIZEOF(.boot2) == 256, "boot2 must be 256 bytes")
+
     .text : {
-        KEEP(*(.vectors))
         *(.text*)
         *(.rodata*)
         . = ALIGN(4);
@@ -29,7 +30,7 @@ SECTIONS
         _edata = .;
     } > SRAM AT > FLASH
 
-    .bss : {
+    .bss (NOLOAD) : {
         . = ALIGN(4);
         _sbss = .;
         *(.bss*)
@@ -38,12 +39,12 @@ SECTIONS
         _ebss = .;
     } > SRAM
 
-    /* Pointer to end of SRAM for stack */
-    _stack_top = ORIGIN(SRAM) + LENGTH(SRAM);
-
-    /* Forth RAM allocation */
-    .forth_mem : {
+    .forth_mem (NOLOAD) : {
         . = ALIGN(4);
         _forth_ram_start = .;
+        . += 200K;
+        _forth_ram_end = .;
     } > SRAM
+
+    _stack_top = ORIGIN(SRAM) + LENGTH(SRAM);
 }
