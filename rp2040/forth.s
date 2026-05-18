@@ -1206,11 +1206,12 @@ _gpio_init:
 1:  ldr r2, [r1, #RESETS_RESET_DONE_OFFSET]
     tst r2, r0
     beq 1b
-    @ 2. Set all GPIO pins (0-29) to function 5 (SIO)
+    @ 2. Set all GPIO pins (2-28) to function 5 (SIO)
     ldr r1, =IO_BANK0_BASE
     adds r1, #4            @ Point to GPIO0_CTRL (STATUS is at +0, CTRL at +4)
     movs r0, #5            @ Function 5 is SIO
-    movs r2, #30           @ Total number of GPIO pins
+    movs r2, #28           @ Total number of GPIO pins
+    adds r1, #16           @ Skip over UART GPIO0 and GPIO1
 2:  str r0, [r1]           @ Set this pin to SIO
     adds r1, #8            @ Advance to next GPIO_CTRL (skip STATUS)
     subs r2, #1
