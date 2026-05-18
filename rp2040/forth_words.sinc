@@ -1,3 +1,6 @@
+@ These higher order Forth functions (words are prepocessed and turned into assembly
+@ The resulting assmebly file is forth_words.inc
+@ Which is included in forth.s
 
 : 2DUP OVER OVER ;
 
