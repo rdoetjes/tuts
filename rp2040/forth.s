@@ -84,7 +84,7 @@ _reset:
     ands r1, r3
     cmp r1, r2
     bne skip_hw_init       @ Skip GPIO init if in QEMU (M3)
-    bl _gpio_init
+    //bl _gpio_init
 skip_hw_init:
     ldr r0, =_sidata
     ldr r1, =_sdata
@@ -110,14 +110,38 @@ skip_hw_init:
 .ifdef PICO
     @ --- Real RP2040 Hardware Initialization ---
 
-    @ Un-reset UART0 and IO_BANK0
+    @ 1. Un-reset essential peripherals: PADS and IO
     ldr r1, =RESETS_BASE
-    ldr r0, =(RESETS_RESET_IO_BANK0_BITS | RESETS_RESET_UART0_BITS)
+    ldr r0, =(RESETS_RESET_PADS_BANK0_BITS | RESETS_RESET_IO_BANK0_BITS)
     ldr r2, =(RESETS_BASE + 0x3000) @ Atomic clear
     str r0, [r2, #RESETS_RESET_OFFSET]
+    movs r0, #1
 10: ldr r2, [r1, #RESETS_RESET_DONE_OFFSET]
+    cmp r2, r0
+    bne 10b
+
+    @ 2. Initialize Onboard LED (GPIO 25)
+    @ Set function to SIO
+    ldr r1, =IO_BANK0_BASE
+    ldr r2, =GPIO25_CTRL_OFFSET
+    movs r0, #5
+    str r0, [r1, r2]
+
+    @ Set SIO direction to output and set pin high
+    ldr r1, =SIO_BASE
+    movs r0, #1
+    lsls r0, r0, #25        @ Bitmask for GPIO 25
+    str r0, [r1, #SIO_GPIO_OE_SET_OFFSET]
+    str r0, [r1, #SIO_GPIO_OUT_SET_OFFSET]
+
+    @ 3. Now, un-reset UART and configure it
+    ldr r1, =RESETS_BASE
+    ldr r0, =RESETS_RESET_UART0_BITS
+    ldr r2, =(RESETS_BASE + 0x3000)
+    str r0, [r2, #RESETS_RESET_OFFSET]
+11: ldr r2, [r1, #RESETS_RESET_DONE_OFFSET]
     tst r2, r0
-    beq 10b
+    beq 11b
 
     @ Set GPIO0 and GPIO1 to UART function (Function 2)
     ldr r1, =IO_BANK0_BASE
@@ -129,30 +153,14 @@ skip_hw_init:
     ldr r0, =UART0_BASE
     movs r1, #0
     str r1, [r0, #UART_CR_OFFSET]
-    @ Assuming default 125MHz clock
     movs r1, #67
     str r1, [r0, #UART_IBRD_OFFSET]
     movs r1, #52
     str r1, [r0, #UART_FBRD_OFFSET]
-    movs r1, #0x70         @ 8 bits, enable FIFOs
+    movs r1, #0x70
     str r1, [r0, #UART_LCR_H_OFFSET]
-    ldr r1, =0x301         @ Enable UART, TX, RX
+    ldr r1, =0x301
     str r1, [r0, #UART_CR_OFFSET]
-
-    @ Initialize Onboard LED (GPIO 25)
-    ldr r1, =IO_BANK0_BASE
-    ldr r2, =GPIO25_CTRL_OFFSET
-    movs r0, #5            @ Function 5 (SIO)
-    str r0, [r1, r2]
-
-    ldr r1, =SIO_BASE
-    movs r0, #1
-    movs r2, #25
-    lsls r0, r0, r2        @ Bit 25
-    @ Output Enable
-    str r0, [r1, #SIO_GPIO_OE_SET_OFFSET]
-    @ Set High (Turn on LED)
-    str r0, [r1, #SIO_GPIO_OUT_SET_OFFSET]
 .else
     @ --- QEMU CMSDK UART Initialization ---
     ldr r0, =CMSDK_UART0_BASE
@@ -327,17 +335,7 @@ defcode "/", 1
 @ -----------------------------------------------------------------------------
 @ HIGH-LEVEL DEFINITIONS
 @ -----------------------------------------------------------------------------
-
-: 2DUP OVER OVER ;
-
-: TEST-WORD 12 13 * ;
-
-: BLINKY BEGIN
-    300 MS_SLEEP
-    25 0 SET_PIN_TO
-    300 MS_SLEEP
-    25 1 SET_PIN_TO
-UNTIL ;
+.include "forth_words.inc"
 
 @ -----------------------------------------------------------------------------
 @ MEMORY AND LOGIC PRIMITIVES

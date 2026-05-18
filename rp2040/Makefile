@@ -15,7 +15,6 @@ LDFLAGS = -T linker.ld
 # Files
 SRCS = forth.s
 BOOT2_SRCS = boot2.s
-PREPROCESSED = forth.pre.s
 OBJS = forth.o
 BOOT2_OBJS = boot2.o
 ELF  = forth.elf
@@ -31,10 +30,10 @@ pico: forth_pico.uf2
 
 $(PREPROCESSED): $(SRCS) rp2040.inc preprocess_forth.py
 	@echo "Preprocessing Forth source..."
-	$(PYTHON) preprocess_forth.py $(SRCS) > $@
+	$(PYTHON) preprocess_forth.py forth_words.sinc > forth_words.inc
 
-$(OBJS): $(PREPROCESSED)
-	$(AS) $(ASFLAGS) $(PREPROCESSED) -o $@
+$(OBJS): $(SRCS)
+	$(AS) $(ASFLAGS) $(SRCS) -o $@
 
 $(ELF): $(OBJS) linker.ld
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
@@ -44,8 +43,8 @@ $(BIN): $(ELF)
 
 # --- Pico specific targets ---
 
-forth_pico.o: $(PREPROCESSED) rp2040.inc
-	$(AS) $(ASFLAGS) --defsym PICO=1 $(PREPROCESSED) -o $@
+forth_pico.o: $(SRCS) rp2040.inc
+	$(AS) $(ASFLAGS) --defsym PICO=1 $(SRCS) -o $@
 
 $(BOOT2_OBJS): $(BOOT2_SRCS)
 	$(AS) $(ASFLAGS) $(BOOT2_SRCS) -o $@
@@ -63,7 +62,7 @@ forth_pico.uf2: forth_pico.bin pad_checksum.py
 	$(PYTHON) uf2conv.py -f 0xe48bff56 -b 0x10000000 -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(ELF) $(BIN) $(PREPROCESSED) forth_pico.o forth_pico.elf forth_pico.bin forth_pico.uf2 $(BOOT2_OBJS) *.log *.clean *.pre.s *.uf2
+	rm -f $(OBJS) $(ELF) $(BIN) forth_pico.o forth_pico.elf forth_pico.bin forth_pico.uf2 $(BOOT2_OBJS) *.log *.clean *.pre.s *.uf2
 
 # Interactive test: Run Forth in QEMU and connect your keyboard to the serial port
 test: $(ELF)
