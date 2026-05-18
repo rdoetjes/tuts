@@ -57,7 +57,7 @@ forth_pico.bin: forth_pico.elf
 forth_pico.uf2: forth_pico.bin pad_checksum.py
 	#@echo "Calculating and injecting Boot Stage 2 CRC..."
 	#$(PYTHON) pad_checksum.py $<
-	cat boot2.bin forth_pico.bin > flash_image.bin
+	#cat boot2.bin forth_pico.bin > flash_image.bin
 	$(PYTHON)  uf2conv.py -f 0xe48bff56 -b 0x10000000 -c flash_image.bin -o forth_pico.uf2
 
 # -------------------------

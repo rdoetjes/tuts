@@ -5,7 +5,7 @@
 @ Unlike traditional Forth VMs, this system compiles words into native ARM
 @ machine code subroutines. Every Forth word is a real ARM function.
 @ =============================================================================
-
+.include "boot.inc"
 .include "rp2040.inc"
 .syntax unified
 .cpu cortex-m0plus
