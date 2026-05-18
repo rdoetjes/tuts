@@ -621,9 +621,9 @@ defcode "BEGIN", 5, 1
     push {lr}
     ldr r0, =_here
     ldr r1, [r0]
-    adds r1, #1
-    lsrs r1, #1
-    lsls r1, #1
+    adds r1, #1     @ align next instruction
+    lsrs r1, #1     @ Make sure it ends on an
+    lsls r1, #1     @ even number 2,4,6 etc
     str r1, [r0]
     subs r5, #4
     str r4, [r5]
@@ -637,21 +637,28 @@ defcode "UNTIL", 5, 1
     adds r1, #1
     lsrs r1, #1
     lsls r1, #1
-    ldr r2, =0x4620
+    ldr r2, =0x4620 @ mov r0, r4
     strh r2, [r1]
     adds r1, #2
-    ldr r2, =0x682c
+    ldr r2, =0x682c @ ldr r4, [r5, #0]
     strh r2, [r1]
     adds r1, #2
-    ldr r2, =0x3504
+    ldr r2, =0x3504 @ adds r5, #4
     strh r2, [r1]
     adds r1, #2
-    ldr r2, =0x2800
+    ldr r2, =0x2800 @ cmp r0, #0
     strh r2, [r1]
     adds r1, #2
-    ldr r2, =0xd100
+    ldr r2, =0xd100 @ bne <label>
     strh r2, [r1]
     adds r1, #2
+
+    @ CALCULATE relative branch offset
+    @ r4 - r1 → distance from current position to loop start
+    @ -4 → adjust for pipeline / branch position
+    @ asrs #1 → convert byte offset → halfword offset (Thumb branches count halfwords)
+    @ & 0x7ff → keep 11-bit offset field
+    @ | 0xe000 → encode as BNE instruction
     subs r2, r4, r1
     subs r2, #4
     asrs r2, #1
@@ -659,6 +666,7 @@ defcode "UNTIL", 5, 1
     ands r2, r3
     ldr r3, =0xe000
     orrs r2, r3
+
     strh r2, [r1]
     adds r1, #2
     str r1, [r0]
