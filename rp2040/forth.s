@@ -16,6 +16,9 @@
 @ -----------------------------------------------------------------------------
 @ The dictionary is a linked list of "word headers" stored in two locations:
 @ 1. Built-in words: Stored in Flash (read-only), defined during assembly.
+@ 1a. Higher order words are defined in Forth in forth_words.sinc.
+@     The preprocessor will translate those to assembly in forth_words.inc
+@     This inturn is include here.
 @ 2. User words: Stored in RAM (starting at _forth_ram_start), created at runtime.
 @
 @ Each word header follows this structure:
