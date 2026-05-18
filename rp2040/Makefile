@@ -14,16 +14,20 @@ LDFLAGS = -T linker.ld
 
 # Files
 SRCS = forth.s
+BOOT2_SRCS = boot2.s
 PREPROCESSED = forth.pre.s
 OBJS = forth.o
+BOOT2_OBJS = boot2.o
 ELF  = forth.elf
 BIN  = forth.bin
 UF2  = forth.uf2
 TEST_FILES = $(wildcard *.fth)
 
-.PHONY: all clean test auto-test $(TEST_FILES)
+.PHONY: all clean test auto-test $(TEST_FILES) pico
 
 all: $(BIN)
+
+pico: forth_pico.uf2
 
 $(PREPROCESSED): $(SRCS) rp2040.inc preprocess_forth.py
 	@echo "Preprocessing Forth source..."
@@ -37,10 +41,27 @@ $(ELF): $(OBJS) linker.ld
 
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
-	python3 uf2conv.py $(BIN) -c -b 0x10000000 -o $(UF2)
+
+# --- Pico specific targets ---
+
+forth_pico.o: $(PREPROCESSED) rp2040.inc
+	$(AS) $(ASFLAGS) --defsym PICO=1 $(PREPROCESSED) -o $@
+
+$(BOOT2_OBJS): $(BOOT2_SRCS)
+	$(AS) $(ASFLAGS) $(BOOT2_SRCS) -o $@
+
+forth_pico.elf: $(BOOT2_OBJS) forth_pico.o linker_pico.ld
+	$(LD) -T linker_pico.ld $(BOOT2_OBJS) forth_pico.o -o $@
+
+forth_pico.bin: forth_pico.elf
+	$(OBJCOPY) -O binary $< $@
+
+forth_pico.uf2: forth_pico.bin
+	@echo "Generating UF2 file..."
+	$(PYTHON) uf2conv.py -f 0xe48bff56 -b 0x10000000 -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(ELF) $(BIN) $(PREPROCESSED) *.log *.clean *.pre.s *.uf2
+	rm -f $(OBJS) $(ELF) $(BIN) $(PREPROCESSED) forth_pico.o forth_pico.elf forth_pico.bin forth_pico.uf2 $(BOOT2_OBJS) *.log *.clean *.pre.s *.uf2
 
 # Interactive test: Run Forth in QEMU and connect your keyboard to the serial port
 test: $(ELF)

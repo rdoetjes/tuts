@@ -127,9 +127,44 @@ skip_hw_init:
     adds r1, #4
     b 3b
 
-4:  ldr r0, =CMSDK_UART0_BASE
+4:
+.ifdef PICO
+    @ --- Real RP2040 Hardware Initialization ---
+
+    @ Un-reset UART0 and IO_BANK0
+    ldr r1, =RESETS_BASE
+    ldr r0, =(RESETS_RESET_IO_BANK0_BITS | RESETS_RESET_UART0_BITS)
+    ldr r2, =(RESETS_BASE + 0x3000) @ Atomic clear
+    str r0, [r2, #RESETS_RESET_OFFSET]
+10: ldr r2, [r1, #RESETS_RESET_DONE_OFFSET]
+    tst r2, r0
+    beq 10b
+
+    @ Set GPIO0 and GPIO1 to UART function (Function 2)
+    ldr r1, =IO_BANK0_BASE
+    movs r0, #2
+    str r0, [r1, #GPIO0_CTRL_OFFSET]
+    str r0, [r1, #GPIO1_CTRL_OFFSET]
+
+    @ Configure UART0 for 115200 8N1
+    ldr r0, =UART0_BASE
+    movs r1, #0
+    str r1, [r0, #UART_CR_OFFSET]
+    @ Assuming default 125MHz clock
+    movs r1, #67
+    str r1, [r0, #UART_IBRD_OFFSET]
+    movs r1, #52
+    str r1, [r0, #UART_FBRD_OFFSET]
+    movs r1, #0x70         @ 8 bits, enable FIFOs
+    str r1, [r0, #UART_LCR_H_OFFSET]
+    ldr r1, =0x301         @ Enable UART, TX, RX
+    str r1, [r0, #UART_CR_OFFSET]
+.else
+    @ --- QEMU CMSDK UART Initialization ---
+    ldr r0, =CMSDK_UART0_BASE
     movs r1, #3
     str r1, [r0, #CMSDK_UART_CTRL_OFFSET]
+.endif
 
     ldr r5, =_data_stack_base
     movs r4, #0
@@ -156,23 +191,41 @@ skip_hw_init:
 .thumb_func
 _emit:
     push {r1, r2, r3, lr}
+.ifdef PICO
+    ldr r1, =UART0_BASE
+e1: ldr r2, [r1, #UART_FR_OFFSET]
+    movs r3, #UART_FR_TXFF_BITS
+    tst r2, r3
+    bne e1
+    str r0, [r1, #UART_DR_OFFSET]
+.else
     ldr r1, =CMSDK_UART0_BASE
 e1: ldr r2, [r1, #CMSDK_UART_STATE_OFFSET]
     movs r3, #1
     tst r2, r3
     bne e1
     str r0, [r1, #CMSDK_UART_DATA_OFFSET]
+.endif
     pop {r1, r2, r3, pc}
 
 .thumb_func
 _key:
     push {r1, r2, lr}
+.ifdef PICO
+    ldr r1, =UART0_BASE
+k1: ldr r2, [r1, #UART_FR_OFFSET]
+    movs r3, #UART_FR_RXFE_BITS
+    tst r2, r3
+    bne k1
+    ldr r0, [r1, #UART_DR_OFFSET]
+.else
     ldr r1, =CMSDK_UART0_BASE
 k1: ldr r2, [r1, #CMSDK_UART_STATE_OFFSET]
     movs r3, #2
     tst r2, r3
     beq k1
     ldr r0, [r1, #CMSDK_UART_DATA_OFFSET]
+.endif
     movs r1, #255
     ands r0, r1
     pop {r1, r2, pc}
