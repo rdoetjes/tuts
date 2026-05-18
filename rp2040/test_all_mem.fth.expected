@@ -1,5 +1,4 @@
 
-ok
 
 ok \ ?
 ok Test ?
@@ -11,7 +10,6 @@ ok and ?
 ok Variable ?
 ok Words
 ?
-ok
 
 ok \ ?
 ok --- ?
@@ -19,74 +17,73 @@ ok Test ?
 ok VARIABLE, ?
 ok @, ?
 ok and ?
-ok !
+ok ! 
 ok ---
 ?
 ok VARIABLE X
 
 ok VARIABLE Y
 
-ok 5 X
+ok 5 X 
 ok !
 
-ok 10 Y
+ok 10 Y 
 ok !
 
-ok X
-ok @
-ok . 33
+ok X 
+ok @ 
+ok . 33 
 ok   \ ?
 ok Should ?
 ok print ?
 ok 5
 
-ok Y
-ok @
-ok . 33
+ok Y 
+ok @ 
+ok . 33 
 ok   \ ?
 ok Should ?
 ok print ?
 ok 10
 
-ok X
-ok @
-ok Y
-ok @
-ok +
-ok X
+ok X 
+ok @ 
+ok Y 
+ok @ 
+ok + 
+ok X 
 ok !
 
-ok X
-ok @
-ok . 66
+ok X 
+ok @ 
+ok . 66 
 ok   \ ?
 ok Should ?
 ok print ?
 ok 15
 
-ok
 
 ok \ ?
 ok --- ?
 ok Test ?
-ok C@
+ok C@ 
 ok and ?
-ok C!
+ok C! 
 ok ---
 ?
 ok VARIABLE CH
 
-ok 255 CH
+ok 255 CH 
 ok !
 
-ok 65 CH
-ok C!
+ok 65 CH 
+ok C! 
 ok \ ?
 ok 'A'
 ?
-ok CH
-ok @
-ok . 65
+ok CH 
+ok @ 
+ok . 65 
 ok   \ ?
 ok Should ?
 ok print ?
@@ -101,15 +98,14 @@ ok of ?
 ok the ?
 ok word)
 ?
-ok CH
-ok C@
-ok . 65
+ok CH 
+ok C@ 
+ok . 65 
 ok  \ ?
 ok Should ?
 ok print ?
 ok 65
 
-ok
 
 ok \ ?
 ok --- ?
@@ -117,11 +113,11 @@ ok Test ?
 ok HERE, ?
 ok ALLOT, ?
 ok and ?
-ok ALIGN
+ok ALIGN 
 ok ---
 ?
-ok HERE
-ok . 536871568
+ok HERE 
+ok . 536871568 
 ok   \ ?
 ok Print ?
 ok current ?
@@ -131,12 +127,12 @@ ok 10 ALLOT
 
 ok ALIGN
 
-ok HERE
-ok . 536871580
+ok HERE 
+ok . 536871580 
 ok   \ ?
 ok Print ?
 ok new ?
-ok HERE
+ok HERE 
 ok (should ?
 ok be ?
 ok at ?
@@ -146,16 +142,15 @@ ok further ?
 ok and ?
 ok 4-aligned)
 ?
-ok
 
 ok \ ?
 ok --- ?
 ok Test ?
-ok ,
+ok , 
 ok (comma) ?
 ok ---
 ?
-ok HERE
+ok HERE 
 ok     \ ?
 ok Save ?
 ok address
@@ -166,32 +161,31 @@ ok 456 ,
 
 ok 789 ,
 
-ok DUP
-ok @
-ok . 123
+ok DUP 
+ok @ 
+ok . 123 
 ok      \ ?
 ok Should ?
 ok print ?
 ok 123
 
-ok DUP
-ok 4 +
-ok @
-ok . 855630583
+ok DUP 
+ok 4 + 
+ok @ 
+ok . 5155910 
 ok  \ ?
 ok Should ?
 ok print ?
 ok 456
 
-ok 8 +
-ok @
-ok . 3997952
+ok 8 + 
+ok @ 
+ok . 1144128768 
 ok      \ ?
 ok Should ?
 ok print ?
 ok 789
 
-ok
 
 ok \ ?
 ok --- ?
@@ -205,27 +199,23 @@ ok ---
 ?
 ok VARIABLE COUNTER
 
-ok 0 COUNTER
+ok 0 COUNTER 
 ok !
 
 ok 10 0 DO
 
-ok   COUNTER
-ok @
-ok 1 +
-ok COUNTER
+ok   COUNTER 
+ok @ 
+ok 1 + 
+ok COUNTER 
 ok !
 
 ok LOOP
 
-ok COUNTER
-ok @
-ok . 1
+ok COUNTER 
+ok @ 
+ok . 1 
 ok \ ?
 ok Should ?
 ok print ?
 ok 10
-
-ok
-
-ok

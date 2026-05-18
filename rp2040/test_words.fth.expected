@@ -1,5 +1,4 @@
 
-ok  
 
 ok \ ?
 ok RP2040 ?
@@ -19,7 +18,6 @@ ok the ?
 ok serial ?
 ok REPL
 ?
-ok 
 
 ok \ ?
 ok 1. ?
@@ -38,7 +36,6 @@ ok 30 (0x1E)
 ok 10 20 + 
 ok .
 30 
-ok 
 
 ok \ ?
 ok 5 * 
@@ -48,7 +45,6 @@ ok 25 (0x19)
 ok 5 5 * 
 ok .
 25 
-ok 
 
 ok \ ?
 ok 2. ?
@@ -65,7 +61,6 @@ ok 1 2 SWAP
 ok . 1 
 ok .
 2 
-ok 
 
 ok \ ?
 ok 3. ?
@@ -91,7 +86,6 @@ ok etc.
 ?
 ok WORDS
 I LOOP DO UNTIL BEGIN ELSE THEN IF ALIGN , ALLOT HERE VARIABLE ; : WORDS .S . C! ! C@ @ < = 2DROP TEST-WORD 2DUP / * - + OVER SWAP DROP DUP 
-ok 
 
 ok \ ?
 ok 4. ?
@@ -110,7 +104,6 @@ ok number
 ?
 ok : DOUBLE DUP + ;
 
-ok 
 
 ok \ ?
 ok Verify ?
@@ -125,7 +118,6 @@ ok 42)
 ok 21 DOUBLE 
 ok .
 42 
-ok 
 
 ok \ ?
 ok 5. ?
@@ -140,7 +132,6 @@ ok dictionary
 ?
 ok WORDS
 DOUBLE I LOOP DO UNTIL BEGIN ELSE THEN IF ALIGN , ALLOT HERE VARIABLE ; : WORDS .S . C! ! C@ @ < = 2DROP TEST-WORD 2DUP / * - + OVER SWAP DROP DUP 
-ok 
 
 ok \ ?
 ok 6. ?
@@ -163,7 +154,6 @@ ok 3
 ok 1 2 OR ?
 ok .
 2 
-ok 
 
 ok \ ?
 ok 7. ?
@@ -175,7 +165,6 @@ ok : SQUARE DUP * ;
 
 ok : SUM-SQUARES SQUARE SWAP SQUARE + ;
 
-ok 
 
 ok \ ?
 ok 3^2 ?
@@ -189,6 +178,3 @@ ok 25 (0x19)
 ok 3 4 SUM-SQUARES 
 ok .
 25 
-ok  
-
-ok 

@@ -97,6 +97,16 @@ _L\@:
 .global _reset
 .thumb_func
 _reset:
+    @ Detect if we are on real RP2040 (Cortex-M0+) or QEMU (Cortex-M3)
+    ldr r0, =0xe000ed00    @ CPUID base
+    ldr r1, [r0]
+    ldr r2, =0x410cc600    @ ARM, Cortex-M0+ (RP2040)
+    ldr r3, =0xffffff00
+    ands r1, r3
+    cmp r1, r2
+    bne skip_hw_init       @ Skip GPIO init if in QEMU (M3)
+    bl _gpio_init
+skip_hw_init:
     ldr r0, =_sidata
     ldr r1, =_sdata
     ldr r2, =_edata
@@ -974,6 +984,30 @@ q_prompt_check:
     movs r0, #32
     bl _emit
     b qloop
+
+.thumb_func
+_gpio_init:
+    push {lr}
+    @ 1. Unreset IO_BANK0 and PADS_BANK0
+    ldr r1, =RESETS_BASE
+    ldr r0, =(RESETS_RESET_IO_BANK0_BITS | RESETS_RESET_PADS_BANK0_BITS)
+    @ Use atomic clear alias to clear the reset bits
+    ldr r2, =ATOMIC_CLR_OFFSET
+    add r2, r1
+    str r0, [r2, #RESETS_RESET_OFFSET]
+1:  ldr r2, [r1, #RESETS_RESET_DONE_OFFSET]
+    tst r2, r0
+    beq 1b
+    @ 2. Set all GPIO pins (0-29) to function 5 (SIO)
+    ldr r1, =IO_BANK0_BASE
+    adds r1, #4            @ Point to GPIO0_CTRL (STATUS is at +0, CTRL at +4)
+    movs r0, #5            @ Function 5 is SIO
+    movs r2, #30           @ Total number of GPIO pins
+2:  str r0, [r1]           @ Set this pin to SIO
+    adds r1, #8            @ Advance to next GPIO_CTRL (skip STATUS)
+    subs r2, #1
+    bne 2b
+    pop {pc}
 
 .thumb_func
 _clit:

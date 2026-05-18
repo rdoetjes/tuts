@@ -1,5 +1,4 @@
 
-ok  
 
 ok VARIABLE X
 
@@ -31,7 +30,6 @@ ok X
 ok @ 
 ok .
 15 
-ok 
 
 ok VARIABLE CH
 
@@ -49,7 +47,6 @@ ok CH
 ok C@ 
 ok .
 65 
-ok 
 
 ok HERE 
 ok .
@@ -61,7 +58,6 @@ ok ALIGN
 ok HERE 
 ok .
 536871580 
-ok 
 
 ok HERE
 
@@ -84,7 +80,6 @@ ok 8 +
 ok @ 
 ok .
 789 
-ok 
 
 ok VARIABLE COUNTER
 
@@ -105,6 +100,3 @@ ok COUNTER
 ok @ 
 ok .
 10 
-ok  
-
-ok 

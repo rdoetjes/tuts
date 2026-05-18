@@ -1,5 +1,4 @@
 
-ok  
 
 ok 1 2 + 
 ok .
@@ -16,7 +15,7 @@ ok 21 DOUBLE
 ok .
 42 
 ok 10 20 30 .S
-<3> 10 20 30
+<3> 10 20 30 
 ok DROP
 
 ok DROP
@@ -61,7 +60,4 @@ ok .
 55 
 ok 12 13 2DROP 
 ok .S
-<0>
-ok  
-
-ok 
+<0> 

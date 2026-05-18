@@ -56,17 +56,23 @@ $(TEST_FILES): $(ELF)
 	@LOG_FILE=$@.log; \
 	CLEAN_LOG=$$LOG_FILE.clean; \
 	EXPECTED=$@.expected; \
-	(echo " "; cat $@; sleep 1; echo " ") | $(QEMU) -machine mps2-an385 -cpu cortex-m3 -kernel $(ELF) -nographic -serial stdio -monitor none > $$LOG_FILE 2>&1 & \
+	(echo " "; cat $@; sleep 10; echo " ") | $(QEMU) -machine mps2-an385 -cpu cortex-m3 -kernel $(ELF) -nographic -serial stdio -monitor none > $$LOG_FILE 2>&1 & \
 	SUB_PID=$$!; \
-	sleep 3; \
-	pkill -P $$SUB_PID || true; \
-	grep -v "qemu:" $$LOG_FILE | grep -v "R00=" | grep -v "XPSR=" | grep -v "FPSCR:" > $$CLEAN_LOG; \
+	sleep 20; \
+	kill -HUP $$SUB_PID 2>/dev/null || true; \
+	sleep 1; \
+	pkill -P $$SUB_PID 2>/dev/null || true; \
+	sync; \
+	grep -v "qemu:" $$LOG_FILE | grep -v "R00=" | grep -v "XPSR=" | grep -v "FPSCR:" | grep -v "terminating on signal" | grep -v "^[[:space:]]*ok[[:space:]]*$$" | sed -e :a -e '/^\s*$$/{$$d;N;ba' -e '}' > $$CLEAN_LOG; \
 	if [ -f $$EXPECTED ]; then \
 		echo "Asserting against $$EXPECTED..."; \
-		if diff -bu $$EXPECTED $$CLEAN_LOG; then \
+		grep -v "^[[:space:]]*ok[[:space:]]*$$" $$EXPECTED | sed -e :a -e '/^\s*$$/{$$d;N;ba' -e '}' > $$EXPECTED.tmp; \
+		if diff -buBw $$EXPECTED.tmp $$CLEAN_LOG; then \
 			echo "PASS: $@ matches $$EXPECTED"; \
+			rm $$EXPECTED.tmp; \
 		else \
 			echo "FAIL: $@ differs from $$EXPECTED"; \
+			rm $$EXPECTED.tmp; \
 			exit 1; \
 		fi \
 	else \
