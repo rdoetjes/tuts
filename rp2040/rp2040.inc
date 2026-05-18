@@ -53,3 +53,8 @@
 
 .equ XOSC_BASE,                 0x40024000
 .equ CLOCKS_BASE,               0x40008000
+
+@ RP2040 Timer
+.equ TIMER_BASE,                0x40054000
+.equ TIMER_TIMEHW_OFFSET,       0x00000000
+.equ TIMER_TIMELW_OFFSET,       0x00000004
