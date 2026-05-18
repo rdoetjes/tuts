@@ -65,27 +65,6 @@ _L\@:
     mov r4, r0
 .endm
 
-@ Quick calls for common words to keep assembly readable
-.macro DUP
-    bl "DUP"
-.endm
-
-.macro DROP
-    bl "DROP"
-.endm
-
-.macro SWAP
-    bl "SWAP"
-.endm
-
-.macro OVER
-    bl "OVER"
-.endm
-
-.macro SLASH
-    bl "/"
-.endm
-
 @ -----------------------------------------------------------------------------
 @ HARDWARE VECTORS & RESET
 @ -----------------------------------------------------------------------------
