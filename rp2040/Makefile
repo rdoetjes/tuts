@@ -18,6 +18,7 @@ PREPROCESSED = forth.pre.s
 OBJS = forth.o
 ELF  = forth.elf
 BIN  = forth.bin
+UF2  = forth.uf2
 TEST_FILES = $(wildcard *.fth)
 
 .PHONY: all clean test auto-test $(TEST_FILES)
@@ -36,6 +37,9 @@ $(ELF): $(OBJS) linker.ld
 
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
+
+$(UF2): $(BIN)
+	python3 uf2conv.py $(BIN) -c -b 0x10000000 -o $(UF2)
 
 clean:
 	rm -f $(OBJS) $(ELF) $(BIN) $(PREPROCESSED) *.log *.clean *.pre.s
