@@ -138,6 +138,21 @@ skip_hw_init:
     str r1, [r0, #UART_LCR_H_OFFSET]
     ldr r1, =0x301         @ Enable UART, TX, RX
     str r1, [r0, #UART_CR_OFFSET]
+
+    @ Initialize Onboard LED (GPIO 25)
+    ldr r1, =IO_BANK0_BASE
+    ldr r2, =GPIO25_CTRL_OFFSET
+    movs r0, #5            @ Function 5 (SIO)
+    str r0, [r1, r2]
+
+    ldr r1, =SIO_BASE
+    movs r0, #1
+    movs r2, #25
+    lsls r0, r0, r2        @ Bit 25
+    @ Output Enable
+    str r0, [r1, #SIO_GPIO_OE_SET_OFFSET]
+    @ Set High (Turn on LED)
+    str r0, [r1, #SIO_GPIO_OUT_SET_OFFSET]
 .else
     @ --- QEMU CMSDK UART Initialization ---
     ldr r0, =CMSDK_UART0_BASE
