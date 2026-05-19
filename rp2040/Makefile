@@ -12,8 +12,8 @@ ASFLAGS = -mcpu=cortex-m0plus -mthumb -g
 LDFLAGS = -T linker.ld
 
 # Files
-SRCS = forth.s
-OBJS = forth.o
+SRCS = boot.s forth.s
+OBJS = boot.o forth.o
 ELF  = forth.elf
 BIN  = forth.bin
 UF2  = forth.uf2
