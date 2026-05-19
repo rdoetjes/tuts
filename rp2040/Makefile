@@ -1,35 +1,42 @@
 # Makefile for RP2040 Forth Implementation
-# Designed to build for RP2040 hardware and test core logic via QEMU
 
-AS = arm-none-eabi-as
-LD = arm-none-eabi-ld
-OBJCOPY = arm-none-eabi-objcopy
-QEMU = qemu-system-arm
-PYTHON = python3
+AS       = arm-none-eabi-as
+LD       = arm-none-eabi-ld
+OBJCOPY  = arm-none-eabi-objcopy
+QEMU     = qemu-system-arm
+PYTHON   = python3
 
-# RP2040 is Cortex-M0+, but for QEMU testing we often use mps2-an385 (Cortex-M3)
-ASFLAGS = -mcpu=cortex-m0plus -mthumb -g
-LDFLAGS = -T linker.ld
+ASFLAGS  = -mcpu=cortex-m0plus -mthumb -g
+LDFLAGS  = -T linker.ld
+PICO_ASFLAGS = $(ASFLAGS) --defsym PICO=1
 
-# Files
-SRCS = boot.s forth.s
-OBJS = boot.o forth.o
+# --------------------------------------------------
+# Common files
+# --------------------------------------------------
+
 ELF  = forth.elf
 BIN  = forth.bin
-UF2  = forth.uf2
+
+PICO_ELF = forth_pico.elf
+PICO_BIN = forth_pico.bin
+PICO_UF2 = forth_pico.uf2
+
 TEST_FILES = $(wildcard *.fth)
 
-.PHONY: all clean test auto-test pico
+# --------------------------------------------------
+# Normal build
+# --------------------------------------------------
+
+OBJS = boot.o forth.o
+
+.PHONY: all clean test auto-test pico disasm
 
 all: $(BIN)
 
-pico: forth_pico.uf2
+boot.o: boot.s
+	$(AS) $(ASFLAGS) -c $< -o $@
 
-# -------------------------
-# Core build
-# -------------------------
-
-$(OBJS): $(SRCS)
+forth.o: forth.s
 	$(AS) $(ASFLAGS) -c $< -o $@
 
 $(ELF): $(OBJS) linker.ld
@@ -38,27 +45,42 @@ $(ELF): $(OBJS) linker.ld
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 
-# -------------------------
+$(PICO_UF2): $(PICO_BIN)
+	cp $(PICO_BIN) flash_image.bin
+	$(PYTHON) uf2conv.py \
+		-f 0xe48bff56 \
+		-b 0x10000000 \
+		-c flash_image.bin \
+		-o $@
+
+pico: $(PICO_UF2)
+
+# --------------------------------------------------
 # Pico build
-# -------------------------
+# --------------------------------------------------
 
-forth_pico.o: $(SRCS) rp2040.inc
-	$(AS) $(ASFLAGS) --defsym PICO=1 -c $(SRCS) -o $@
+PICO_OBJS = boot_pico.o forth_pico.o
 
-$(BOOT2_OBJS): $(BOOT2_SRCS)
-	$(AS) $(BOOT2_ASFLAGS) -c $< -o $@
+boot_pico.o: boot.s rp2040.inc
+	$(AS) $(PICO_ASFLAGS) -c $< -o $@
 
-forth_pico.elf: $(BOOT2_OBJS) forth_pico.o linker_pico.ld
-	$(LD) $(LDFLAGS) $(BOOT2_OBJS) forth_pico.o -o $@
+forth_pico.o: forth.s rp2040.inc
+	$(AS) $(PICO_ASFLAGS) -c $< -o $@
 
-forth_pico.bin: forth_pico.elf
+$(PICO_ELF): $(PICO_OBJS) linker_pico.ld
+	$(LD) -T linker_pico.ld $(PICO_OBJS) -o $@
+
+$(PICO_BIN): $(PICO_ELF)
 	$(OBJCOPY) -O binary $< $@
 
-forth_pico.uf2: forth_pico.bin pad_checksum.py
-	#@echo "Calculating and injecting Boot Stage 2 CRC..."
-	#$(PYTHON) pad_checksum.py $<
-	#cat boot2.bin forth_pico.bin > flash_image.bin
-	$(PYTHON)  uf2conv.py -f 0xe48bff56 -b 0x10000000 -c flash_image.bin -o forth_pico.uf2
+$(PICO_UF2): $(PICO_BIN)
+	cp $(PICO_BIN) flash_image.bin
+	$(PYTHON) uf2conv.py \
+		-f 0xe48bff56 \
+		-b 0x10000000 \
+		-c flash_image.bin \
+		-o $@
+
 
 # -------------------------
 # Clean
@@ -66,7 +88,7 @@ forth_pico.uf2: forth_pico.bin pad_checksum.py
 
 clean:
 	rm -f $(OBJS) $(ELF) $(BIN) \
-	      forth_pico.o forth_pico.elf forth_pico.bin forth_pico.uf2 \
+	      boot_pico.o forth_pico.o forth_pico.elf forth_pico.bin forth_pico.uf2 \
 	      $(BOOT2_OBJS) *.log *.clean *.pre.s *.uf2
 
 # -------------------------
