@@ -25,10 +25,10 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Loaded " << sequence.size() << " steps from '" << sequence_file << "'.\n";
 
-    // Setup ALSA
-    snd_pcm_t* handle = nullptr;
-    if (!bluebox::playing::setup_alsa(handle)) {
-        std::cerr << "ALSA setup failed; cannot play sequence.\n";
+    // Setup PulseAudio
+    pa_simple* handle = nullptr;
+    if (!bluebox::playing::setup_pulseaudio(handle)) {
+        std::cerr << "PulseAudio setup failed; cannot play sequence.\n";
         return 1;
     }
 
@@ -49,8 +49,9 @@ int main(int argc, char* argv[]) {
     }
 
     if (handle) {
-        snd_pcm_drain(handle);
-        snd_pcm_close(handle);
+        int error;
+        pa_simple_drain(handle, &error);
+        pa_simple_free(handle);
     }
 
     std::cout << "Sequence complete.\n";

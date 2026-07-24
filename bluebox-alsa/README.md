@@ -1,15 +1,15 @@
-# bluebox-alsa
+# bluebox-pulse
 
-A small ALSA-based BlueBox for producing DTMF and CCITT (C5) MF tones, as used in the 80s and 90s to seize control over C5 international trunks. Something us Dutch hackers did a lot until the mid 90s, when C5 trunks were superseeded by SS7.
+A small PulseAudio-based BlueBox for producing DTMF and CCITT (C5) MF tones, as used in the 80s and 90s to seize control over C5 international trunks. Something us Dutch hackers did a lot until the mid 90s, when C5 trunks were superseeded by SS7.
 
 Watch the video: [<img src="https://img.youtube.com/vi/1oUmj1x98k8/hqdefault.jpg" width="640" />](https://www.youtube.com/watch?v=1oUmj1x98k8)   
 
-The program reads a simple tab-delimited "sequence" file and plays tones via the default ALSA playback device. It's useful for scripting tone sequences such as dialing procedures, signaling (KP1/KP2/ST), and other multi-frequency tones.
+The program reads a simple tab-delimited "sequence" file and plays tones via the default PulseAudio playback device. It's useful for scripting tone sequences such as dialing procedures, signaling (KP1/KP2/ST), and other multi-frequency tones.
 
 ## Highlights / Features
 
 - Generates DTMF and  CCITT-5 (C5-style MF) tones.
-- Uses ALSA for low-latency audio output.
+- Uses PulseAudio for cross-platform audio output (works on Linux and FreeBSD).
 - Simple, tab-delimited sequence format that supports:
   - `D` (DTMF single-character tones)
   - `C` (C5 / CCITT5 codes and named tones)
@@ -19,9 +19,9 @@ The program reads a simple tab-delimited "sequence" file and plays tones via the
 
 ## Requirements
 
-- Linux with ALSA development libraries (libasound2-dev or equivalent).
+- Linux or FreeBSD with PulseAudio development libraries (`libpulse-dev` on Linux, `pulseaudio` on FreeBSD).
 - A C++17-capable compiler (g++ recommended).
-- You may need permission to access the audio device; add your user to the `audio` group or run the binary with sufficient privileges if ALSA open fails.
+- You may need permission to access the audio device; ensure the PulseAudio daemon is running and accessible to your user.
 
 The program uses:
 - Sample rate: 8000 Hz
@@ -42,7 +42,7 @@ make debug
 make clean
 ```
 
-The default build target here is `release`. The `Makefile` links against ALSA (`-lasound`) — see `Makefile` for details.
+The default build target here is `release`. The `Makefile` links against PulseAudio (`-lpulse-simple -lpulse`) — see `Makefile` for details.
 
 ## Run
 
@@ -171,17 +171,16 @@ There are also international examples: `international_transit_kp2`, `internation
 
 ## Implementation notes
 
-- The implementation is in `main.cpp`. It generates plain sinusoids (no envelope) for the two frequencies per tone, sums them, and writes signed 16-bit frames to ALSA.
-- The code sets up ALSA with:
+- The implementation is in `playing.cpp`. It generates plain sinusoids (with a small attack/decay ramp) for the two frequencies per tone, sums them, and writes signed 16-bit frames to PulseAudio.
+- The code sets up PulseAudio with:
   - Sample rate 8000 Hz
   - Mono
-  - Period size ~128 frames
-  - Buffer size = period * 4
-- The generator clamps to the int16 range and recovers from ALSA underruns.
+  - Simple API
+- The generator clamps to the int16 range.
 
 ## Troubleshooting
 
-- "Cannot open PCM device": ensure ALSA is installed and the default device exists. Check permissions (audio group) or try running with elevated permissions.
+- "pa_simple_new() failed": ensure the PulseAudio daemon is running and accessible.
 - Distorted sound / clipping: the code uses a conservative amplitude (about 40% of max) to mitigate clipping. If you modify amplitudes or mix with other audio, be careful.
 - Timing-sensitive sequences (e.g., waiting for a 2600 Hz line): these may require human observation; you can use `~` to wait for a keypress or specify a small sleep duration.
 
@@ -190,7 +189,7 @@ There are also international examples: `international_transit_kp2`, `internation
 - The code is intentionally simple and contained in `tone_dialer.cpp`. If you want:
   - Add amplitude envelopes (fade-in/out) to reduce clicks,
   - Support additional tone sets,
-  - Add file output (WAV) instead of ALSA playback,
+  - Add file output (WAV) instead of PulseAudio playback,
   - Add command-line options for device selection, sample rate, or volume.
 
 ## Files of interest

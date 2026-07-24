@@ -27,7 +27,8 @@
 #include <string>
 
 #include "parsing.h"   // for parsing::SequenceStep
-#include <alsa/asoundlib.h> // for snd_pcm_t, snd_pcm_format_t
+#include <pulse/simple.h>
+#include <pulse/error.h>
 
 namespace bluebox {
 namespace playing {
@@ -35,36 +36,32 @@ namespace playing {
 /* Audio configuration constants (compatible with existing implementation) */
 inline constexpr unsigned SAMPLE_RATE       = 8000;             // 8Khz is more than enough since the highest frequency is 2600Hz twice the maxiumum frequcy is nminal
 inline constexpr unsigned CHANNELS          = 1;
-inline constexpr snd_pcm_format_t FORMAT    = SND_PCM_FORMAT_S16_LE;
 inline constexpr double AMPLITUDE           = static_cast<double>(INT16_MAX) * 0.4;
 inline constexpr unsigned PERIOD_SIZE       = 128;              // approx ~16 ms @ 8 kHz
 inline constexpr unsigned BUFFER_MULTIPLIER = 4;
 inline constexpr int MIN_SILENCE_MS         = 5;                // minimum enforced silence after a tone
 
 /*
- * setup_alsa
+ * setup_pulseaudio
  *
- * Open and configure the default ALSA PCM device for playback using the
- * parameters defined above. On success, `handle` will contain an opened and
- * prepared snd_pcm_t* (caller is responsible for calling snd_pcm_close).
+ * Open and configure the PulseAudio simple connection for playback.
+ * On success, `handle` will contain an opened pa_simple* (caller is responsible for calling pa_simple_free).
  *
- * Returns true on success, false on failure (caller may log errors from ALSA).
+ * Returns true on success, false on failure (caller may log errors from PulseAudio).
  */
-bool setup_alsa(snd_pcm_t*& handle);
+bool setup_pulseaudio(pa_simple*& handle);
 
 /*
  * write_frames
  *
- * Write `frame_count` frames (int16_t samples for mono) to the ALSA device.
- * This function should recover from underruns and attempt to write all frames
- * before returning. Returns true on success, false on unrecoverable error.
+ * Write `frame_count` frames (int16_t samples for mono) to the PulseAudio device.
  *
  * Parameters:
- *  - handle: opened snd_pcm_t* (playback)
+ *  - handle: opened pa_simple* (playback)
  *  - data: pointer to interleaved frames (int16_t)
  *  - frame_count: number of frames to write
  */
-bool write_frames(snd_pcm_t* handle, const int16_t* data, size_t frame_count);
+bool write_frames(pa_simple* handle, const int16_t* data, size_t frame_count);
 
 /*
  * generate_tone_buffer
@@ -95,14 +92,14 @@ void generate_tone_buffer(int f1, int f2, int duration_ms, std::vector<int16_t>&
  * H steps will be skipped (with a warning).
  *
  * Parameters:
- *  - handle: opened snd_pcm_t* returned from setup_alsa
+ *  - handle: opened pa_simple* returned from setup_pulseaudio
  *  - sequence: vector of parsing::SequenceStep (parsed from file)
  *  - serial_fd: file descriptor for serial device, or -1 when not available
  *
  * This function will block until the sequence finishes. It should perform
  * conservative silence padding between steps (at least MIN_SILENCE_MS).
  */
-void play_sequence(snd_pcm_t* handle, const std::vector<parsing::SequenceStep>& sequence, int serial_fd);
+void play_sequence(pa_simple* handle, const std::vector<parsing::SequenceStep>& sequence, int serial_fd);
 
 } // namespace playing
 } // namespace bluebox

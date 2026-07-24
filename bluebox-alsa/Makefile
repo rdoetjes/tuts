@@ -1,4 +1,4 @@
-# Makefile for tone_dialer (ALSA DTMF / CCITT5 / MF tone generator)
+# Makefile for tone_dialer (PulseAudio DTMF / CCITT5 / MF tone generator)
 # Updated to build multiple .cpp translation units (serial.cpp, dtmf.cpp, c5.cpp, parsing.cpp, playing.cpp, etc.)
 # Usage:
 #   make           -> build optimized release binary
@@ -7,12 +7,12 @@
 #   make run       -> build release and run with example_sequence.txt
 #
 TARGET     := tone_dialer
-SRCS       := $(wildcard *.cpp)
+SRCS       := c5.cpp dtmf.cpp main.cpp parsing.cpp playing.cpp serial.cpp
 OBJS       := $(SRCS:.cpp=.o)
 
 CXX        := g++
 CXXFLAGS   := -std=c++17 -Wall -Wextra -pedantic
-LDFLAGS    := -lasound -lm
+LDFLAGS    := -lpulse-simple -lpulse -lm
 
 # Debug build flags
 DEBUG_CXXFLAGS   := -g -O0 -DDEBUG
