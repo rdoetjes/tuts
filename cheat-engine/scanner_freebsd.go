@@ -65,10 +65,8 @@ func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 	var results []uintptr
 
 	// Use sysctl kern.proc.vmmap.<pid> to get memory maps without /proc
-	mib := []int32{1, 14, 32, int32(s.pid)} // CTL_KERN, KERN_PROC, KERN_PROC_VMMAP, pid
-
 	// First call to get the required size
-	bufSize, err := unix.SysctlRaw("kern.proc.vmmap", int32(s.pid))
+	bufSize, err := unix.SysctlRaw("kern.proc.vmmap", s.pid)
 	if err != nil {
 		return nil, fmt.Errorf("sysctl kern.proc.vmmap failed: %w", err)
 	}

@@ -1,18 +1,22 @@
 # Project variables
 BINARY_NAME=cheat-engine
-# Use a simple way to detect OS that works in both GNU and BSD make
-# GNU make uses $(shell ...), BSD make uses !=
-OS_GNU := $(shell uname)
-OS_BSD != uname
-OS = $(OS_GNU)$(OS_BSD)
 
-# Determine CC and SIGN based on OS
-# We use shell scripts inside the targets to remain compatible
-CC_DARWIN = clang
-CC_FREEBSD = clang
-CC_LINUX = gcc
+# Determine OS using a method compatible with both GNU and BSD make
+# BSD make ignores lines starting with 'ifdef', GNU make follows them.
+# However, for simplicity and to avoid the "shell uname" warning in BSD make,
+# we'll use a shell-based detection inside a single variable assignment.
+OS != uname
 
-SIGN_DARWIN = codesign -s - --entitlements entitlements.plist --force
+# Compiler settings
+CC_Darwin = clang
+CC_FreeBSD = clang
+CC_Linux = gcc
+
+SIGN_Darwin = codesign -s - --entitlements entitlements.plist --force
+
+# Selected compiler based on detected OS
+CC = $(CC_$(OS))
+SIGN = $(SIGN_$(OS))
 
 .PHONY: all build clean run help
 
@@ -20,18 +24,14 @@ all: build
 
 build:
 	@echo "Building for $(OS)..."
+	CC=$(CC) CGO_ENABLED=1 go build -o $(BINARY_NAME) .
 	@if [ "$(OS)" = "Darwin" ]; then \
-		CC=$(CC_DARWIN) CGO_ENABLED=1 go build -o $(BINARY_NAME) .; \
 		if [ -f entitlements.plist ]; then \
 			echo "Signing binary with entitlements..."; \
-			$(SIGN_DARWIN) $(BINARY_NAME); \
+			$(SIGN) $(BINARY_NAME); \
 		else \
 			echo "Warning: entitlements.plist not found."; \
 		fi; \
-	elif [ "$(OS)" = "FreeBSD" ]; then \
-		CC=$(CC_FREEBSD) CGO_ENABLED=1 go build -o $(BINARY_NAME) .; \
-	else \
-		CC=$(CC_LINUX) CGO_ENABLED=1 go build -o $(BINARY_NAME) .; \
 	fi
 
 clean:
