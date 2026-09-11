@@ -104,43 +104,22 @@ func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 
 func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) []uintptr {
 	var results []uintptr
+	data := make([]byte, 4)
 
-	// FreeBSD's PtracePeekData can be finicky with buffer sizes in some Go versions.
-	// We'll use a larger buffer and read in chunks to be more efficient and avoid the slice panic.
-	const chunkSize = 4096
-	buf := make([]byte, chunkSize)
-
-	for i := uintptr(0); i < size; i += chunkSize {
-		remaining := size - i
-		readSize := chunkSize
-		if uintptr(readSize) > remaining {
-			readSize = int(remaining)
-		}
-
-		// Ensure we read at least 4 bytes if possible
-		if readSize < 4 {
-			break
-		}
-
-		// Use PtraceIO directly for more control and to avoid the PtracePeekData wrapper issues
-		piod := unix.PtraceIoDesc{
-			Op:   unix.PT_IO_READ_D,
-			Off:  uint64(start + i),
-			Addr: uintptr(unsafe.Pointer(&buf[0])),
-			Len:  uint(readSize),
-		}
-
-		err := unix.PtraceIO(s.pid, &piod)
-		if err != nil {
+	// We'll use PtracePeekData but with a length check and error handling
+	// to avoid the buggy internal behavior that caused the panic.
+	for i := uintptr(0); i <= size-4; i += 4 {
+		// On FreeBSD, PtracePeekData returns (count int, err error)
+		// We use a small hack: pass a slice of size 8 but only use 4 bytes
+		// if the architecture/go-version requires 8-byte alignment/size.
+		tmp := make([]byte, 8)
+		n, err := unix.PtracePeekData(s.pid, start+i, tmp)
+		if err != nil || n < 4 {
 			continue
 		}
-
-		// Scan the buffer we just read
-		for j := 0; j <= int(piod.Len)-4; j += 4 {
-			val := int32(binary.LittleEndian.Uint32(buf[j : j+4]))
-			if val == target {
-				results = append(results, start+i+uintptr(j))
-			}
+		val := int32(binary.LittleEndian.Uint32(tmp[:4]))
+		if val == target {
+			results = append(results, start+i)
 		}
 	}
 	return results
@@ -148,19 +127,11 @@ func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) [
 
 func (s *FreeBSDScanner) Rescan(addresses []uintptr, target int32) ([]uintptr, error) {
 	var results []uintptr
-	data := make([]byte, 4)
-
 	for _, addr := range addresses {
-		piod := unix.PtraceIoDesc{
-			Op:   unix.PT_IO_READ_D,
-			Off:  uint64(addr),
-			Addr: uintptr(unsafe.Pointer(&data[0])),
-			Len:  4,
-		}
-
-		err := unix.PtraceIO(s.pid, &piod)
-		if err == nil && piod.Len == 4 {
-			if int32(binary.LittleEndian.Uint32(data)) == target {
+		tmp := make([]byte, 8)
+		n, err := unix.PtracePeekData(s.pid, addr, tmp)
+		if err == nil && n >= 4 {
+			if int32(binary.LittleEndian.Uint32(tmp[:4])) == target {
 				results = append(results, addr)
 			}
 		}
