@@ -104,7 +104,6 @@ func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 
 func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) []uintptr {
 	var results []uintptr
-	data := make([]byte, 4)
 
 	// We'll use PtracePeekData but with a length check and error handling
 	// to avoid the buggy internal behavior that caused the panic.
