@@ -123,6 +123,8 @@ func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) [
 			}
 			continue
 		}
+
+		fmt.Printf("hmmm %d\n", n)
 		if n < 4 {
 			continue
 		}
