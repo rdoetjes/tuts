@@ -12,7 +12,7 @@ OBJS       := $(SRCS:.cpp=.o)
 
 CXX        := g++
 CXXFLAGS   := -std=c++17 -Wall -Wextra -pedantic
-LDFLAGS    := -lpulse-simple -lpulse -lm
+LDFLAGS    := -L/opt/homebrew/opt/pulseaudio/lib -lpulse-simple -lpulse -lm
 
 # Debug build flags
 DEBUG_CXXFLAGS   := -g -O0 -DDEBUG
