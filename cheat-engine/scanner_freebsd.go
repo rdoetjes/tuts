@@ -126,6 +126,7 @@ func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) [
 		}
 
 		val := int32(binary.LittleEndian.Uint32(tmp[:4]))
+		fmt.Printf("%d\n", val)
 		if val == target {
 			results = append(results, start+i)
 		}
