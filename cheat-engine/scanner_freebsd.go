@@ -3,12 +3,9 @@
 package main
 
 import (
-	"bufio"
 	"encoding/binary"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
+	"unsafe"
 
 	"golang.org/x/sys/unix"
 )
@@ -46,52 +43,62 @@ func (s *FreeBSDScanner) Close() {
 	}
 }
 
+// kinfo_vmentry structure for FreeBSD
+type kinfoVmentry struct {
+	StructSize   int32
+	Type         int32
+	Start        uint64
+	End          uint64
+	Offset       uint64
+	VnodeId      uint64
+	Status       uint32
+	Extra3       uint32
+	Read         int32
+	Write        int32
+	Execute      int32
+	CopyOnWrite  int32
+	NeedsCopy    int32
+	TypeSpecific [112]byte // Simplified
+}
+
 func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 	var results []uintptr
 
-	// FreeBSD procfs provides memory maps in /proc/<pid>/map
-	// Format: start end resident priv_resident obj_id perms ref_cnt shadow_cnt flags type
-	mapPath := fmt.Sprintf("/proc/%d/map", s.pid)
-	mapFile, err := os.Open(mapPath)
+	// Use sysctl kern.proc.vmmap.<pid> to get memory maps without /proc
+	mib := []int32{1, 14, 32, int32(s.pid)} // CTL_KERN, KERN_PROC, KERN_PROC_VMMAP, pid
+
+	// First call to get the required size
+	bufSize, err := unix.SysctlRaw("kern.proc.vmmap", int32(s.pid))
 	if err != nil {
-		return nil, fmt.Errorf("failed to open %s: %w", mapPath, err)
+		return nil, fmt.Errorf("sysctl kern.proc.vmmap failed: %w", err)
 	}
-	defer mapFile.Close()
 
-	scanner := bufio.NewScanner(mapFile)
-	for scanner.Scan() {
-		line := scanner.Text()
-		fields := strings.Fields(line)
-		if len(fields) < 6 {
-			continue
+	if len(bufSize) == 0 {
+		return nil, fmt.Errorf("no memory maps returned for pid %d", s.pid)
+	}
+
+	// The buffer contains a sequence of kinfo_vmentry structures
+	// Each structure starts with its size (int32)
+	offset := 0
+	for offset < len(bufSize) {
+		entry := (*kinfoVmentry)(unsafe.Pointer(&bufSize[offset]))
+
+		if entry.StructSize == 0 {
+			break
 		}
 
-		// fields[5] contains permissions like "rw-"
-		perms := fields[5]
-		if !strings.Contains(perms, "r") || !strings.Contains(perms, "w") {
-			continue
+		// Check permissions: must be readable and writable
+		if entry.Read != 0 && entry.Write != 0 {
+			start := uintptr(entry.Start)
+			size := uintptr(entry.End - entry.Start)
+
+			if size > 0 && size < 0x7FFFFFFF {
+				regionResults := s.scanRegion(start, size, target)
+				results = append(results, regionResults...)
+			}
 		}
 
-		// fields[0] is start, fields[1] is end (hex with 0x prefix)
-		start, err := strconv.ParseUint(strings.TrimPrefix(fields[0], "0x"), 16, 64)
-		if err != nil {
-			continue
-		}
-		end, err := strconv.ParseUint(strings.TrimPrefix(fields[1], "0x"), 16, 64)
-		if err != nil {
-			continue
-		}
-
-		size := end - start
-		if size <= 0 || size > 0x7FFFFFFF {
-			continue
-		}
-
-		// Read region using PtracePeekData in 4-byte chunks
-		// Note: Using /proc/<pid>/mem would be faster if enabled (procfs is often restricted)
-		// For robustness on FreeBSD, we'll try to use /proc/<pid>/mem first, fallback to Ptrace
-		regionResults := s.scanRegion(uintptr(start), uintptr(size), target)
-		results = append(results, regionResults...)
+		offset += int(entry.StructSize)
 	}
 
 	return results, nil
@@ -101,25 +108,7 @@ func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) [
 	var results []uintptr
 	data := make([]byte, 4)
 
-	// Try reading /proc/<pid>/mem if available
-	memPath := fmt.Sprintf("/proc/%d/mem", s.pid)
-	memFile, err := os.Open(memPath)
-	if err == nil {
-		defer memFile.Close()
-		buffer := make([]byte, size)
-		_, err = memFile.ReadAt(buffer, int64(start))
-		if err == nil {
-			for i := 0; i <= len(buffer)-4; i += 4 {
-				val := int32(binary.LittleEndian.Uint32(buffer[i : i+4]))
-				if val == target {
-					results = append(results, start+uintptr(i))
-				}
-			}
-			return results
-		}
-	}
-
-	// Fallback to PtracePeekData (much slower but reliable)
+	// Fallback to PtracePeekData as primary on FreeBSD without procfs
 	for i := uintptr(0); i <= size-4; i += 4 {
 		_, err := unix.PtracePeekData(s.pid, start+i, data)
 		if err != nil {
