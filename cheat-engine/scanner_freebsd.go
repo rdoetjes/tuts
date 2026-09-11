@@ -113,6 +113,8 @@ func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) [
 	for i := uintptr(0); i <= size-4; i += 4 {
 		n, err := unix.PtracePeekData(s.pid, start+i, tmp)
 		if err != nil {
+			fmt.Printf("%s\n", err)
+
 			// If we hit an unreadable page within the region, move to next page
 			if err == unix.EIO || err == unix.EFAULT {
 				// Round up to next 4KB page
