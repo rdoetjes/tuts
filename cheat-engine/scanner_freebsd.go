@@ -95,6 +95,7 @@ func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 			// entry.CopyOnWrite != 0 usually indicates private data in many contexts
 			if size > 0 && size < 100*1024*1024 { // Cap at 100MB per region for performance
 				regionResults := s.scanRegion(start, size, target)
+				fmt.Printf(".")
 				results = append(results, regionResults...)
 			}
 		}
