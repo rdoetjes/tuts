@@ -65,7 +65,6 @@ func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 	var results []uintptr
 
 	// Use sysctl kern.proc.vmmap.<pid> to get memory maps without /proc
-	// First call to get the required size
 	bufSize, err := unix.SysctlRaw("kern.proc.vmmap", s.pid)
 	if err != nil {
 		return nil, fmt.Errorf("sysctl kern.proc.vmmap failed: %w", err)
@@ -75,27 +74,30 @@ func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 		return nil, fmt.Errorf("no memory maps returned for pid %d", s.pid)
 	}
 
+	fmt.Printf("Scanning process memory regions...\n")
+
 	// The buffer contains a sequence of kinfo_vmentry structures
-	// Each structure starts with its size (int32)
 	offset := 0
 	for offset < len(bufSize) {
 		entry := (*kinfoVmentry)(unsafe.Pointer(&bufSize[offset]))
-
 		if entry.StructSize == 0 {
 			break
 		}
 
 		// Check permissions: must be readable and writable
-		if entry.Read != 0 && entry.Write != 0 {
+		// Type 1 is usually VM_MAP_ENTRY_USER (mapped memory)
+		if entry.Read != 0 && entry.Write != 0 && entry.Type == 1 {
 			start := uintptr(entry.Start)
-			size := uintptr(entry.End - entry.Start)
+			end := uintptr(entry.End)
+			size := end - start
 
-			if size > 0 && size < 0x7FFFFFFF {
+			// Focus on private memory regions and avoid massive gaps
+			// entry.CopyOnWrite != 0 usually indicates private data in many contexts
+			if size > 0 && size < 100*1024*1024 { // Cap at 100MB per region for performance
 				regionResults := s.scanRegion(start, size, target)
 				results = append(results, regionResults...)
 			}
 		}
-
 		offset += int(entry.StructSize)
 	}
 
@@ -104,18 +106,25 @@ func (s *FreeBSDScanner) InitialScan(target int32) ([]uintptr, error) {
 
 func (s *FreeBSDScanner) scanRegion(start uintptr, size uintptr, target int32) []uintptr {
 	var results []uintptr
+	tmp := make([]byte, 8)
 
-	// We'll use PtracePeekData but with a length check and error handling
-	// to avoid the buggy internal behavior that caused the panic.
+	// Optimization: ptrace is very slow for single-word reads.
+	// We only scan every 4 bytes (aligned) as that's where int32s usually live.
 	for i := uintptr(0); i <= size-4; i += 4 {
-		// On FreeBSD, PtracePeekData returns (count int, err error)
-		// We use a small hack: pass a slice of size 8 but only use 4 bytes
-		// if the architecture/go-version requires 8-byte alignment/size.
-		tmp := make([]byte, 8)
 		n, err := unix.PtracePeekData(s.pid, start+i, tmp)
-		if err != nil || n < 4 {
+		if err != nil {
+			// If we hit an unreadable page within the region, move to next page
+			if err == unix.EIO || err == unix.EFAULT {
+				// Round up to next 4KB page
+				i = (i + 4096) & ^uintptr(4095)
+				i -= 4 // adjust for loop increment
+			}
 			continue
 		}
+		if n < 4 {
+			continue
+		}
+
 		val := int32(binary.LittleEndian.Uint32(tmp[:4]))
 		if val == target {
 			results = append(results, start+i)
