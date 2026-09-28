@@ -38,6 +38,10 @@ func main() {
 
 		//viewerDist = 30 + (20 * (math.Sin(rl.GetTime()))) // pulse the distance in and out
 		viewerDist = 30
+		// 1. Draw scrolling floor
+		drawFloor(angle, float64(screenWidth), float64(screenHeight), fov, viewerDist)
+
+		// 2. Draw word
 		for _, line := range word.Lines {
 			// 1. Rotate
 			p1 := transform(line.P1, rotX, rotY, rotZ)
@@ -67,4 +71,76 @@ func transform(v Vec3, rx, ry, rz float64) Vec3 {
 	v = v.RotateZ(rz)
 
 	return v
+}
+
+func drawFloor(time, screenWidth, screenHeight, fov, viewerDist float64) {
+	gridSize := 5.0
+	numCols := 16
+	numRows := 20
+	floorY := -8.0
+
+	// Scrolling speed and wrap-around
+	speed := 15.0
+	totalScroll := time * speed
+	zOffset := math.Mod(totalScroll, gridSize)
+	scrollIndex := int(math.Floor(totalScroll / gridSize))
+
+	startX := -float64(numCols) * gridSize / 2.0
+	startZ := -viewerDist + 5.0 // Start a bit in front of the viewer
+
+	for i := 0; i < numRows; i++ {
+		for j := 0; j < numCols; j++ {
+			x0 := startX + float64(j)*gridSize
+			x1 := x0 + gridSize
+			z0 := startZ + float64(i)*gridSize - zOffset
+			z1 := z0 + gridSize
+
+			// Checkered pattern - pinned to virtual grid coordinates to prevent snapping
+			color := rl.White
+			if (i+j+scrollIndex)%2 == 0 {
+				color = rl.Red
+			}
+
+			// Smooth distance fade (fog) based on actual Z position to prevent flickering
+			currentZ := float64(i)*gridSize - zOffset
+			maxDistance := float64(numRows) * gridSize
+			distFade := 1.0 - (currentZ / maxDistance)
+			if distFade < 0 {
+				distFade = 0
+			}
+			r := uint8(float64(color.R) * distFade)
+			g := uint8(float64(color.G) * distFade)
+			b := uint8(float64(color.B) * distFade)
+			fadeColor := rl.NewColor(r, g, b, 255)
+
+			drawProjectedQuad(
+				Vec3{X: x0, Y: floorY, Z: z0},
+				Vec3{X: x1, Y: floorY, Z: z0},
+				Vec3{X: x1, Y: floorY, Z: z1},
+				Vec3{X: x0, Y: floorY, Z: z1},
+				fadeColor,
+				screenWidth, screenHeight, fov, viewerDist,
+			)
+		}
+	}
+}
+
+func drawProjectedQuad(c1, c2, c3, c4 Vec3, color rl.Color, screenWidth, screenHeight, fov, viewerDist float64) {
+	// Near plane clipping
+	if c1.Z <= -viewerDist+1 || c2.Z <= -viewerDist+1 || c3.Z <= -viewerDist+1 || c4.Z <= -viewerDist+1 {
+		return
+	}
+
+	p1 := c1.Project(screenWidth, screenHeight, fov, viewerDist)
+	p2 := c2.Project(screenWidth, screenHeight, fov, viewerDist)
+	p3 := c3.Project(screenWidth, screenHeight, fov, viewerDist)
+	p4 := c4.Project(screenWidth, screenHeight, fov, viewerDist)
+
+	v1 := rl.Vector2{X: float32(p1.X), Y: float32(p1.Y)}
+	v2 := rl.Vector2{X: float32(p2.X), Y: float32(p2.Y)}
+	v3 := rl.Vector2{X: float32(p3.X), Y: float32(p3.Y)}
+	v4 := rl.Vector2{X: float32(p4.X), Y: float32(p4.Y)}
+
+	rl.DrawTriangle(v1, v2, v3, color)
+	rl.DrawTriangle(v1, v3, v4, color)
 }
