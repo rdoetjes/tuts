@@ -10,10 +10,10 @@ const (
 	screenWidth  = 800
 	screenHeight = 600
 	fov          = 400.0
-	viewerDist   = 5.0
 )
 
 func main() {
+	viewerDist := 10.0
 	rl.InitWindow(screenWidth, screenHeight, "3D Vector Art - R A Y")
 	defer rl.CloseWindow()
 
@@ -39,9 +39,11 @@ func main() {
 		rotZ := angle * 0.2
 
 		// Floating effect for the whole word
-		offsetY := math.Sin(angle) * 0.3
+		offsetY := math.Sin(angle) * 0.01
 
 		for _, line := range word.Lines {
+			//rotZ = math.Sin(rl.GetTime()) * 0.1
+
 			// 1. Rotate
 			p1 := transform(line.P1, rotX, rotY, rotZ)
 			p2 := transform(line.P2, rotX, rotY, rotZ)
@@ -51,15 +53,12 @@ func main() {
 			p2.Y += offsetY
 
 			// 3. Project to 2D
+			viewerDist = 30 + (20 * (math.Sin(rl.GetTime())))
 			v1 := p1.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
 			v2 := p2.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
 
 			// 4. Draw
 			color := rl.RayWhite
-			if line.IsConnector {
-				// Very dark gray so they are almost invisible but technically "there"
-				color = rl.NewColor(30, 30, 30, 255)
-			}
 			rl.DrawLine(int32(v1.X), int32(v1.Y), int32(v2.X), int32(v2.Y), color)
 		}
 
