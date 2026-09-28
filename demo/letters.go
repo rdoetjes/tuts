@@ -77,20 +77,5 @@ func GetWord() Letter {
 		})
 	}
 
-	// Add connecting "structural" lines (Black/Invisible)
-	// Connecting R to A
-	word.Lines = append(word.Lines, Line{
-		P1:          Vec3{-spacing + 1, 0, 0}, // Right side of R
-		P2:          Vec3{-0.5, 0, 0},         // Left side of A
-		IsConnector: true,
-	})
-
-	// Connecting A to Y
-	word.Lines = append(word.Lines, Line{
-		P1:          Vec3{0.5, 0, 0},         // Right side of A
-		P2:          Vec3{spacing - 1, 0, 0}, // Left side of Y
-		IsConnector: true,
-	})
-
 	return word
 }
