@@ -95,15 +95,6 @@ func GetWord() Letter {
 				P2: Vec3{X: line.P2.X + offset, Y: line.P2.Y, Z: line.P2.Z},
 			})
 		}
-
-		// Add connecting lines between letters
-		if i < len(chars)-1 {
-			word.Lines = append(word.Lines, Line{
-				P1:          Vec3{X: offset + 0.8, Y: 0, Z: 0},
-				P2:          Vec3{X: offset + spacing - 0.8, Y: 0, Z: 0},
-				IsConnector: true,
-			})
-		}
 	}
 
 	return word
