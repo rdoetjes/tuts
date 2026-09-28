@@ -54,7 +54,7 @@ func main() {
 
 			// 4. Draw
 			color := rl.RayWhite
-			rl.DrawLine(int32(v1.X), int32(v1.Y), int32(v2.X), int32(v2.Y), color)
+			rl.DrawLineEx(rl.NewVector2(float32(v1.X), float32(v1.Y)), rl.NewVector2(float32(v2.X), float32(v2.Y)), 3.0, color)
 		}
 
 		rl.EndDrawing()
