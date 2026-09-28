@@ -7,31 +7,32 @@ import (
 )
 
 const (
-	screenWidth  = 800
-	screenHeight = 600
-	fov          = 400.0
+	fov = 400.0
 )
 
 func main() {
 	viewerDist := 10.0
-	rl.InitWindow(screenWidth, screenHeight, "3D Vector Art - R A Y")
+
+	// Set fullscreen flag before initialization
+	rl.SetConfigFlags(rl.FlagFullscreenMode)
+
+	rl.InitWindow(0, 0, "3D Vector Art - R A Y")
 	defer rl.CloseWindow()
 
 	rl.SetTargetFPS(60)
+	rl.HideCursor()
 
 	word := GetWord()
-
+	screenWidth := rl.GetScreenWidth()
+	screenHeight := rl.GetScreenHeight()
 	angle := 0.0
 
 	for !rl.WindowShouldClose() {
 		// Update
 		angle += 0.015
-
 		// Draw
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
-
-		rl.DrawText("3D Vector Word - R A Y", 10, 10, 20, rl.Gray)
 
 		// Entire word rotations
 		rotX := angle * 0.4
@@ -42,8 +43,6 @@ func main() {
 		offsetY := math.Sin(angle) * 0.01
 
 		for _, line := range word.Lines {
-			//rotZ = math.Sin(rl.GetTime()) * 0.1
-
 			// 1. Rotate
 			p1 := transform(line.P1, rotX, rotY, rotZ)
 			p2 := transform(line.P2, rotX, rotY, rotZ)
