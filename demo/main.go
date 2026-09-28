@@ -6,11 +6,8 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-const (
-	fov = 400.0
-)
-
 func main() {
+	const fov = 500.0
 	viewerDist := 10.0
 
 	// Set fullscreen flag before initialization
@@ -39,24 +36,17 @@ func main() {
 		rotY := angle * 0.6
 		rotZ := angle * 0.2
 
-		// Floating effect for the whole word
-		offsetY := math.Sin(angle) * 0.01
-
+		viewerDist = 30 + (20 * (math.Sin(rl.GetTime()))) // pulse the distance in and out
 		for _, line := range word.Lines {
 			// 1. Rotate
 			p1 := transform(line.P1, rotX, rotY, rotZ)
 			p2 := transform(line.P2, rotX, rotY, rotZ)
 
-			// 2. Center the word and add float
-			p1.Y += offsetY
-			p2.Y += offsetY
-
-			// 3. Project to 2D
-			viewerDist = 30 + (20 * (math.Sin(rl.GetTime())))
+			// 2. Project to 2D
 			v1 := p1.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
 			v2 := p2.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
 
-			// 4. Draw
+			// 3. Draw
 			color := rl.RayWhite
 			rl.DrawLine(int32(v1.X), int32(v1.Y), int32(v2.X), int32(v2.Y), color)
 		}
