@@ -33,7 +33,7 @@ func main() {
 
 		// Entire word rotations
 		rotX := angle * 0.4
-		rotY := angle * 0.6
+		rotY := angle * 0.5
 		rotZ := angle * 0.2
 
 		//viewerDist = 30 + (20 * (math.Sin(rl.GetTime()))) // pulse the distance in and out
