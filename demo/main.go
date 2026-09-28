@@ -36,7 +36,6 @@ func main() {
 		rotY := angle * 0.5
 		rotZ := angle * 0.2
 
-		//viewerDist = 30 + (20 * (math.Sin(rl.GetTime()))) // pulse the distance in and out
 		viewerDist = 30
 		// 1. Draw scrolling floor
 		drawFloor(angle, float64(screenWidth), float64(screenHeight), fov, viewerDist)
