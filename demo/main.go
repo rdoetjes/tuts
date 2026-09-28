@@ -36,17 +36,23 @@ func main() {
 		rotY := angle * 0.6
 		rotZ := angle * 0.2
 
-		viewerDist = 30 + (20 * (math.Sin(rl.GetTime()))) // pulse the distance in and out
+		//viewerDist = 30 + (20 * (math.Sin(rl.GetTime()))) // pulse the distance in and out
+		viewerDist = 30
 		for _, line := range word.Lines {
 			// 1. Rotate
 			p1 := transform(line.P1, rotX, rotY, rotZ)
 			p2 := transform(line.P2, rotX, rotY, rotZ)
 
-			// 2. Project to 2D
+			// 2. Scale in and out
+			scale := (math.Sin(rl.GetTime()) * 0.8) + 1.0
+			p1 = p1.Scale(scale)
+			p2 = p2.Scale(scale)
+
+			// 3. Project to 2D
 			v1 := p1.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
 			v2 := p2.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
 
-			// 3. Draw
+			// 4. Draw
 			color := rl.RayWhite
 			rl.DrawLine(int32(v1.X), int32(v1.Y), int32(v2.X), int32(v2.Y), color)
 		}
@@ -59,5 +65,6 @@ func transform(v Vec3, rx, ry, rz float64) Vec3 {
 	v = v.RotateX(rx)
 	v = v.RotateY(ry)
 	v = v.RotateZ(rz)
+
 	return v
 }
