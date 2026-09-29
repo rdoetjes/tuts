@@ -74,31 +74,33 @@ var MoodyPalette = []rl.Color{
 func (s *Scene) update() {
 	s.angle += 0.015
 	s.sf.Process()
-
-	// Update balls motion
-	floorY := -8.0
 	time := rl.GetTime()
+	floorY := -8.0
 
+	s.updateBalls(time, floorY)
+	s.updateScroller()
+}
+
+func (s *Scene) updateBalls(time, floorY float64) {
 	for i := range s.balls {
 		b := &s.balls[i]
 
-		// Static X (determined at init)
-
 		// Depth movement (Z) - Moving near and far
 		zCenter := 15.0
-		zRange := 10.0
+		zRange := 20.0
 		zSpeed := 1.2
-		offset := float64(i) * math.Pi // Out of phase
-		b.Pos.Z = zCenter + math.Sin(time*zSpeed+offset)*zRange
+		offset := float64(i)*math.Pi + float64(100*i) // Out of phase
+		b.Pos.Z = zCenter + math.Sin(time*zSpeed+offset)*zRange*2.0
 
 		// Vertical bounce (Y)
-		bounceHeight := 6.0
+		bounceHeight := 9.0
 		bounceSpeed := 3.5
 		// Use absolute sine for a "bouncing" motion off the floor
 		b.Pos.Y = floorY + 1.0 + math.Abs(math.Sin(time*bounceSpeed+offset))*bounceHeight
 	}
+}
 
-	// Update scroller
+func (s *Scene) updateScroller() {
 	s.scrollerX -= 4.5
 	textSize := rl.MeasureTextEx(s.font, s.scrollerText, s.fontSize, 2)
 	if s.scrollerX < -textSize.X {
@@ -116,11 +118,11 @@ func (s *Scene) draw() {
 	// 2. Draw scrolling floor
 	drawFloor(s.angle, s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
 
-	// 3. Draw word
-	s.drawWord()
-
 	// 4. Draw balls and shadows
 	s.drawBalls()
+
+	// 3. Draw word
+	s.drawWord()
 
 	// 5. Draw rainbow scroller
 	s.drawScroller()
@@ -151,14 +153,6 @@ func (s *Scene) drawBalls() {
 			// 1. Chrome Gradient (Main Body)
 			// Mid-grey to light-grey for that metallic "tapered" shading
 			rl.DrawCircleGradient(center, radius, rl.LightGray, rl.NewColor(40, 40, 40, 255))
-
-			// 2. Hit Spot / Specular Highlight
-			// Strong white light source
-			hitPos := rl.NewVector2(float32(proj.X)-radius*0.35, float32(proj.Y)-radius*0.35)
-			rl.DrawCircleGradient(hitPos, radius*0.4, rl.White, rl.NewColor(255, 255, 255, 0))
-
-			// 3. Final sharp highlight
-			rl.DrawCircle(int32(hitPos.X), int32(hitPos.Y), radius*0.1, rl.White)
 		}
 	}
 }
