@@ -6,6 +6,11 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type Ball struct {
+	Pos Vec3
+	Vel Vec3
+}
+
 type Scene struct {
 	sf           *StarField
 	word         Letter
@@ -18,6 +23,7 @@ type Scene struct {
 	scrollerX    float32
 	scrollerText string
 	fontSize     float32
+	balls        [2]Ball
 }
 
 func main() {
@@ -43,6 +49,10 @@ func main() {
 	s.word = GetWord()
 	s.scrollerX = float32(s.screenWidth)
 
+	// Initialize balls (X is now static)
+	s.balls[0] = Ball{Pos: Vec3{X: -12, Y: 0, Z: 10}}
+	s.balls[1] = Ball{Pos: Vec3{X: 12, Y: 0, Z: 10}}
+
 	rl.SetTargetFPS(60)
 	rl.HideCursor()
 
@@ -65,6 +75,29 @@ func (s *Scene) update() {
 	s.angle += 0.015
 	s.sf.Process()
 
+	// Update balls motion
+	floorY := -8.0
+	time := rl.GetTime()
+
+	for i := range s.balls {
+		b := &s.balls[i]
+
+		// Static X (determined at init)
+
+		// Depth movement (Z) - Moving near and far
+		zCenter := 15.0
+		zRange := 10.0
+		zSpeed := 1.2
+		offset := float64(i) * math.Pi // Out of phase
+		b.Pos.Z = zCenter + math.Sin(time*zSpeed+offset)*zRange
+
+		// Vertical bounce (Y)
+		bounceHeight := 6.0
+		bounceSpeed := 3.5
+		// Use absolute sine for a "bouncing" motion off the floor
+		b.Pos.Y = floorY + 1.0 + math.Abs(math.Sin(time*bounceSpeed+offset))*bounceHeight
+	}
+
 	// Update scroller
 	s.scrollerX -= 4.5
 	textSize := rl.MeasureTextEx(s.font, s.scrollerText, s.fontSize, 2)
@@ -86,10 +119,48 @@ func (s *Scene) draw() {
 	// 3. Draw word
 	s.drawWord()
 
-	// 4. Draw rainbow scroller
+	// 4. Draw balls and shadows
+	s.drawBalls()
+
+	// 5. Draw rainbow scroller
 	s.drawScroller()
 
 	rl.EndDrawing()
+}
+
+func (s *Scene) drawBalls() {
+	floorY := -8.0
+	for _, b := range s.balls {
+		// 1. Draw shadow on the grid
+		shadowPos := Vec3{X: b.Pos.X, Y: floorY, Z: b.Pos.Z}
+		shadowProj := shadowPos.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
+
+		// Shadow size scales with height
+		heightFactor := (b.Pos.Y - floorY)
+		shadowSize := 40.0 / (1.0 + heightFactor*0.2)
+		if shadowPos.Z > -s.viewerDist+1 {
+			rl.DrawEllipse(int32(shadowProj.X), int32(shadowProj.Y), float32(shadowSize), float32(shadowSize/2), rl.NewColor(0, 0, 0, 150))
+		}
+
+		// 2. Draw "Chrome" Ball
+		proj := b.Pos.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
+		if b.Pos.Z > -s.viewerDist+1 {
+			radius := float32(40.0 / (s.viewerDist + b.Pos.Z) * (s.fov / 10.0))
+			center := rl.NewVector2(float32(proj.X), float32(proj.Y))
+
+			// 1. Chrome Gradient (Main Body)
+			// Mid-grey to light-grey for that metallic "tapered" shading
+			rl.DrawCircleGradient(center, radius, rl.LightGray, rl.NewColor(40, 40, 40, 255))
+
+			// 2. Hit Spot / Specular Highlight
+			// Strong white light source
+			hitPos := rl.NewVector2(float32(proj.X)-radius*0.35, float32(proj.Y)-radius*0.35)
+			rl.DrawCircleGradient(hitPos, radius*0.4, rl.White, rl.NewColor(255, 255, 255, 0))
+
+			// 3. Final sharp highlight
+			rl.DrawCircle(int32(hitPos.X), int32(hitPos.Y), radius*0.1, rl.White)
+		}
+	}
 }
 
 func (s *Scene) drawScroller() {
