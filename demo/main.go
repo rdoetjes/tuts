@@ -27,49 +27,55 @@ func main() {
 	angle := 0.0
 
 	for !rl.WindowShouldClose() {
-		// Update
-		angle += 0.015
-		// Draw
-		rl.BeginDrawing()
-		rl.ClearBackground(rl.Black)
+		update(sf, &angle)
+		draw(sf, word, angle, float64(screenWidth), float64(screenHeight), fov, viewerDist)
+	}
+}
 
-		// Entire word rotations
-		rotX := angle * 0.4
-		rotY := angle * 0.5
-		rotZ := angle * 0.2
+func update(sf *StarField, angle *float64) {
+	*angle += 0.015
+	sf.Process()
+}
 
-		viewerDist = 30
+func draw(sf *StarField, word Letter, angle float64, screenWidth, screenHeight, fov, viewerDist float64) {
+	rl.BeginDrawing()
+	rl.ClearBackground(rl.Black)
 
-		// process
-		sf.Process()
+	// 1. Draw stars
+	sf.Draw()
 
-		// 1. Draw stars
-		sf.Draw()
+	// 2. Draw scrolling floor
+	drawFloor(angle, screenWidth, screenHeight, fov, 30.0)
 
-		// 2. Draw scrolling floor
-		drawFloor(angle, float64(screenWidth), float64(screenHeight), fov, viewerDist)
+	// 3. Draw word
+	drawWord(word, angle, screenWidth, screenHeight, fov, 30.0)
 
-		// 3. Draw word
-		for _, line := range word.Lines {
-			// 1. Rotate
-			p1 := transform(line.P1, rotX, rotY, rotZ)
-			p2 := transform(line.P2, rotX, rotY, rotZ)
+	rl.EndDrawing()
+}
 
-			// 2. Scale in and out
-			scale := (math.Sin(rl.GetTime()) * 0.8) + 1.0
-			p1 = p1.Scale(scale)
-			p2 = p2.Scale(scale)
+func drawWord(word Letter, angle float64, screenWidth, screenHeight, fov, viewerDist float64) {
+	// Entire word rotations
+	rotX := angle * 0.4
+	rotY := angle * 0.5
+	rotZ := angle * 0.2
 
-			// 3. Project to 2D
-			v1 := p1.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
-			v2 := p2.Project(float64(screenWidth), float64(screenHeight), fov, viewerDist)
+	for _, line := range word.Lines {
+		// 1. Rotate
+		p1 := transform(line.P1, rotX, rotY, rotZ)
+		p2 := transform(line.P2, rotX, rotY, rotZ)
 
-			// 4. Draw
-			color := rl.RayWhite
-			rl.DrawLineEx(rl.NewVector2(float32(v1.X), float32(v1.Y)), rl.NewVector2(float32(v2.X), float32(v2.Y)), 3.0, color)
-		}
+		// 2. Scale in and out
+		scale := (math.Sin(rl.GetTime()) * 0.8) + 1.0
+		p1 = p1.Scale(scale)
+		p2 = p2.Scale(scale)
 
-		rl.EndDrawing()
+		// 3. Project to 2D
+		v1 := p1.Project(screenWidth, screenHeight, fov, viewerDist)
+		v2 := p2.Project(screenWidth, screenHeight, fov, viewerDist)
+
+		// 4. Draw
+		color := rl.RayWhite
+		rl.DrawLineEx(rl.NewVector2(float32(v1.X), float32(v1.Y)), rl.NewVector2(float32(v2.X), float32(v2.Y)), 3.0, color)
 	}
 }
 
