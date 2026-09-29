@@ -16,7 +16,7 @@ func main() {
 	rl.InitWindow(0, 0, "3D Vector Art - R A Y")
 	defer rl.CloseWindow()
 
-	sf := NewStarField(int(float64(rl.GetScreenWidth()*rl.GetScreenHeight()) * 0.0006))
+	sf := NewStarField(int(float64(rl.GetScreenWidth()*rl.GetScreenHeight()) * 0.0005))
 
 	rl.SetTargetFPS(60)
 	rl.HideCursor()

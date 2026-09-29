@@ -45,7 +45,9 @@ func (s *StarField) Process() {
 }
 
 func (s *StarField) Draw() {
-	for _, star := range s.Stars {
-		rl.DrawCircleV(star.Pos, float32(star.Size), rl.NewColor(star.Brightness*40, star.Brightness*40, star.Brightness*40, 255))
+	for i := range s.Stars {
+		star := s.Stars[i]
+		color := rl.NewColor(star.Brightness*80, star.Brightness*80, star.Brightness*80, 255)
+		rl.DrawCircleV(star.Pos, float32(star.Size), color)
 	}
 }
