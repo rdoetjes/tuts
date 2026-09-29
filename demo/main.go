@@ -112,6 +112,9 @@ func (s *Scene) draw() {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.Black)
 
+	// 0. Draw background raster bars
+	s.drawRasterBars()
+
 	// 1. Draw stars
 	s.sf.Draw()
 
@@ -128,6 +131,41 @@ func (s *Scene) draw() {
 	s.drawScroller()
 
 	rl.EndDrawing()
+}
+
+func (s *Scene) drawRasterBars() {
+	time := rl.GetTime()
+	barHeight := 60
+	for i := 0; i < 3; i++ {
+		// Bouncing in a sine wave
+		offset := float64(i) * 0.8
+		yCenter := float32(s.screenHeight/2) + float32(math.Sin(time*1.5+offset)*(s.screenHeight*0.35))
+
+		// Draw simple gradient raster bar
+		for j := 0; j < barHeight; j++ {
+			// Calculate factor (0 at edges, 1 at center of bar)
+			factor := 1.0 - math.Abs(float64(j-barHeight/2))/float64(barHeight/2)
+
+			// Palette selection with offset per bar
+			// We cycle through the palette based on the bar index and the line position
+			palVal := math.Mod(float64(i)*0.33+factor*0.5, 1.0)
+			idx := palVal * float64(len(MoodyPalette)-1)
+			i1 := int(math.Floor(idx))
+			i2 := i1 + 1
+			frac := float32(idx - float64(i1))
+
+			baseColor := rl.ColorLerp(MoodyPalette[i1], MoodyPalette[i2], frac)
+
+			// Apply the edge fading (the classic raster look)
+			color := baseColor
+			color.R = uint8(float32(color.R) * float32(factor))
+			color.G = uint8(float32(color.G) * float32(factor))
+			color.B = uint8(float32(color.B) * float32(factor))
+
+			yPos := int32(yCenter) + int32(j-barHeight/2)
+			rl.DrawRectangle(0, yPos, int32(s.screenWidth), 1, color)
+		}
+	}
 }
 
 func (s *Scene) drawBalls() {
