@@ -6,60 +6,113 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func main() {
-	const fov = 500.0
-	viewerDist := 10.0
+type Scene struct {
+	sf           *StarField
+	word         Letter
+	font         rl.Font
+	fov          float64
+	viewerDist   float64
+	screenWidth  float64
+	screenHeight float64
+	angle        float64
+	scrollerX    float32
+	scrollerText string
+	fontSize     float32
+}
 
+func main() {
 	// Set fullscreen flag before initialization
 	rl.SetConfigFlags(rl.FlagFullscreenMode)
 
 	rl.InitWindow(0, 0, "3D Vector Art - R A Y")
 	defer rl.CloseWindow()
 
-	sf := NewStarField(int(float64(rl.GetScreenWidth()*rl.GetScreenHeight()) * 0.0005))
+	s := &Scene{
+		fov:          500.0,
+		viewerDist:   30.0,
+		screenWidth:  float64(rl.GetScreenWidth()),
+		screenHeight: float64(rl.GetScreenHeight()),
+		scrollerText: "--- PHONAX DELIVERS AGAIN! --- ANOTHER 0-DAY CRACK FOR THE ELITE DUDES! --- WE HEARD THE LAMERS AT 'THE WEAKLINGS' ARE STILL TRYING TO FIGURE OUT THE NOP SLIDE... MAYBE TRY POKING SOME GRASS INSTEAD! --- PHONAX IS RAIDING THE SEVEN DIGITAL SEAS WHILE YOUR COMMODORE IS STILL LOADING FROM TAPE! --- GREETS TO THE REAL ONES ON THE WHIRLWIND BBS! --- BIG FUCKS TO THE PIRACY PATROL - CATCH US IF YOU CAN, SUCKERS! --- WE'RE NOT JUST CRACKING THE CODE, WE'RE CRACKING YOUR MOM'S FAVORITE HIGH SCORES! --- PHONAX: THE ONLY GROUP THAT CAN COMPILE IN THEIR SLEEP! --- KEEP YOUR EYES PEELED FOR OUR NEXT RELEASE OR YOU'LL BE STUCK PLAYING PONG FOREVER! --- PHONAX OWNS 1988!!! ---",
+		fontSize:     100.0,
+	}
+
+	s.font = rl.LoadFont("assets/fonts/Impact.ttf")
+	defer rl.UnloadFont(s.font)
+
+	s.sf = NewStarField(int(s.screenWidth * s.screenHeight * 0.0005))
+	s.word = GetWord()
+	s.scrollerX = float32(s.screenWidth)
 
 	rl.SetTargetFPS(60)
 	rl.HideCursor()
 
-	word := GetWord()
-	screenWidth := rl.GetScreenWidth()
-	screenHeight := rl.GetScreenHeight()
-	angle := 0.0
-
 	for !rl.WindowShouldClose() {
-		update(sf, &angle)
-		draw(sf, word, angle, float64(screenWidth), float64(screenHeight), fov, viewerDist)
+		s.update()
+		s.draw()
 	}
 }
 
-func update(sf *StarField, angle *float64) {
-	*angle += 0.015
-	sf.Process()
+func (s *Scene) update() {
+	s.angle += 0.015
+	s.sf.Process()
+
+	// Update scroller
+	s.scrollerX -= 4.5
+	textSize := rl.MeasureTextEx(s.font, s.scrollerText, s.fontSize, 2)
+	if s.scrollerX < -textSize.X {
+		s.scrollerX = float32(s.screenWidth)
+	}
 }
 
-func draw(sf *StarField, word Letter, angle float64, screenWidth, screenHeight, fov, viewerDist float64) {
+func (s *Scene) draw() {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.Black)
 
 	// 1. Draw stars
-	sf.Draw()
+	s.sf.Draw()
 
 	// 2. Draw scrolling floor
-	drawFloor(angle, screenWidth, screenHeight, fov, 30.0)
+	drawFloor(s.angle, s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
 
 	// 3. Draw word
-	drawWord(word, angle, screenWidth, screenHeight, fov, 30.0)
+	s.drawWord()
+
+	// 4. Draw rainbow scroller
+	s.drawScroller()
 
 	rl.EndDrawing()
 }
 
-func drawWord(word Letter, angle float64, screenWidth, screenHeight, fov, viewerDist float64) {
-	// Entire word rotations
-	rotX := angle * 0.4
-	rotY := angle * 0.5
-	rotZ := angle * 0.2
+func (s *Scene) drawScroller() {
+	currentX := s.scrollerX
+	y := float32(s.screenHeight) - 150
+	time := rl.GetTime()
 
-	for _, line := range word.Lines {
+	for i, char := range s.scrollerText {
+		charStr := string(char)
+		hue := uint8(int(time*700+float64(i)*15) % 200)
+		color := rl.NewColor(hue, hue, hue, 255)
+
+		// Wavy effect
+		waveY := y + float32(math.Sin(float64(i)*0.15+time*5.0)*25.0)
+
+		position := rl.NewVector2(currentX, waveY)
+		rl.DrawTextEx(s.font, charStr, position, s.fontSize, 2, color)
+
+		charWidth := rl.MeasureTextEx(s.font, charStr, s.fontSize, 2).X
+		currentX += charWidth
+	}
+}
+
+func (s *Scene) drawWord() {
+	// Entire word rotations
+	rotX := s.angle * 0.4
+	rotY := s.angle * 0.5
+	rotZ := s.angle * 0.2
+
+	time := rl.GetTime()
+	hue := float32(int(time*800 + float64(2)*15))
+	for _, line := range s.word.Lines {
 		// 1. Rotate
 		p1 := transform(line.P1, rotX, rotY, rotZ)
 		p2 := transform(line.P2, rotX, rotY, rotZ)
@@ -70,11 +123,11 @@ func drawWord(word Letter, angle float64, screenWidth, screenHeight, fov, viewer
 		p2 = p2.Scale(scale)
 
 		// 3. Project to 2D
-		v1 := p1.Project(screenWidth, screenHeight, fov, viewerDist)
-		v2 := p2.Project(screenWidth, screenHeight, fov, viewerDist)
+		v1 := p1.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
+		v2 := p2.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
 
 		// 4. Draw
-		color := rl.RayWhite
+		color := rl.ColorFromHSV(hue, 1.0, 1.0)
 		rl.DrawLineEx(rl.NewVector2(float32(v1.X), float32(v1.Y)), rl.NewVector2(float32(v2.X), float32(v2.Y)), 3.0, color)
 	}
 }
