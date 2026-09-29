@@ -16,6 +16,8 @@ func main() {
 	rl.InitWindow(0, 0, "3D Vector Art - R A Y")
 	defer rl.CloseWindow()
 
+	sf := NewStarField(int(float64(rl.GetScreenWidth()*rl.GetScreenHeight()) * 0.0006))
+
 	rl.SetTargetFPS(60)
 	rl.HideCursor()
 
@@ -37,10 +39,17 @@ func main() {
 		rotZ := angle * 0.2
 
 		viewerDist = 30
-		// 1. Draw scrolling floor
+
+		// process
+		sf.Process()
+
+		// 1. Draw stars
+		sf.Draw()
+
+		// 2. Draw scrolling floor
 		drawFloor(angle, float64(screenWidth), float64(screenHeight), fov, viewerDist)
 
-		// 2. Draw word
+		// 3. Draw word
 		for _, line := range word.Lines {
 			// 1. Rotate
 			p1 := transform(line.P1, rotX, rotY, rotZ)
