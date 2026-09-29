@@ -32,7 +32,7 @@ func main() {
 		viewerDist:   30.0,
 		screenWidth:  float64(rl.GetScreenWidth()),
 		screenHeight: float64(rl.GetScreenHeight()),
-		scrollerText: "--- PHONAX DELIVERS AGAIN! --- ANOTHER 0-DAY CRACK FOR THE ELITE DUDES! --- WE HEARD THE LAMERS AT 'THE WEAKLINGS' ARE STILL TRYING TO FIGURE OUT THE NOP SLIDE... MAYBE TRY POKING SOME GRASS INSTEAD! --- PHONAX IS RAIDING THE SEVEN DIGITAL SEAS WHILE YOUR COMMODORE IS STILL LOADING FROM TAPE! --- GREETS TO THE REAL ONES ON THE WHIRLWIND BBS! --- BIG FUCKS TO THE PIRACY PATROL - CATCH US IF YOU CAN, SUCKERS! --- WE'RE NOT JUST CRACKING THE CODE, WE'RE CRACKING YOUR MOM'S FAVORITE HIGH SCORES! --- PHONAX: THE ONLY GROUP THAT CAN COMPILE IN THEIR SLEEP! --- KEEP YOUR EYES PEELED FOR OUR NEXT RELEASE OR YOU'LL BE STUCK PLAYING PONG FOREVER! --- PHONAX OWNS 1988!!! ---",
+		scrollerText: "------------------------------ PHONAX DELIVERS AGAIN! --- ANOTHER 0-DAY CRACK FOR THE ELITE DUDES! --- WE HEARD THE LAMERS AT 'THE WEAKLINGS' ARE STILL TRYING TO FIGURE OUT THE NOP SLIDE... MAYBE TRY POKING SOME GRASS INSTEAD! --- PHONAX IS RAIDING THE SEVEN DIGITAL SEAS WHILE YOUR COMMODORE IS STILL LOADING FROM TAPE! --- GREETS TO THE REAL ONES ON THE WHIRLWIND BBS! --- BIG FUCKS TO THE PIRACY PATROL - CATCH US IF YOU CAN, SUCKERS! --- WE'RE NOT JUST CRACKING THE CODE, WE'RE CRACKING YOUR MOM'S FAVORITE HIGH SCORES! --- PHONAX: THE ONLY GROUP THAT CAN COMPILE IN THEIR SLEEP! --- KEEP YOUR EYES PEELED FOR OUR NEXT RELEASE OR YOU'LL BE STUCK PLAYING PONG FOREVER! --- PHONAX OWNS 1988!!! ----------------",
 		fontSize:     100.0,
 	}
 
@@ -106,19 +106,18 @@ func (s *Scene) drawScroller() {
 
 func (s *Scene) drawWord() {
 	// Entire word rotations
-	rotX := s.angle * 0.4
-	rotY := s.angle * 0.5
-	rotZ := s.angle * 0.2
-
+	rotX := 0.0
+	rotY := s.angle * 0.45
+	rotZ := 0.0
 	time := rl.GetTime()
-	hue := float32(int(time*800 + float64(2)*15))
+
 	for _, line := range s.word.Lines {
 		// 1. Rotate
 		p1 := transform(line.P1, rotX, rotY, rotZ)
 		p2 := transform(line.P2, rotX, rotY, rotZ)
 
 		// 2. Scale in and out
-		scale := (math.Sin(rl.GetTime()) * 0.8) + 1.0
+		scale := (math.Sin(time) * 0.8) + 1.0
 		p1 = p1.Scale(scale)
 		p2 = p2.Scale(scale)
 
@@ -126,9 +125,17 @@ func (s *Scene) drawWord() {
 		v1 := p1.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
 		v2 := p2.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
 
-		// 4. Draw
-		color := rl.ColorFromHSV(hue, 1.0, 1.0)
-		rl.DrawLineEx(rl.NewVector2(float32(v1.X), float32(v1.Y)), rl.NewVector2(float32(v2.X), float32(v2.Y)), 3.0, color)
+		// 4. Draw 3 times with offset and hue shift for extruded look
+		for i := 0; i < 2; i++ {
+			offset := float32(i) * 2.0
+			hue := float32(int(time*120+float64(i)*40) % 360)
+			color := rl.ColorFromHSV(hue, 0.8, 1.0)
+
+			p1_2d := rl.NewVector2(float32(v1.X)+offset, float32(v1.Y)+offset)
+			p2_2d := rl.NewVector2(float32(v2.X)+offset, float32(v2.Y)+offset)
+
+			rl.DrawLineEx(p1_2d, p2_2d, 3.0, color)
+		}
 	}
 }
 
