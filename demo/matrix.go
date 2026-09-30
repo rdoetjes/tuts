@@ -97,3 +97,10 @@ func (v Vec3) Project(width, height, fov, viewerDistance float64) Vec2 {
 		-v.Y*factor + height/2,
 	}
 }
+
+func transform(v Vec3, rx, ry, rz float64) Vec3 {
+	v = v.RotateX(rx)
+	v = v.RotateY(ry)
+	v = v.RotateZ(rz)
+	return v
+}

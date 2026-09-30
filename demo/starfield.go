@@ -34,7 +34,7 @@ func NewStarField(nrStars int) *StarField {
 	return starfield
 }
 
-func (s *StarField) Process() {
+func (s *StarField) Update() {
 	for i := range s.Stars {
 		if s.Stars[i].Pos.X > 0 {
 			s.Stars[i].Pos.X -= float32(s.Stars[i].Speed) * 3
