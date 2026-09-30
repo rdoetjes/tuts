@@ -11,16 +11,8 @@ type Ball struct {
 	Vel Vec3
 }
 
-type Spark struct {
-	Pos      Vec3
-	Vel      Vec3
-	Life     float32
-	ColorIdx int
-}
-
 type BallSystem struct {
-	Data   [2]Ball
-	Sparks []Spark
+	Data [2]Ball
 }
 
 func (bs *BallSystem) Update(s *Scene, floorY float64) {
@@ -29,6 +21,7 @@ func (bs *BallSystem) Update(s *Scene, floorY float64) {
 	// Update Balls
 	for i := range bs.Data {
 		b := &bs.Data[i]
+
 		zCenter := 15.0
 		zRange := 20.0
 		zSpeed := 1.2
@@ -39,26 +32,14 @@ func (bs *BallSystem) Update(s *Scene, floorY float64) {
 		bounceSpeed := 3.5
 		b.Pos.Y = floorY + 1.0 + math.Abs(math.Sin(time*bounceSpeed+offset))*bounceHeight
 	}
-
-	// Update Sparks
-	for i := len(bs.Sparks) - 1; i >= 0; i-- {
-		bs.Sparks[i].Pos.X += bs.Sparks[i].Vel.X
-		bs.Sparks[i].Pos.Y += bs.Sparks[i].Vel.Y
-		bs.Sparks[i].Pos.Z += bs.Sparks[i].Vel.Z
-		bs.Sparks[i].Vel.Y -= 0.01
-		bs.Sparks[i].Life -= 0.02
-		if bs.Sparks[i].Life <= 0 {
-			bs.Sparks = append(bs.Sparks[:i], bs.Sparks[i+1:]...)
-		}
-	}
 }
 
 func (bs *BallSystem) Draw(s *Scene) {
-	bs.DrawBalls(s, false)
+	bs.drawBalls(s, false)
 }
 
-func (bs *BallSystem) DrawBalls(s *Scene, isReflection bool) {
-	floorY := -8.0
+func (bs *BallSystem) drawBalls(s *Scene, isReflection bool) {
+	floorY := s.floor.Y
 	for _, b := range bs.Data {
 		ballPos := b.Pos
 		if isReflection {
@@ -80,6 +61,7 @@ func (bs *BallSystem) DrawBalls(s *Scene, isReflection bool) {
 		if ballPos.Z > -s.viewerDist+1 {
 			radius := float32(40.0 / (s.viewerDist + ballPos.Z) * (s.fov / 10.0))
 			center := rl.NewVector2(float32(proj.X), float32(proj.Y))
+
 			c1 := rl.LightGray
 			c2 := rl.NewColor(40, 40, 40, 255)
 			if isReflection {

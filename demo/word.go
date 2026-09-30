@@ -6,14 +6,18 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func (s *Scene) drawWord(isReflection bool) {
+type WordSystem struct {
+	Data Letter
+}
+
+func (ws *WordSystem) Draw(s *Scene, isReflection bool) {
 	rotX := s.angle * 2
 	rotY := s.angle * 3
 	rotZ := 0.0
 	time := rl.GetTime()
-	floorY := -8.0
+	floorY := s.floor.Y
 
-	for _, line := range s.word.Lines {
+	for _, line := range ws.Data.Lines {
 		p1 := transform(line.P1, rotX, rotY, rotZ)
 		p2 := transform(line.P2, rotX, rotY, rotZ)
 
@@ -47,9 +51,4 @@ func (s *Scene) drawWord(isReflection bool) {
 			rl.DrawLineEx(p1_2d, p2_2d, 3.0, color)
 		}
 	}
-}
-
-func (s *Scene) drawReflections() {
-	s.drawWord(true)
-	s.balls.DrawBalls(s, true)
 }

@@ -6,7 +6,7 @@ import (
 
 type Scene struct {
 	starfield    *StarField
-	word         Letter
+	word         WordSystem
 	font         rl.Font
 	fov          float64
 	viewerDist   float64
@@ -15,6 +15,7 @@ type Scene struct {
 	angle        float64
 	scroller     Scroller
 	balls        BallSystem
+	floor        Floor
 }
 
 var MoodyPalette = []rl.Color{
@@ -41,7 +42,7 @@ func main() {
 	defer rl.UnloadFont(s.font)
 
 	s.starfield = NewStarField(int(s.screenWidth * s.screenHeight * 0.0005))
-	s.word = GetWord()
+	s.word = WordSystem{Data: GetWord()}
 	s.scroller = Scroller{
 		Text:     "--- PHONAX DELIVERS AGAIN! --- ANOTHER 0-DAY CRACK FOR THE ELITE DUDES! --- WE HEARD THE LAMERS AT 'THE WEAKLINGS' ARE STILL TRYING TO FIGURE OUT THE NOP SLIDE... MAYBE TRY POKING SOME GRASS INSTEAD! --- PHONAX IS RAIDING THE SEVEN DIGITAL SEAS WHILE YOUR COMMODORE IS STILL LOADING FROM TAPE! --- GREETS TO THE REAL ONES ON THE WHIRLWIND BBS! --- BIG FUCKS TO THE PIRACY PATROL - CATCH US IF YOU CAN, SUCKERS! --- WE'RE NOT JUST CRACKING THE CODE, WE'RE CRACKING YOUR MOM'S FAVORITE HIGH SCORES! --- PHONAX: THE ONLY GROUP THAT CAN COMPILE IN THEIR SLEEP! --- KEEP YOUR EYES PEELED FOR OUR NEXT RELEASE OR YOU'LL BE STUCK PLAYING PONG FOREVER! --- PHONAX OWNS 1988!!! ---",
 		FontSize: 100.0,
@@ -51,6 +52,16 @@ func main() {
 	// Initialize balls
 	s.balls.Data[0] = Ball{Pos: Vec3{X: -12, Y: 0, Z: 10}}
 	s.balls.Data[1] = Ball{Pos: Vec3{X: 12, Y: 0, Z: 10}}
+
+	s.floor = Floor{
+		Y:              -8.0,
+		GridSize:       5.0,
+		NumCols:        40,
+		NumRows:        25,
+		RoadWidth:      30.0,
+		MountainBuffer: 15.0,
+		Speed:          15.0,
+	}
 
 	rl.SetTargetFPS(60)
 	rl.HideCursor()
@@ -64,9 +75,8 @@ func main() {
 func (s *Scene) Update() {
 	s.angle += 0.015
 	s.starfield.Update()
-	floorY := -8.0
 
-	s.balls.Update(s, floorY)
+	s.balls.Update(s, s.floor.Y)
 	s.scroller.Update(s)
 }
 
@@ -76,9 +86,8 @@ func (s *Scene) Draw() {
 
 	s.drawRasterBars()
 	s.starfield.Draw()
-	s.drawReflections()
-	s.drawFloor()
-	s.drawWord(false)
+	s.floor.Draw(s)
+	s.word.Draw(s, false)
 	s.balls.Draw(s)
 	s.scroller.Draw(s)
 
