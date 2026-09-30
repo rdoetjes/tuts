@@ -35,26 +35,20 @@ func (bs *BallSystem) Update(s *Scene, floorY float64) {
 }
 
 func (bs *BallSystem) Draw(s *Scene) {
-	bs.drawBalls(s, false)
+	bs.drawBalls(s)
 }
 
-func (bs *BallSystem) drawBalls(s *Scene, isReflection bool) {
+func (bs *BallSystem) drawBalls(s *Scene) {
 	floorY := s.floor.Y
 	for _, b := range bs.Data {
 		ballPos := b.Pos
-		if isReflection {
-			ballPos.Y = floorY - (ballPos.Y - floorY)
-			if ballPos.Y > floorY {
-				continue
-			}
-		} else {
-			shadowPos := Vec3{X: b.Pos.X, Y: floorY, Z: b.Pos.Z}
-			shadowProj := shadowPos.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
-			heightFactor := (b.Pos.Y - floorY)
-			shadowSize := 40.0 / (1.0 + heightFactor*0.2)
-			if shadowPos.Z > -s.viewerDist+1 {
-				rl.DrawEllipse(int32(shadowProj.X), int32(shadowProj.Y), float32(shadowSize), float32(shadowSize/2), rl.NewColor(0, 0, 0, 150))
-			}
+
+		shadowPos := Vec3{X: b.Pos.X, Y: floorY, Z: b.Pos.Z}
+		shadowProj := shadowPos.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
+		heightFactor := (b.Pos.Y - floorY)
+		shadowSize := 40.0 / (1.0 + heightFactor*0.2)
+		if shadowPos.Z > -s.viewerDist+1 {
+			rl.DrawEllipse(int32(shadowProj.X), int32(shadowProj.Y), float32(shadowSize), float32(shadowSize/2), rl.NewColor(0, 0, 0, 150))
 		}
 
 		proj := ballPos.Project(s.screenWidth, s.screenHeight, s.fov, s.viewerDist)
@@ -64,10 +58,7 @@ func (bs *BallSystem) drawBalls(s *Scene, isReflection bool) {
 
 			c1 := rl.LightGray
 			c2 := rl.NewColor(40, 40, 40, 255)
-			if isReflection {
-				c1.A = 100
-				c2.A = 100
-			}
+
 			rl.DrawCircleGradient(center, radius, c1, c2)
 		}
 	}

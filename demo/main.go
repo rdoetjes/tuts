@@ -58,7 +58,7 @@ func main() {
 		GridSize:       5.0,
 		NumCols:        40,
 		NumRows:        25,
-		RoadWidth:      30.0,
+		RoadWidth:      50.0,
 		MountainBuffer: 15.0,
 		Speed:          15.0,
 	}
@@ -87,7 +87,7 @@ func (s *Scene) Draw() {
 	s.drawRasterBars()
 	s.starfield.Draw()
 	s.floor.Draw(s)
-	s.word.Draw(s, false)
+	s.word.Draw(s)
 	s.balls.Draw(s)
 	s.scroller.Draw(s)
 
