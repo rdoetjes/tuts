@@ -83,7 +83,6 @@ func drawFire() {
 				g := uint8(120 + (float64(val)-150)*1.3)
 				color = rl.NewColor(255, g, 0, 255)
 			}
-
 			// Add some vertical tapering to the alpha based on height
 			heightAlpha := uint8(float32(fireHeight-y) / float32(fireHeight) * 255)
 			if color.A > heightAlpha {
@@ -480,7 +479,7 @@ func main() {
 		drawScroller(font, timer, scrollText, scrollPos)
 		drawLogo(font, timer, pulse)
 		drawSubHeader(font, timer, isFlatline)
-		drawGlitches()
+		//drawGlitches()
 		drawScanlines()
 		drawBorder()
 
