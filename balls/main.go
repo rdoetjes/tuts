@@ -9,7 +9,7 @@ import (
 const (
 	screenWidth  = 1024
 	screenHeight = 768
-	starCount    = 200
+	starCount    = 400
 )
 
 type Star struct {
@@ -32,7 +32,19 @@ func updateStars(stars []Star) {
 	speed := float32(8.0)
 	for i := range stars {
 		stars[i].z -= speed
-		if stars[i].z <= 0 {
+
+		// Projection check for recycling
+		// If z is too small or the star has flown past the screen boundaries, recycle it
+		isOffScreen := false
+		if stars[i].z > 0 {
+			sx := (stars[i].x/stars[i].z)*100 + float32(screenWidth/2)
+			sy := (stars[i].y/stars[i].z)*100 + float32(screenHeight/2)
+			if sx < 0 || sx > screenWidth || sy < 0 || sy > screenHeight {
+				isOffScreen = true
+			}
+		}
+
+		if stars[i].z <= 0 || isOffScreen {
 			stars[i].x = float32(rl.GetRandomValue(-screenWidth, screenWidth))
 			stars[i].y = float32(rl.GetRandomValue(-screenHeight, screenHeight))
 			stars[i].z = float32(screenWidth)
@@ -103,9 +115,88 @@ func drawBall(angle float64, radius float64, color rl.Color, ballRadius float32,
 	rl.DrawCircleLines(x, y, ballRadius, rl.NewColor(255, 255, 255, 180))
 }
 
+func drawOrbitingBalls(timer float64) {
+	nrBalls := 12
+	spreadAngle := (2 * math.Pi) / float64(nrBalls)
+	for j := 0; j < nrBalls; j++ {
+		angle := float64(j)*spreadAngle + timer*2.0
+
+		t := timer*3.0 + float64(j)*0.5
+		r := uint8(150 + 105*math.Cos(t))
+		g := uint8(50 + 50*math.Sin(t*0.8))
+		b := uint8(220 + 35*math.Sin(t*0.6))
+		color := rl.NewColor(r, g, b, 255)
+
+		drawBall(angle, 280, color, 30, timer)
+	}
+}
+
+func drawScroller(font rl.Font, timer float64, scrollText string, scrollPos float32) {
+	for i, char := range scrollText {
+		charX := scrollPos + float32(i*45)
+		if charX < -40 || charX > screenWidth {
+			continue
+		}
+		// Classic sine wave scroller
+		charY := float32(screenHeight-120) + float32(math.Sin(timer*4+float64(i)*0.25)*60)
+
+		pos := rl.NewVector2(charX, charY)
+		shadowPos := rl.NewVector2(charX+4, charY+4)
+
+		// Text shadow
+		rl.DrawTextEx(font, string(char), shadowPos, 60, 2, rl.DarkPurple)
+		// Animated text color
+		color := rl.NewColor(uint8(127+127*math.Sin(timer*2+float64(i)*0.1)), 255, 255, 255)
+		rl.DrawTextEx(font, string(char), pos, 60, 2, color)
+	}
+}
+
+func drawLogo(font rl.Font, timer float64) {
+	headerText := "CRU JONES '89"
+	fontSize := float32(80 + int32(math.Sin(timer*2)*5))
+
+	textSize := rl.MeasureTextEx(font, headerText, fontSize, 2)
+	headerX := (float32(screenWidth) - textSize.X) / 2
+
+	// Logo shadow
+	rl.DrawTextEx(font, headerText, rl.NewVector2(headerX+6, 56), fontSize, 2, rl.Maroon)
+	// Logo main
+	rl.DrawTextEx(font, headerText, rl.NewVector2(headerX, 50), fontSize, 2, rl.Gold)
+}
+
+func drawSubHeader(font rl.Font) {
+	subText := "<< CRACKED BY PHONAX >>"
+	fontSize := float32(30)
+	textSize := rl.MeasureTextEx(font, subText, fontSize, 2)
+	subX := (float32(screenWidth) - textSize.X) / 2
+
+	rl.DrawTextEx(font, subText, rl.NewVector2(subX, 130), fontSize, 2, rl.Lime)
+}
+
+func drawGlitches() {
+	if rl.GetRandomValue(0, 100) < 2 {
+		glitchY := int32(rl.GetRandomValue(0, screenHeight))
+		glitchH := int32(rl.GetRandomValue(5, 20))
+		rl.DrawRectangle(0, glitchY, screenWidth, glitchH, rl.NewColor(255, 255, 255, 100))
+	}
+}
+
+func drawScanlines() {
+	for y := 0; y < screenHeight; y += 3 {
+		rl.DrawLine(0, int32(y), screenWidth, int32(y), rl.NewColor(0, 0, 0, 80))
+	}
+}
+
+func drawBorder() {
+	rl.DrawRectangleLinesEx(rl.NewRectangle(0, 0, float32(screenWidth), float32(screenHeight)), 10, rl.NewColor(100, 100, 100, 255))
+}
+
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "CRU JONES - 1989 CRACKTRO")
 	defer rl.CloseWindow()
+
+	font := rl.LoadFont("assets/fonts/Impact.ttf")
+	defer rl.UnloadFont(font)
 
 	rl.SetTargetFPS(60)
 
@@ -121,79 +212,23 @@ func main() {
 
 		updateStars(stars)
 		scrollPos -= 5.0 // Scroll speed
-		if scrollPos < -float32(len(scrollText)*35) {
+		if scrollPos < -float32(len(scrollText)*45) {
 			scrollPos = float32(screenWidth)
 		}
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		// Background layer
 		drawStars(stars)
 		drawCopperBars(timer)
+		drawOrbitingBalls(timer)
+		drawScroller(font, timer, scrollText, scrollPos)
+		drawLogo(font, timer)
+		drawSubHeader(font)
+		drawGlitches()
+		drawScanlines()
+		drawBorder()
 
-		// Middle layer: Orbiting balls
-		nrBalls := 12
-		spreadAngle := (2 * math.Pi) / float64(nrBalls)
-		for j := 0; j < nrBalls; j++ {
-			angle := float64(j)*spreadAngle + timer*2.0
-
-			t := timer*3.0 + float64(j)*0.5
-			r := uint8(150 + 105*math.Cos(t))
-			g := uint8(50 + 50*math.Sin(t*0.8))
-			b := uint8(220 + 35*math.Sin(t*0.6))
-			color := rl.NewColor(r, g, b, 255)
-
-			drawBall(angle, 280, color, 30, timer)
-		}
-
-		// Foreground layer: Scrolling text
-		for i, char := range scrollText {
-			charX := scrollPos + float32(i*35)
-			if charX < -40 || charX > screenWidth {
-				continue
-			}
-			// Classic sine wave scroller
-			charY := float32(screenHeight-120) + float32(math.Sin(timer*4+float64(i)*0.25)*60)
-
-			// Text shadow
-			rl.DrawText(string(char), int32(charX)+4, int32(charY)+4, 60, rl.DarkPurple)
-			// Animated text color
-			color := rl.NewColor(uint8(127+127*math.Sin(timer*2+float64(i)*0.1)), 255, 255, 255)
-			rl.DrawText(string(char), int32(charX), int32(charY), 60, color)
-		}
-
-		// Logo/Header with a pulsing effect
-		headerText := "CRU JONES '89"
-		logoScale := 80 + int32(math.Sin(timer*2)*5)
-		headerX := int32(screenWidth/2 - rl.MeasureText(headerText, logoScale)/2)
-
-		// Logo shadow
-		rl.DrawText(headerText, headerX+6, 56, logoScale, rl.Maroon)
-		// Logo main
-		rl.DrawText(headerText, headerX, 50, logoScale, rl.Gold)
-
-		// Sub-header
-		subText := "<< CRACKED BY CRU >>"
-		subX := int32(screenWidth/2 - rl.MeasureText(subText, 30)/2)
-		rl.DrawText(subText, subX, 130, 30, rl.Lime)
-
-		// Occasional Glitch Effect
-		if rl.GetRandomValue(0, 100) < 2 {
-			glitchY := int32(rl.GetRandomValue(0, screenHeight))
-			glitchH := int32(rl.GetRandomValue(5, 20))
-			rl.DrawRectangle(0, glitchY, screenWidth, glitchH, rl.NewColor(255, 255, 255, 100))
-		}
-
-		// Scanlines / CRT Effect
-		for y := 0; y < screenHeight; y += 3 {
-			rl.DrawLine(0, int32(y), screenWidth, int32(y), rl.NewColor(0, 0, 0, 80))
-		}
-
-		// Border frame
-		rl.DrawRectangleLinesEx(rl.NewRectangle(0, 0, float32(screenWidth), float32(screenHeight)), 10, rl.NewColor(100, 100, 100, 255))
-
-		// rl.DrawFPS(10, 10)
 		rl.EndDrawing()
 	}
 }
