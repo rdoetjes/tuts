@@ -257,13 +257,60 @@ func drawHeartRateMonitors(timer float64, pulse float32, isFlatline bool) {
 	}
 }
 
-func drawSubHeader(font rl.Font) {
+func drawSubHeader(font rl.Font, timer float64) {
 	subText := "<< CRACKED BY D'ELITE >>"
-	fontSize := float32(30)
-	textSize := rl.MeasureTextEx(font, subText, fontSize, 2)
-	subX := (float32(screenWidth) - textSize.X) / 2
 
-	rl.DrawTextEx(font, subText, rl.NewVector2(subX, 130), fontSize, 2, rl.Lime)
+	baseFontSize := float32(35)
+	spacing := float32(2)
+
+	// Calculate total width to center the whole string
+	totalWidth := float32(0)
+	for _, char := range subText {
+		charSize := rl.MeasureTextEx(font, string(char), baseFontSize, spacing)
+		totalWidth += charSize.X
+	}
+
+	startX := (float32(screenWidth) - totalWidth) / 2
+	baseY := float32(135)
+
+	for i, char := range subText {
+		// Individual character wobbling
+		charTimer := timer*5.0 + float64(i)*0.5
+		offsetY := float32(math.Sin(charTimer)) * 15.0
+		offsetX := float32(math.Cos(charTimer*0.8)) * 5.0
+
+		// Individual scaling
+		charPulse := float32(math.Sin(charTimer*0.7))*0.2 + 1.0
+		charFontSize := baseFontSize * charPulse
+
+		// Blend between Maroon (red shade) and Gold (yellow shade)
+		t := float64(math.Sin(timer*3.0+float64(i)*0.3))*0.5 + 0.5
+		r := uint8(128 + t*127) // 128 (Maroon R) to 255 (Gold R)
+		g := uint8(t * 203)     // 0 (Maroon G) to 203 (Gold G)
+		b := uint8(0)           // Both are in the red-green spectrum
+
+		textColor := rl.NewColor(r, g, b, 255)
+
+		charStr := string(char)
+		charSize := rl.MeasureTextEx(font, charStr, charFontSize, spacing)
+
+		pos := rl.NewVector2(startX+offsetX, baseY+offsetY-charSize.Y/2)
+
+		// Drop shadow
+		rl.DrawTextEx(font, charStr, rl.NewVector2(pos.X+3, pos.Y+3), charFontSize, spacing, rl.NewColor(0, 0, 0, 150))
+
+		// Character glow (using the same red/yellow shade with alpha)
+		glowColor := rl.NewColor(r, g, b, 80)
+		rl.DrawTextEx(font, charStr, rl.NewVector2(pos.X-1, pos.Y-1), charFontSize, spacing, glowColor)
+		rl.DrawTextEx(font, charStr, rl.NewVector2(pos.X+1, pos.Y+1), charFontSize, spacing, glowColor)
+
+		// Main character
+		rl.DrawTextEx(font, charStr, pos, charFontSize, spacing, textColor)
+
+		// Advance startX for the next character (using base size for consistent spacing)
+		baseCharSize := rl.MeasureTextEx(font, charStr, baseFontSize, spacing)
+		startX += baseCharSize.X
+	}
 }
 
 func drawGlitches() {
@@ -341,7 +388,7 @@ func main() {
 
 		drawScroller(font, timer, scrollText, scrollPos)
 		drawLogo(font, timer, pulse)
-		drawSubHeader(font)
+		drawSubHeader(font, timer)
 		drawGlitches()
 		drawScanlines()
 		drawBorder()
