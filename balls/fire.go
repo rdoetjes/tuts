@@ -104,7 +104,7 @@ func (f *FireEffect) Update(isFlatline bool) {
 	f.texUpdated = false
 }
 
-func (f *FireEffect) Draw(isTop bool) {
+func (f *FireEffect) Draw() {
 	f.initTexture()
 	if !f.texUpdated {
 		rl.UpdateTexture(f.texture, f.pixels)
@@ -114,10 +114,9 @@ func (f *FireEffect) Draw(isTop bool) {
 	destRect := rl.NewRectangle(0, screenHeight-220, screenWidth, 250)
 	sourceRect := rl.NewRectangle(0, 0, fireWidth, fireHeight)
 
-	if isTop {
-		destRect.Y = -30
-		sourceRect.Height = -fireHeight // Flip texture
-	}
+	rl.DrawTexturePro(f.texture, sourceRect, destRect, rl.NewVector2(0, 0), 0, rl.White)
 
+	destRect.Y = -30
+	sourceRect.Height = -fireHeight // Flip texture
 	rl.DrawTexturePro(f.texture, sourceRect, destRect, rl.NewVector2(0, 0), 0, rl.White)
 }

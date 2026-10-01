@@ -12,7 +12,7 @@ func (cb *CopperBars) Draw(timer float64) {
 	numBars := 6
 	barHeight := float32(30)
 	for i := 0; i < numBars; i++ {
-		yPos := float32(screenHeight/2) + float32(math.Sin(timer*1.5+float64(i)*0.4)*250)
+		yPos := float32(screenHeight/2) + float32(math.Sin(timer*1.5+float64(i)*0.4)*270)
 
 		for j := 0; j < int(barHeight); j++ {
 			intensity := uint8(255 - math.Abs(float64(j)-float64(barHeight/2))*15)

@@ -12,7 +12,7 @@ const (
 	screenHeight  = 768
 	starCount     = 400
 	heartbeatSize = 60
-	fireWidth     = 320
+	fireWidth     = 480
 	fireHeight    = 100
 )
 
@@ -123,9 +123,8 @@ func main() {
 		}
 
 		starfield.Draw()
-		fire.Draw(false)
-		fire.Draw(true)
 		copperBars.Draw(timer)
+		fire.Draw()
 		balls.Draw(timer)
 		monitor.Draw(screenWidth/2, screenHeight/2, timer, isFlatline)
 		scroller.Draw(timer, scrollPos)
