@@ -8,7 +8,7 @@ BINARY_NAME=balls
 all: build
 
 build:
-	CC=$(CC) CGO_ENABLED=$(CGO_ENABLED) go build -o $(BINARY_NAME) main.go
+	CC=$(CC) CGO_ENABLED=$(CGO_ENABLED) go build -o $(BINARY_NAME) *.go
 
 run: build
 	./$(BINARY_NAME)
