@@ -41,7 +41,7 @@ func (f *FireEffect) Update(isFlatline bool) {
 	} else {
 		for x := 0; x < fireWidth; x++ {
 			if f.buffer[(fireHeight-1)*fireWidth+x] > 8 {
-				f.buffer[(fireHeight-1)*fireWidth+x] -= 8
+				f.buffer[(fireHeight-1)*fireWidth+x] -= 1
 			} else {
 				f.buffer[(fireHeight-1)*fireWidth+x] = 0
 			}
