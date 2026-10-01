@@ -12,7 +12,7 @@ const (
 	screenHeight  = 768
 	starCount     = 400
 	heartbeatSize = 60
-	fireWidth     = 320 // Lower resolution for the fire effect
+	fireWidth     = 450 // Lower resolution for the fire effect
 	fireHeight    = 100
 )
 
@@ -196,7 +196,7 @@ func drawCopperBars(timer float64) {
 	numBars := 6
 	barHeight := float32(30)
 	for i := 0; i < numBars; i++ {
-		yPos := float32(screenHeight/2-100) + float32(math.Sin(timer*1.5+float64(i)*0.4)*250)
+		yPos := float32(screenHeight/2) + float32(math.Sin(timer*1.5+float64(i)*0.4)*250)
 
 		// Draw a gradient bar
 		for j := 0; j < int(barHeight); j++ {
@@ -491,15 +491,14 @@ func main() {
 		drawStars(stars)
 		drawFire()
 		drawCopperBars(timer)
-		drawOrbitingBalls(timer)
 
 		// Pass isFlatline to stop the EKG scrolling
 		drawHeartRateMonitor(screenWidth/2, screenHeight/2, timer, isFlatline)
 
-		drawScroller(font, timer, scrollText, scrollPos)
 		drawLogo(font, timer, pulse)
 		drawSubHeader(font, timer, isFlatline)
-		//drawGlitches()
+		drawOrbitingBalls(timer)
+		drawScroller(font, timer, scrollText, scrollPos)
 		drawScanlines()
 		drawBorder()
 
