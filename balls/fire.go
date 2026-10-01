@@ -83,14 +83,17 @@ func (f *FireEffect) Update(isFlatline bool) {
 
 			var color rl.Color
 			if val < 70 {
-				g := uint8(120 + (float64(val)-150)*1.3)
-				color = rl.NewColor(val*g, 0, 0, 255)
+				color = rl.NewColor(255, 0, 0, 120-val)
+			} else if val < 150 {
+				g := uint8((float64(val) - 70) * 1.5)
+				color = rl.NewColor(255, val+g, 0, 200)
 			} else {
-				g := uint8((float64(val) - 6) * 1.5)
-				color = rl.NewColor(255, g, 0, 200)
+				g := uint8(120 + (float64(val)-150)*1.3)
+				color = rl.NewColor(255, g, 0, 255)
 			}
 
-			hFactor := float32(fireHeight-y) / float32(fireHeight)
+			// Height-based alpha tapering: Tips (y=0) are transparent, Source (y=fireHeight) is opaque
+			hFactor := float32(y) / float32(fireHeight)
 			heightAlpha := uint8(hFactor * 255)
 			if color.A > heightAlpha {
 				color.A = heightAlpha
