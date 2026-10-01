@@ -21,13 +21,24 @@ var (
 	fireBuffer     [fireWidth * fireHeight]uint8
 )
 
-func updateFire() {
-	// Randomize bottom row (fire source) with "hot spots" for clumping
-	for x := 0; x < fireWidth; x++ {
-		if rl.GetRandomValue(0, 10) > 1 {
-			fireBuffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(200, 255))
-		} else {
-			fireBuffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(0, 100))
+func updateFire(isFlatline bool) {
+	if !isFlatline {
+		// Randomize bottom row (fire source) with "hot spots" for clumping
+		for x := 0; x < fireWidth; x++ {
+			if rl.GetRandomValue(0, 10) > 1 {
+				fireBuffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(200, 255))
+			} else {
+				fireBuffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(0, 100))
+			}
+		}
+	} else {
+		// Cool down the source when flatlined
+		for x := 0; x < fireWidth; x++ {
+			if fireBuffer[(fireHeight-1)*fireWidth+x] > 8 {
+				fireBuffer[(fireHeight-1)*fireWidth+x] -= 8
+			} else {
+				fireBuffer[(fireHeight-1)*fireWidth+x] = 0
+			}
 		}
 	}
 
@@ -45,8 +56,15 @@ func updateFire() {
 				randOffset := rl.GetRandomValue(0, 2) - 1
 				dstX := (x + int(randOffset) + fireWidth) % fireWidth
 
-				// Random cooling
-				cooling := uint8(rl.GetRandomValue(1, 4))
+				// Random cooling (increased if flatlined to fade out faster)
+				coolingBase := int32(1)
+				coolingMax := int32(4)
+				if isFlatline {
+					coolingBase = 3
+					coolingMax = 6
+				}
+				cooling := uint8(rl.GetRandomValue(coolingBase, coolingMax))
+
 				if uint32(pixel) > uint32(cooling) {
 					fireBuffer[(y-1)*fireWidth+dstX] = pixel - cooling
 				} else {
@@ -446,7 +464,7 @@ func main() {
 		timer += dt
 
 		updateStars(stars)
-		updateFire()
+		updateFire(isFlatline)
 		scrollPos -= 5.0 // Scroll speed
 
 		// Check if the specific phrase is centered on screen
