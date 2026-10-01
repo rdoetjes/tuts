@@ -7,10 +7,35 @@ import (
 )
 
 const (
-	screenWidth  = 1024
-	screenHeight = 768
-	starCount    = 400
+	screenWidth   = 1024
+	screenHeight  = 768
+	starCount     = 400
+	heartbeatSize = 120
 )
+
+var heartbeatTable [heartbeatSize]float32
+
+func initHeartbeat() {
+	for i := 0; i < heartbeatSize; i++ {
+		t := float64(i) / float64(heartbeatSize)
+		var val float64
+
+		// Realistic PQRST Waveform
+		if t >= 0.1 && t <= 0.2 { // P wave: small bump
+			val = 0.15 * math.Sin((t-0.1)*10*math.Pi)
+		} else if t > 0.22 && t <= 0.24 { // Q wave: small dip
+			val = -0.2 * math.Sin((t-0.22)*50*math.Pi)
+		} else if t > 0.24 && t <= 0.28 { // R wave: massive spike
+			val = 1.0 * math.Sin((t-0.24)*25*math.Pi)
+		} else if t > 0.28 && t <= 0.30 { // S wave: sharp dip
+			val = -0.4 * math.Sin((t-0.28)*50*math.Pi)
+		} else if t >= 0.4 && t <= 0.6 { // T wave: medium bump
+			val = 0.25 * math.Sin((t-0.4)*5*math.Pi)
+		}
+
+		heartbeatTable[i] = float32(val)
+	}
+}
 
 type Star struct {
 	x, y, z float32
@@ -175,9 +200,9 @@ func drawScroller(font rl.Font, timer float64, scrollText string, scrollPos floa
 	}
 }
 
-func drawLogo(font rl.Font, timer float64) {
+func drawLogo(font rl.Font, timer float64, pulse float32) {
 	headerText := "CRU JONES & PHONAX '89"
-	fontSize := float32(80 + int32(math.Sin(timer*2)*5))
+	fontSize := float32(80 + pulse*25) // Pulse the font size like a heartbeat
 
 	textSize := rl.MeasureTextEx(font, headerText, fontSize, 2)
 	headerX := (float32(screenWidth) - textSize.X) / 2
@@ -186,6 +211,47 @@ func drawLogo(font rl.Font, timer float64) {
 	rl.DrawTextEx(font, headerText, rl.NewVector2(headerX+6, 56), fontSize, 2, rl.Maroon)
 	// Logo main
 	rl.DrawTextEx(font, headerText, rl.NewVector2(headerX, 50), fontSize, 2, rl.Gold)
+}
+
+func drawHeartRateMonitors(timer float64, pulse float32) {
+	width := int32(80)
+	height := int32(50)
+
+	// Position them relative to the logo
+	logoY := int32(50)
+	leftX := int32(screenWidth/2 - 460)
+	rightX := int32(screenWidth/2 + 460 - width)
+
+	monitors := []int32{leftX, rightX}
+
+	for _, x := range monitors {
+		// Draw "Postage Stamp" Box
+		rl.DrawRectangle(x, logoY, width, height, rl.NewColor(0, 40, 0, 200))
+		rl.DrawRectangleLines(x, logoY, width, height, rl.Lime)
+
+		// Draw the trace inside
+		for i := int32(0); i < width; i++ {
+			// Calculate historical pulse based on horizontal position
+			// This makes the wave "scroll" through the box
+			histOffset := (timer * 2.0) - float64(i)*0.01
+			t := math.Mod(histOffset, 1.0)
+			if t < 0 {
+				t += 1.0
+			}
+
+			// Map t to our heartbeat table
+			idx := int(t*float64(heartbeatSize)) % heartbeatSize
+			h := heartbeatTable[idx] * float32(height/2-5)
+
+			rl.DrawPixel(x+width-i, logoY+height/2-int32(h), rl.Lime)
+
+			// Add a little glow/tail
+			if i < 10 {
+				alpha := uint8(255 - i*20)
+				rl.DrawPixel(x+width-i, logoY+height/2-int32(h), rl.NewColor(200, 255, 200, alpha))
+			}
+		}
+	}
 }
 
 func drawSubHeader(font rl.Font) {
@@ -225,6 +291,7 @@ func main() {
 	rl.SetTargetFPS(60)
 
 	stars := initStars()
+	initHeartbeat()
 
 	scrollText := "-----------------CRU JONES PRESENTS... THE 1989 ULTIMATE CRACKTRO DEMO!    CODED IN GO USING RAYLIB-GO...    GREETINGS TO: FAIRLIGHT - RAZOR 1911 - SKID ROW - GENESIS - TRSI - THE SILENTS - PHENOMENA - ANTHROX - TITAN...    WE BRING YOU THE BEST RELEASES, CRACKED AND PACKED FOR YOUR PLEASURE!    REMEMBER: LIVE FAST, DIE YOUNG, LEAVE A GOOD LOOKING BODY!!! ..... AND REMEMBER.... STAY RAD!!! --------------------------------------------"
 	scrollPos := float32(screenWidth)
@@ -243,11 +310,16 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
+		// Get current pulse from pre-calculated table
+		pulseIndex := int(timer*60) % heartbeatSize
+		pulse := heartbeatTable[pulseIndex]
+
 		drawStars(stars)
 		drawCopperBars(timer)
 		drawOrbitingBalls(timer)
+		drawHeartRateMonitors(timer, pulse)
 		drawScroller(font, timer, scrollText, scrollPos)
-		drawLogo(font, timer)
+		drawLogo(font, timer, pulse)
 		drawSubHeader(font)
 		drawGlitches()
 		drawScanlines()
