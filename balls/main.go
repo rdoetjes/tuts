@@ -12,9 +12,88 @@ const (
 	screenHeight  = 768
 	starCount     = 400
 	heartbeatSize = 60
+	fireWidth     = 320 // Lower resolution for the fire effect
+	fireHeight    = 100
 )
 
-var heartbeatTable [heartbeatSize]float32
+var (
+	heartbeatTable [heartbeatSize]float32
+	fireBuffer     [fireWidth * fireHeight]uint8
+)
+
+func updateFire() {
+	// Randomize bottom row (fire source) with "hot spots" for clumping
+	for x := 0; x < fireWidth; x++ {
+		if rl.GetRandomValue(0, 10) > 1 {
+			fireBuffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(200, 255))
+		} else {
+			fireBuffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(0, 100))
+		}
+	}
+
+	// Propagate fire upwards with random horizontal drift
+	for x := 0; x < fireWidth; x++ {
+		for y := 1; y < fireHeight; y++ {
+			// Get heat from below
+			srcIdx := y*fireWidth + x
+			pixel := fireBuffer[srcIdx]
+
+			if pixel == 0 {
+				fireBuffer[(y-1)*fireWidth+x] = 0
+			} else {
+				// Random horizontal drift (x - 1, x, or x + 1)
+				randOffset := rl.GetRandomValue(0, 2) - 1
+				dstX := (x + int(randOffset) + fireWidth) % fireWidth
+
+				// Random cooling
+				cooling := uint8(rl.GetRandomValue(1, 4))
+				if uint32(pixel) > uint32(cooling) {
+					fireBuffer[(y-1)*fireWidth+dstX] = pixel - cooling
+				} else {
+					fireBuffer[(y-1)*fireWidth+dstX] = 0
+				}
+			}
+		}
+	}
+}
+
+func drawFire() {
+	scaleX := float32(screenWidth) / float32(fireWidth)
+	scaleY := float32(250) / float32(fireHeight) // Slightly taller
+	startY := float32(screenHeight - 220)
+
+	for y := 0; y < fireHeight; y++ {
+		for x := 0; x < fireWidth; x++ {
+			val := fireBuffer[y*fireWidth+x]
+			if val < 10 { // Threshold for visibility
+				continue
+			}
+
+			// Map heat value to vivid fire palette
+			var color rl.Color
+			if val < 70 {
+				// Deep red for the tips
+				color = rl.NewColor(val*3, 0, 0, uint8(val*2))
+			} else if val < 150 {
+				// Fiery Orange
+				g := uint8((float64(val) - 70) * 1.5)
+				color = rl.NewColor(255, g, 0, 200)
+			} else {
+				// Bright Yellow core
+				g := uint8(120 + (float64(val)-150)*1.3)
+				color = rl.NewColor(255, g, 0, 255)
+			}
+
+			// Add some vertical tapering to the alpha based on height
+			heightAlpha := uint8(float32(fireHeight-y) / float32(fireHeight) * 255)
+			if color.A > heightAlpha {
+				color.A = heightAlpha
+			}
+
+			rl.DrawRectangle(int32(float32(x)*scaleX), int32(startY+float32(y)*scaleY), int32(scaleX)+1, int32(scaleY)+1, color)
+		}
+	}
+}
 
 func initHeartbeat() {
 	for i := 0; i < heartbeatSize; i++ {
@@ -366,6 +445,7 @@ func main() {
 		timer += dt
 
 		updateStars(stars)
+		updateFire()
 		scrollPos -= 5.0 // Scroll speed
 
 		// Check if the specific phrase is centered on screen
@@ -390,6 +470,7 @@ func main() {
 		}
 
 		drawStars(stars)
+		drawFire()
 		drawCopperBars(timer)
 		drawOrbitingBalls(timer)
 
