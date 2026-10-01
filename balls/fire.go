@@ -60,7 +60,7 @@ func (f *FireEffect) Update(isFlatline bool) {
 				dstX := (x + randOffset + fireWidth) % fireWidth
 				cooling := uint8(1 + r.Intn(4))
 				if isFlatline {
-					cooling += 2
+					cooling += 4
 				}
 				if uint32(pixel) > uint32(cooling) {
 					f.buffer[(y-1)*fireWidth+dstX] = pixel - cooling
@@ -84,12 +84,12 @@ func (f *FireEffect) Update(isFlatline bool) {
 			var color rl.Color
 			if val < 70 {
 				color = rl.NewColor(val*3, 0, 0, uint8(val*2))
-			} else if val < 150 {
-				g := uint8((float64(val) - 70) * 1.5)
-				color = rl.NewColor(255, g, 0, 200)
-			} else {
+			} else if val < 64 {
 				g := uint8(120 + (float64(val)-150)*1.3)
-				color = rl.NewColor(255, g, 0, 255)
+				color = rl.NewColor(255, 120+g, 0, 255)
+			} else {
+				g := uint8((float64(val) - 6) * 1.5)
+				color = rl.NewColor(255, g, 0, 200)
 			}
 
 			hFactor := float32(fireHeight-y) / float32(fireHeight)
