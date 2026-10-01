@@ -52,8 +52,8 @@ func (l *LensEffect) Update(dt float32, timer float64) {
 		l.Vel.Y *= -1
 	}
 
-	// Pulse magnification: Base 1.5 + range 1.0 using abs(sin)
-	l.Magnification = 1.5 + float32(math.Abs(math.Sin(timer*2.0)))*1.0
+	// Pulse magnification: Base 2.0 + range 2.0
+	l.Magnification = 2.0 + float32(math.Abs(math.Sin(timer*2.0)))*2.0
 }
 
 func (l *LensEffect) Begin() {

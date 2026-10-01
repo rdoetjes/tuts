@@ -29,7 +29,11 @@ void main()
     {
         // Magnification logic: Scale coordinates relative to the lens center
         vec2 offset = screenPos - lensPos;
-        vec2 magCoord = lensPos + offset / magnification;
+        
+        // Curved lens logic (Fish-eye effect)
+        float falloff = 1.0 - (dist / lensRadius); // 1.0 at center, 0.0 at edge
+        float dynamicMag = 1.0 + (magnification - 1.0) * falloff;
+        vec2 magCoord = lensPos + offset / dynamicMag;
         
         // Normalize back to 0.0 - 1.0 for texture sampling
         vec2 uv = magCoord / renderSize;
