@@ -257,9 +257,8 @@ func drawHeartRateMonitors(timer float64, pulse float32, isFlatline bool) {
 	}
 }
 
-func drawSubHeader(font rl.Font, timer float64) {
+func drawSubHeader(font rl.Font, timer float64, isFlatline bool) {
 	subText := "<< CRACKED BY D'ELITE >>"
-
 	baseFontSize := float32(35)
 	spacing := float32(2)
 
@@ -282,6 +281,13 @@ func drawSubHeader(font rl.Font, timer float64) {
 		// Individual scaling
 		charPulse := float32(math.Sin(charTimer*0.7))*0.2 + 1.0
 		charFontSize := baseFontSize * charPulse
+
+		if isFlatline {
+			charPulse = 0.0
+			charFontSize = baseFontSize
+			offsetX = 0.0
+			offsetY = 0.0
+		}
 
 		// Blend between Maroon (red shade) and Gold (yellow shade)
 		t := float64(math.Sin(timer*3.0+float64(i)*0.3))*0.5 + 0.5
@@ -388,7 +394,7 @@ func main() {
 
 		drawScroller(font, timer, scrollText, scrollPos)
 		drawLogo(font, timer, pulse)
-		drawSubHeader(font, timer)
+		drawSubHeader(font, timer, isFlatline)
 		drawGlitches()
 		drawScanlines()
 		drawBorder()
