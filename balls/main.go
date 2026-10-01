@@ -11,7 +11,7 @@ const (
 	screenWidth   = 1024
 	screenHeight  = 768
 	starCount     = 400
-	heartbeatSize = 120
+	heartbeatSize = 60
 )
 
 var heartbeatTable [heartbeatSize]float32
@@ -138,7 +138,7 @@ func drawBall(angle float64, radius float64, color rl.Color, ballRadius float32,
 	rl.DrawCircle(x-int32(ballRadius/2), y-int32(ballRadius/2), ballRadius*0.15, rl.White)
 
 	// Glowing rim
-	rl.DrawCircleLines(x, y, ballRadius, rl.NewColor(255, 255, 255, 180))
+	//rl.DrawCircleLines(x, y, ballRadius, rl.NewColor(255, 255, 255, 180))
 }
 
 func drawOrbitingBalls(timer float64) {
@@ -258,7 +258,7 @@ func drawHeartRateMonitors(timer float64, pulse float32, isFlatline bool) {
 }
 
 func drawSubHeader(font rl.Font) {
-	subText := "<< CRACKED BY PHONAX >>"
+	subText := "<< CRACKED BY D'ELITE >>"
 	fontSize := float32(30)
 	textSize := rl.MeasureTextEx(font, subText, fontSize, 2)
 	subX := (float32(screenWidth) - textSize.X) / 2
@@ -285,7 +285,7 @@ func drawBorder() {
 }
 
 func main() {
-	rl.InitWindow(screenWidth, screenHeight, "CRU JONES - 1989 CRACKTRO")
+	rl.InitWindow(screenWidth, screenHeight, "D'ELITE - 1989 CRACKTRO")
 	defer rl.CloseWindow()
 
 	font := rl.LoadFont("assets/fonts/Impact.ttf")
@@ -296,7 +296,7 @@ func main() {
 	stars := initStars()
 	initHeartbeat()
 
-	scrollText := "-----------------CRU JONES PRESENTS... THE 1989 ULTIMATE CRACKTRO DEMO!    CODED IN GO USING RAYLIB-GO...    GREETINGS TO: FAIRLIGHT - RAZOR 1911 - SKID ROW - GENESIS - TRSI - THE SILENTS - PHENOMENA - ANTHROX - TITAN...    WE BRING YOU THE BEST RELEASES, CRACKED AND PACKED FOR YOUR PLEASURE!    REMEMBER: LIVE FAST, DIE YOUNG, LEAVE A GOOD LOOKING BODY!!! ..... AND REMEMBER.... STAY RAD!!! --------------------------------------------"
+	scrollText := "-----------------CRU JONES & PHONAX PRESENTS... THE 1989 ULTIMATE CRACKTRO DEMO!    CODED IN GO USING RAYLIB-GO...    GREETINGS TO: FAIRLIGHT - RAZOR 1911 - SKID ROW - GENESIS - TRSI - THE SILENTS - PHENOMENA - ANTHROX - TITAN...    WE BRING YOU THE BEST RELEASES, CRACKED AND PACKED FOR YOUR PLEASURE!    REMEMBER: LIVE FAST, DIE YOUNG, LEAVE A GOOD LOOKING BODY!!! ..... AND REMEMBER.... STAY RAD!!! --------------------------------------------"
 	phrase := "LEAVE A GOOD LOOKING BODY"
 	phraseIndex := strings.Index(scrollText, phrase)
 	isFlatline := false
