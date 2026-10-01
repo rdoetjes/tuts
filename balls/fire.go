@@ -82,11 +82,9 @@ func (f *FireEffect) Update(isFlatline bool) {
 			}
 
 			var color rl.Color
-			if val < 70 {
-				color = rl.NewColor(val*3, 0, 0, uint8(val*2))
-			} else if val < 64 {
+			if val < 64 {
 				g := uint8(120 + (float64(val)-150)*1.3)
-				color = rl.NewColor(255, 120+g, 0, 255)
+				color = rl.NewColor(val*g, 0, 0, 255)
 			} else {
 				g := uint8((float64(val) - 6) * 1.5)
 				color = rl.NewColor(255, g, 0, 200)
