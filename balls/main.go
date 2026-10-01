@@ -180,9 +180,6 @@ func main() {
 		scroller.Draw(timer, scrollPos)
 		header.DrawLogo(timer, pulse)
 		header.DrawSubHeader(timer, isFlatline)
-
-		DrawGlitches()
-		DrawScanlines()
 		DrawBorder()
 
 		rl.EndDrawing()
