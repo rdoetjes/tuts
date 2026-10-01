@@ -35,7 +35,7 @@ func updateFire(isFlatline bool) {
 		// Cool down the source when flatlined
 		for x := 0; x < fireWidth; x++ {
 			if fireBuffer[(fireHeight-1)*fireWidth+x] > 8 {
-				fireBuffer[(fireHeight-1)*fireWidth+x] -= 8
+				fireBuffer[(fireHeight-1)*fireWidth+x] -= uint8(rl.GetRandomValue(0, 8))
 			} else {
 				fireBuffer[(fireHeight-1)*fireWidth+x] = 0
 			}
@@ -282,9 +282,9 @@ func drawScroller(font rl.Font, timer float64, scrollText string, scrollPos floa
 
 		thickness := float32(5)
 		offsets := []rl.Vector2{
-			{-thickness, -thickness}, {0, -thickness}, {thickness, -thickness},
-			{-thickness, 0}, {thickness, 0},
-			{-thickness, thickness}, {0, thickness}, {thickness, thickness},
+			{X: -thickness, Y: -thickness}, {X: 0, Y: -thickness}, {X: thickness, Y: -thickness},
+			{X: -thickness, Y: 0}, {X: thickness, Y: 0},
+			{X: -thickness, Y: thickness}, {X: 0, Y: thickness}, {X: thickness, Y: thickness},
 		}
 
 		for _, off := range offsets {
