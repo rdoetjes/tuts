@@ -109,7 +109,6 @@ func drawFire() {
 
 			rl.DrawRectangle(int32(float32(x)*scaleX), int32(startY+float32(y)*scaleY), int32(scaleX)+1, int32(scaleY)+1, color)
 			rl.DrawRectangle(int32(float32(x)*scaleX), int32(rl.GetScreenHeight())-int32(startY+float32(y)*scaleY), int32(scaleX)+1, int32(scaleY)+1, color)
-
 		}
 	}
 }
@@ -465,7 +464,7 @@ func main() {
 
 		updateStars(stars)
 		updateFire(isFlatline)
-		scrollPos -= 5.0 // Scroll speed
+		scrollPos -= 6.0 // Scroll speed
 
 		// Check if the specific phrase is centered on screen
 		phraseX := scrollPos + float32(phraseIndex*45)
