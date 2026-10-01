@@ -106,10 +106,12 @@ func drawCopperBars(timer float64) {
 
 			var color rl.Color
 			if i%2 == 0 {
-				color = rl.NewColor(intensity, 0, intensity, 180) // Purple/Magenta
+				color = rl.NewColor(255, 0, 0, 180) // Vivid Red
 			} else {
-				color = rl.NewColor(0, intensity, intensity, 180) // Cyan
+				color = rl.NewColor(255, 230, 0, 180) // Bright Yellow
 			}
+			// Use intensity to modulate alpha for the glow effect
+			color.A = uint8(float64(intensity) * 0.7)
 			rl.DrawLine(0, int32(yPos)+int32(j), screenWidth, int32(yPos)+int32(j), color)
 		}
 	}
@@ -147,11 +149,10 @@ func drawOrbitingBalls(timer float64) {
 	for j := 0; j < nrBalls; j++ {
 		angle := float64(j)*spreadAngle + timer*2.0
 
+		// Vivid Fire palette color for the balls (Red -> Orange -> Yellow)
 		t := timer*3.0 + float64(j)*0.5
-		r := uint8(150 + 105*math.Cos(t))
-		g := uint8(50 + 50*math.Sin(t*0.8))
-		b := uint8(220 + 35*math.Sin(t*0.6))
-		color := rl.NewColor(r, g, b, 255)
+		g := uint8(115 + 115*math.Sin(t)) // G up to 230 for bright yellow
+		color := rl.NewColor(255, g, 0, 255)
 
 		drawBall(angle, 280, color, 30, timer)
 	}
@@ -168,21 +169,17 @@ func drawScroller(font rl.Font, timer float64, scrollText string, scrollPos floa
 
 		pos := rl.NewVector2(charX, charY)
 
-		// Pulse in the opposite direction (subtracting from the timer phase)
+		// Vivid Fire Palette: Red to Yellow
 		t := timer*3.0 - float64(i)*0.2
-
-		// Elite 80s "Sunset Neon" Palette: Cycling through Hot Pink, Cyan, and Gold
-		r := uint8(180 + 75*math.Sin(t))
-		g := uint8(100 + 155*math.Cos(t*0.7))
-		b := uint8(200 + 55*math.Sin(t*1.2))
+		g := uint8(110 + 110*math.Cos(t)) // G up to 220
 		// Main Animated Text Color
-		textColor := rl.NewColor(r, g, b, 255)
+		textColor := rl.NewColor(255, g, 0, 255)
 
-		// Pulsing Outline Color (offset phase for a "chasing" effect)
+		// Pulsing Outline Color (Deep Red/Maroon)
 		ot := timer*5.0 + float64(i)*0.3
-		or := uint8(40 + 40*math.Sin(ot))
+		or := uint8(60 + 40*math.Sin(ot))
 		og := uint8(0)
-		ob := uint8(60 + 60*math.Cos(ot*0.8))
+		ob := uint8(0)
 		outlineColor := rl.NewColor(or, og, ob, 255)
 
 		thickness := float32(5)
@@ -214,46 +211,56 @@ func drawLogo(font rl.Font, timer float64, pulse float32) {
 	rl.DrawTextEx(font, headerText, rl.NewVector2(headerX, 50), fontSize, 2, rl.Gold)
 }
 
-func drawHeartRateMonitors(timer float64, pulse float32, isFlatline bool) {
-	width := int32(120)
-	height := int32(70)
+func drawHeartRateMonitor(centerX, centerY int32, timer float64, isFlatline bool) {
+	width := int32(180)
+	height := int32(100)
+	x := centerX - width/2
+	y := centerY - height/2
 
-	// Position them relative to the logo
-	logoY := int32(50)
-	leftX := int32(screenWidth/2 - 460)
-	rightX := int32(screenWidth/2 + 460 - width)
+	// Draw "Postage Stamp" Box with Maroon/Dark theme
+	rl.DrawRectangle(x, y, width, height, rl.NewColor(30, 0, 0, 180))
+	rl.DrawRectangleLinesEx(rl.NewRectangle(float32(x), float32(y), float32(width), float32(height)), 2, rl.Gold)
 
-	monitors := []int32{leftX, rightX}
+	var prevX, prevY float32
+	hasPrev := false
 
-	for _, x := range monitors {
-		// Draw "Postage Stamp" Box
-		rl.DrawRectangle(x, logoY, width, height, rl.NewColor(0, 40, 0, 200))
-		rl.DrawRectangleLines(x, logoY, width, height, rl.Lime)
-
-		// Draw the trace inside
-		for i := int32(0); i < width; i++ {
-			var h float32 = 0
-			if !isFlatline {
-				// Calculate historical pulse based on horizontal position
-				histOffset := (timer * 2.0) - float64(i)*0.01
-				t := math.Mod(histOffset, 1.0)
-				if t < 0 {
-					t += 1.0
-				}
-
-				// Map t to our heartbeat table
-				idx := int(t*float64(heartbeatSize)) % heartbeatSize
-				h = heartbeatTable[idx] * float32(height/2-5)
+	// Draw the trace inside
+	for i := int32(0); i < width; i++ {
+		var h float32 = 0
+		if !isFlatline {
+			// Calculate historical pulse based on horizontal position
+			histOffset := (timer * 2.0) - float64(i)*0.01
+			t := math.Mod(histOffset, 1.0)
+			if t < 0 {
+				t += 1.0
 			}
 
-			rl.DrawPixel(x+width-i, logoY+height/2-int32(h), rl.Lime)
-
-			// Add a little glow/tail (only if active)
-			if !isFlatline && i < 10 {
-				alpha := uint8(255 - i*20)
-				rl.DrawPixel(x+width-i, logoY+height/2-int32(h), rl.NewColor(200, 255, 200, alpha))
-			}
+			// Map t to our heartbeat table
+			idx := int(t*float64(heartbeatSize)) % heartbeatSize
+			h = heartbeatTable[idx] * float32(height/2-10)
 		}
+
+		// Vivid Fire palette color for the trace (Red to Yellow)
+		colorT := float64(math.Sin(timer*4.0-float64(i)*0.04))*0.5 + 0.5
+		g := uint8(colorT * 230) // G up to 230
+		traceColor := rl.NewColor(255, g, 0, 255)
+
+		px := float32(x + width - i)
+		py := float32(y) + float32(height)/2 - h
+
+		if hasPrev {
+			rl.DrawLineEx(rl.NewVector2(prevX, prevY), rl.NewVector2(px, py), 3, traceColor)
+		}
+
+		// Add a little glow/tail (only if active)
+		if !isFlatline && i < 20 {
+			alpha := uint8(255 - i*12)
+			glowColor := rl.NewColor(255, g, 0, alpha)
+			rl.DrawCircle(int32(px), int32(py), 2, glowColor)
+		}
+
+		prevX, prevY = px, py
+		hasPrev = true
 	}
 }
 
@@ -289,13 +296,10 @@ func drawSubHeader(font rl.Font, timer float64, isFlatline bool) {
 			offsetY = 0.0
 		}
 
-		// Blend between Maroon (red shade) and Gold (yellow shade)
+		// Vivid Fire: Transition from Red (255,0,0) to Yellow (255,220,0)
 		t := float64(math.Sin(timer*3.0+float64(i)*0.3))*0.5 + 0.5
-		r := uint8(128 + t*127) // 128 (Maroon R) to 255 (Gold R)
-		g := uint8(t * 203)     // 0 (Maroon G) to 203 (Gold G)
-		b := uint8(0)           // Both are in the red-green spectrum
-
-		textColor := rl.NewColor(r, g, b, 255)
+		g := uint8(t * 220)
+		textColor := rl.NewColor(255, g, 0, 255)
 
 		charStr := string(char)
 		charSize := rl.MeasureTextEx(font, charStr, charFontSize, spacing)
@@ -306,7 +310,7 @@ func drawSubHeader(font rl.Font, timer float64, isFlatline bool) {
 		rl.DrawTextEx(font, charStr, rl.NewVector2(pos.X+3, pos.Y+3), charFontSize, spacing, rl.NewColor(0, 0, 0, 150))
 
 		// Character glow (using the same red/yellow shade with alpha)
-		glowColor := rl.NewColor(r, g, b, 80)
+		glowColor := rl.NewColor(255, g, 0, 80)
 		rl.DrawTextEx(font, charStr, rl.NewVector2(pos.X-1, pos.Y-1), charFontSize, spacing, glowColor)
 		rl.DrawTextEx(font, charStr, rl.NewVector2(pos.X+1, pos.Y+1), charFontSize, spacing, glowColor)
 
@@ -390,7 +394,7 @@ func main() {
 		drawOrbitingBalls(timer)
 
 		// Pass isFlatline to stop the EKG scrolling
-		drawHeartRateMonitors(timer, pulse, isFlatline)
+		drawHeartRateMonitor(screenWidth/2, screenHeight/2, timer, isFlatline)
 
 		drawScroller(font, timer, scrollText, scrollPos)
 		drawLogo(font, timer, pulse)
