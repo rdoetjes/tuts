@@ -3,7 +3,6 @@ package main
 import (
 	"math"
 	"strings"
-	"unsafe"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -19,8 +18,7 @@ const (
 
 var (
 	heartbeatTable [heartbeatSize]float32
-	heartThump     rl.Sound
-	flatlineBeep   rl.Sound
+	bgMusic        rl.Music
 )
 
 func initHeartbeat() {
@@ -47,47 +45,11 @@ func initHeartbeat() {
 func initAudio() {
 	rl.InitAudioDevice()
 
-	sampleRate := 44100
-	duration := 1.0
-	frameCount := int(float64(sampleRate) * duration)
-	samples := make([]float32, frameCount)
-
-	for i := 0; i < frameCount; i++ {
-		t := float64(i) / float64(sampleRate)
-		var val float64
-		if t > 0.24 && t < 0.35 {
-			env := math.Exp(-(t - 0.24) * 25)
-			val += 0.8 * math.Sin(2*math.Pi*55*(t-0.24)) * env
-		}
-		if t > 0.45 && t < 0.55 {
-			env := math.Exp(-(t - 0.45) * 30)
-			val += 0.5 * math.Sin(2*math.Pi*45*(t-0.45)) * env
-		}
-		samples[i] = float32(val)
+	// Load Background Music
+	bgMusic = rl.LoadMusicStream("assets/music/DumDum.mp3")
+	if bgMusic.Stream.Buffer != nil {
+		rl.PlayMusicStream(bgMusic)
 	}
-
-	wave := rl.Wave{
-		FrameCount: uint32(frameCount),
-		SampleRate: uint32(sampleRate),
-		SampleSize: 32,
-		Channels:   1,
-		Data:       unsafe.Pointer(&samples[0]),
-	}
-	heartThump = rl.LoadSoundFromWave(wave)
-
-	beepSamples := make([]float32, frameCount)
-	for i := 0; i < frameCount; i++ {
-		t := float64(i) / float64(sampleRate)
-		beepSamples[i] = float32(0.1 * math.Sin(2*math.Pi*1000*t))
-	}
-	waveBeep := rl.Wave{
-		FrameCount: uint32(frameCount),
-		SampleRate: uint32(sampleRate),
-		SampleSize: 32,
-		Channels:   1,
-		Data:       unsafe.Pointer(&beepSamples[0]),
-	}
-	flatlineBeep = rl.LoadSoundFromWave(waveBeep)
 }
 
 func main() {
@@ -96,8 +58,7 @@ func main() {
 
 	initAudio()
 	defer rl.CloseAudioDevice()
-	defer rl.UnloadSound(heartThump)
-	defer rl.UnloadSound(flatlineBeep)
+	defer rl.UnloadMusicStream(bgMusic)
 
 	font := rl.LoadFont("assets/fonts/Impact.ttf")
 	defer rl.UnloadFont(font)
@@ -122,29 +83,19 @@ func main() {
 
 	scrollTimer := float64(0)
 	var timer float64 = 0
-	lastHeartbeatIdx := -1
 
 	for !rl.WindowShouldClose() {
 		dt := float64(rl.GetFrameTime())
 		timer += dt
 
+		rl.UpdateMusicStream(bgMusic)
+
 		scrollTimer += dt
 		pulseIndex := int(timer*60) % heartbeatSize
 
 		if !isFlatline {
-			// Trigger heartbeat sound at the start of the R-wave
-			if pulseIndex == 15 && lastHeartbeatIdx != 15 {
-				rl.PlaySound(heartThump)
-			}
-			if rl.IsSoundPlaying(flatlineBeep) {
-				rl.StopSound(flatlineBeep)
-			}
-		} else {
-			if !rl.IsSoundPlaying(flatlineBeep) {
-				rl.PlaySound(flatlineBeep)
-			}
+			scrollTimer += dt
 		}
-		lastHeartbeatIdx = pulseIndex
 
 		scrollPos := float32(screenWidth) - float32(scrollTimer*300.0)
 
