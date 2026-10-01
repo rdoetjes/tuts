@@ -76,6 +76,8 @@ func main() {
 	scroller := NewScroller(font, scrollText)
 	monitor := &HeartMonitor{}
 	header := &Header{font: font}
+	lens := NewLensEffect(60.0) // 120 pixel radius lens
+	defer lens.Unload()
 
 	phrase := "LEAVE A GOOD LOOKING BODY"
 	phraseIndex := strings.Index(scrollText, phrase)
@@ -90,7 +92,6 @@ func main() {
 
 		rl.UpdateMusicStream(bgMusic)
 
-		scrollTimer += dt
 		pulseIndex := int(timer*60) % heartbeatSize
 
 		if !isFlatline {
@@ -102,6 +103,7 @@ func main() {
 		// Update
 		starfield.Update(float32(dt))
 		fire.Update(isFlatline)
+		lens.Update(float32(dt), timer)
 
 		// Check Flatline
 		phraseX := scrollPos + float32(phraseIndex*50)
@@ -114,14 +116,13 @@ func main() {
 			isFlatline = false // Reset flatline only on scroll wrap
 		}
 
-		rl.BeginDrawing()
-		rl.ClearBackground(rl.Black)
-
 		var pulse float32 = 0
 		if !isFlatline {
 			pulse = heartbeatTable[pulseIndex]
 		}
 
+		// Draw scene to texture
+		lens.Begin()
 		starfield.Draw()
 		copperBars.Draw(timer)
 		fire.Draw()
@@ -131,6 +132,21 @@ func main() {
 		header.DrawLogo(timer, pulse)
 		header.DrawSubHeader(timer, isFlatline)
 		DrawBorder()
+		rl.EndTextureMode()
+
+		// Final composite to screen
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.Black)
+
+		// Update shader uniforms and draw with shader
+		rl.SetShaderValue(lens.Shader, lens.posLoc, []float32{lens.Pos.X, float32(screenHeight) - lens.Pos.Y}, rl.ShaderUniformVec2)
+		rl.SetShaderValue(lens.Shader, lens.radiusLoc, []float32{lens.Radius}, rl.ShaderUniformFloat)
+		rl.SetShaderValue(lens.Shader, lens.magLoc, []float32{lens.Magnification}, rl.ShaderUniformFloat)
+		rl.SetShaderValue(lens.Shader, lens.sizeLoc, []float32{float32(screenWidth), float32(screenHeight)}, rl.ShaderUniformVec2)
+
+		rl.BeginShaderMode(lens.Shader)
+		rl.DrawTextureRec(lens.Target.Texture, rl.NewRectangle(0, 0, float32(lens.Target.Texture.Width), float32(-lens.Target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
+		rl.EndShaderMode()
 
 		rl.EndDrawing()
 	}
