@@ -35,7 +35,7 @@ func (f *FireEffect) Update(isFlatline bool) {
 			if rl.GetRandomValue(0, 10) > 1 {
 				f.buffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(200, 255))
 			} else {
-				f.buffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(0, 100))
+				f.buffer[(fireHeight-1)*fireWidth+x] = uint8(rl.GetRandomValue(2, 100))
 			}
 		}
 	} else {
