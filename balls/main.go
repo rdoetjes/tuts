@@ -141,18 +141,42 @@ func drawScroller(font rl.Font, timer float64, scrollText string, scrollPos floa
 		charY := float32(screenHeight-120) + float32(math.Sin(timer*4+float64(i)*0.25)*60)
 
 		pos := rl.NewVector2(charX, charY)
-		shadowPos := rl.NewVector2(charX+4, charY+4)
 
-		// Text shadow
-		rl.DrawTextEx(font, string(char), shadowPos, 60, 2, rl.DarkPurple)
-		// Animated text color
-		color := rl.NewColor(uint8(127+127*math.Sin(timer*2+float64(i)*0.1)), 255, 255, 255)
-		rl.DrawTextEx(font, string(char), pos, 60, 2, color)
+		// Pulse in the opposite direction (subtracting from the timer phase)
+		t := timer*3.0 - float64(i)*0.2
+
+		// Elite 80s "Sunset Neon" Palette: Cycling through Hot Pink, Cyan, and Gold
+		r := uint8(180 + 75*math.Sin(t))
+		g := uint8(100 + 155*math.Cos(t*0.7))
+		b := uint8(200 + 55*math.Sin(t*1.2))
+		// Main Animated Text Color
+		textColor := rl.NewColor(r, g, b, 255)
+
+		// Pulsing Outline Color (offset phase for a "chasing" effect)
+		ot := timer*5.0 + float64(i)*0.3
+		or := uint8(40 + 40*math.Sin(ot))
+		og := uint8(0)
+		ob := uint8(60 + 60*math.Cos(ot*0.8))
+		outlineColor := rl.NewColor(or, og, ob, 255)
+
+		thickness := float32(5)
+		offsets := []rl.Vector2{
+			{-thickness, -thickness}, {0, -thickness}, {thickness, -thickness},
+			{-thickness, 0}, {thickness, 0},
+			{-thickness, thickness}, {0, thickness}, {thickness, thickness},
+		}
+
+		for _, off := range offsets {
+			rl.DrawTextEx(font, string(char), rl.NewVector2(pos.X+off.X, pos.Y+off.Y), 60, 2, outlineColor)
+		}
+
+		// Main Animated Text
+		rl.DrawTextEx(font, string(char), pos, 60, 2, textColor)
 	}
 }
 
 func drawLogo(font rl.Font, timer float64) {
-	headerText := "CRU JONES '89"
+	headerText := "CRU JONES & PHONAX '89"
 	fontSize := float32(80 + int32(math.Sin(timer*2)*5))
 
 	textSize := rl.MeasureTextEx(font, headerText, fontSize, 2)
