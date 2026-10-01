@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"strings"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -213,7 +214,7 @@ func drawLogo(font rl.Font, timer float64, pulse float32) {
 	rl.DrawTextEx(font, headerText, rl.NewVector2(headerX, 50), fontSize, 2, rl.Gold)
 }
 
-func drawHeartRateMonitors(timer float64, pulse float32) {
+func drawHeartRateMonitors(timer float64, pulse float32, isFlatline bool) {
 	width := int32(80)
 	height := int32(50)
 
@@ -231,22 +232,24 @@ func drawHeartRateMonitors(timer float64, pulse float32) {
 
 		// Draw the trace inside
 		for i := int32(0); i < width; i++ {
-			// Calculate historical pulse based on horizontal position
-			// This makes the wave "scroll" through the box
-			histOffset := (timer * 2.0) - float64(i)*0.01
-			t := math.Mod(histOffset, 1.0)
-			if t < 0 {
-				t += 1.0
-			}
+			var h float32 = 0
+			if !isFlatline {
+				// Calculate historical pulse based on horizontal position
+				histOffset := (timer * 2.0) - float64(i)*0.01
+				t := math.Mod(histOffset, 1.0)
+				if t < 0 {
+					t += 1.0
+				}
 
-			// Map t to our heartbeat table
-			idx := int(t*float64(heartbeatSize)) % heartbeatSize
-			h := heartbeatTable[idx] * float32(height/2-5)
+				// Map t to our heartbeat table
+				idx := int(t*float64(heartbeatSize)) % heartbeatSize
+				h = heartbeatTable[idx] * float32(height/2-5)
+			}
 
 			rl.DrawPixel(x+width-i, logoY+height/2-int32(h), rl.Lime)
 
-			// Add a little glow/tail
-			if i < 10 {
+			// Add a little glow/tail (only if active)
+			if !isFlatline && i < 10 {
 				alpha := uint8(255 - i*20)
 				rl.DrawPixel(x+width-i, logoY+height/2-int32(h), rl.NewColor(200, 255, 200, alpha))
 			}
@@ -294,6 +297,10 @@ func main() {
 	initHeartbeat()
 
 	scrollText := "-----------------CRU JONES PRESENTS... THE 1989 ULTIMATE CRACKTRO DEMO!    CODED IN GO USING RAYLIB-GO...    GREETINGS TO: FAIRLIGHT - RAZOR 1911 - SKID ROW - GENESIS - TRSI - THE SILENTS - PHENOMENA - ANTHROX - TITAN...    WE BRING YOU THE BEST RELEASES, CRACKED AND PACKED FOR YOUR PLEASURE!    REMEMBER: LIVE FAST, DIE YOUNG, LEAVE A GOOD LOOKING BODY!!! ..... AND REMEMBER.... STAY RAD!!! --------------------------------------------"
+	phrase := "LEAVE A GOOD LOOKING BODY"
+	phraseIndex := strings.Index(scrollText, phrase)
+	isFlatline := false
+
 	scrollPos := float32(screenWidth)
 
 	var timer float64 = 0
@@ -303,21 +310,35 @@ func main() {
 
 		updateStars(stars)
 		scrollPos -= 5.0 // Scroll speed
+
+		// Check if the specific phrase is centered on screen
+		phraseX := scrollPos + float32(phraseIndex*45)
+		if phraseX < float32(screenWidth/2+200) && phraseX > float32(screenWidth/2-400) {
+			isFlatline = true
+		}
+
 		if scrollPos < -float32(len(scrollText)*45) {
 			scrollPos = float32(screenWidth)
+			isFlatline = false // Restart after wrap
 		}
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
 		// Get current pulse from pre-calculated table
-		pulseIndex := int(timer*60) % heartbeatSize
-		pulse := heartbeatTable[pulseIndex]
+		var pulse float32 = 0
+		if !isFlatline {
+			pulseIndex := int(timer*60) % heartbeatSize
+			pulse = heartbeatTable[pulseIndex]
+		}
 
 		drawStars(stars)
 		drawCopperBars(timer)
 		drawOrbitingBalls(timer)
-		drawHeartRateMonitors(timer, pulse)
+
+		// Pass isFlatline to stop the EKG scrolling
+		drawHeartRateMonitors(timer, pulse, isFlatline)
+
 		drawScroller(font, timer, scrollText, scrollPos)
 		drawLogo(font, timer, pulse)
 		drawSubHeader(font)
