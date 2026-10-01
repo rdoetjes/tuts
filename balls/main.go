@@ -94,9 +94,7 @@ func main() {
 
 		pulseIndex := int(timer*60) % heartbeatSize
 
-		if !isFlatline {
-			scrollTimer += dt
-		}
+		scrollTimer += dt
 
 		scrollPos := float32(screenWidth) - float32(scrollTimer*300.0)
 
