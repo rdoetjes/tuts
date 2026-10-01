@@ -203,7 +203,7 @@ func drawScroller(font rl.Font, timer float64, scrollText string, scrollPos floa
 
 func drawLogo(font rl.Font, timer float64, pulse float32) {
 	headerText := "CRU JONES & PHONAX '89"
-	fontSize := float32(80 + pulse*25) // Pulse the font size like a heartbeat
+	fontSize := float32(80 + pulse*8) // Pulse the font size like a heartbeat
 
 	textSize := rl.MeasureTextEx(font, headerText, fontSize, 2)
 	headerX := (float32(screenWidth) - textSize.X) / 2
