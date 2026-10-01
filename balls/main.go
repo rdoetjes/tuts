@@ -215,8 +215,8 @@ func drawLogo(font rl.Font, timer float64, pulse float32) {
 }
 
 func drawHeartRateMonitors(timer float64, pulse float32, isFlatline bool) {
-	width := int32(80)
-	height := int32(50)
+	width := int32(120)
+	height := int32(70)
 
 	// Position them relative to the logo
 	logoY := int32(50)
@@ -296,7 +296,7 @@ func main() {
 	stars := initStars()
 	initHeartbeat()
 
-	scrollText := "-----------------CRU JONES & PHONAX PRESENTS... THE 1989 ULTIMATE CRACKTRO DEMO!    CODED IN GO USING RAYLIB-GO...    GREETINGS TO: FAIRLIGHT - RAZOR 1911 - SKID ROW - GENESIS - TRSI - THE SILENTS - PHENOMENA - ANTHROX - TITAN...    WE BRING YOU THE BEST RELEASES, CRACKED AND PACKED FOR YOUR PLEASURE!    REMEMBER: LIVE FAST, DIE YOUNG, LEAVE A GOOD LOOKING BODY!!! ..... AND REMEMBER.... STAY RAD!!! --------------------------------------------"
+	scrollText := "-----------------CRU JONES & PHONAX PRESENTS... THE 1989 ULTIMATE CRACKTRO DEMO!    CODED IN GO USING RAYLIB-GO...    GREETINGS TO: FAIRLIGHT - RAZOR 1911 - SKID ROW - GENESIS - TRSI - THE SILENTS - PHENOMENA - ANTHROX - TITAN...    WE BRING YOU THE BEST RELEASES, CRACKED AND PACKED FOR YOUR PLEASURE! ...... AND  REMEMBER: LIVE FAST, DIE YOUNG, LEAVE A GOOD LOOKING BODY!!! ..... AND ALWAYS, STAY RAD!!! --------------------------------------------"
 	phrase := "LEAVE A GOOD LOOKING BODY"
 	phraseIndex := strings.Index(scrollText, phrase)
 	isFlatline := false
