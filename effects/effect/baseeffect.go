@@ -1,4 +1,4 @@
-package effects
+package effect
 
 type BaseEffect interface {
 	Process()

@@ -1,8 +1,8 @@
-package effects
+package effect
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
-var firePalette = []rl.Color{
+var FirePalette = []rl.Color{
 	{R: 7, G: 7, B: 7, A: 255}, {R: 31, G: 7, B: 7, A: 255}, {R: 47, G: 15, B: 7, A: 255},
 	{R: 71, G: 15, B: 7, A: 255}, {R: 87, G: 23, B: 7, A: 255}, {R: 103, G: 31, B: 7, A: 255},
 	{R: 119, G: 31, B: 7, A: 255}, {R: 143, G: 39, B: 7, A: 255}, {R: 159, G: 47, B: 7, A: 255},
@@ -116,7 +116,7 @@ func (s *Flames) updatePixels() {
 			intensity := s.heatmap[y][x]
 			color := rl.Blank // Transparent
 			if intensity > 0 {
-				color = firePalette[intensity]
+				color = FirePalette[intensity]
 			}
 			rl.ImageDrawPixel(s.image, int32(x), int32(y), color)
 		}
