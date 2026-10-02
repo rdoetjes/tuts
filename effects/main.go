@@ -17,8 +17,8 @@ func main() {
 	fire := effect.NewFlames(400, 150)
 	pentagram := effect.NewPentagram()
 	rasterBars := effect.NewRasterBars(effect.FirePalette)
-	stars := effect.NewStarfield(400)
-	moon := effect.NewMoon(200)
+	embers := effect.NewStarfield(400)
+	background_glow := effect.NewMoon(200)
 
 	lyrics := "                  I GUESS, D'ELITE TEAM IS GOING TO HELL... AND LET US TELL YOU... IN THE IMMORTAL WORDS OF BON SCOTT..... HELL AIN'T A BAD PLACE TO BE!!!...          "
 
@@ -56,8 +56,8 @@ func main() {
 		fire.Process()
 		pentagram.Process()
 		rasterBars.Process()
-		stars.Process()
-		moon.Process()
+		embers.Process()
+		background_glow.Process()
 		scroll.Process()
 
 		if scroll2.Process() {
@@ -76,8 +76,8 @@ func main() {
 		rl.BeginTextureMode(target)
 		rl.ClearBackground(rl.Black)
 
-		moon.Draw()
-		stars.Draw()
+		background_glow.Draw()
+		embers.Draw()
 
 		if rasterBars.IsMovingUp() {
 			pentagram.Draw()
