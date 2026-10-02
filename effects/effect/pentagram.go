@@ -185,13 +185,13 @@ func (p *Pentagram) drawBeveledLine(p1, p2 rl.Vector2, avgScale float32, depth f
 	}
 
 	// Warm metallic glint on the ridge
-	//fake specular highlight technique
 	glintFactor := float32(math.Cos(float64(angle) - float64(p.angle*0.5)))
-	if glintFactor > 0.2 {
+	if glintFactor > 0.8 {
 		fade := avgScale * 4.0
 		if fade > 1.0 {
 			fade = 1.0
 		}
+		// Calculate alpha: (0.0 to 0.2) * 5.0 * 200 = (0.0 to 200)
 		alpha := uint8((glintFactor - 0.8) * 5.0 * 200 * fade)
 		rl.DrawLineEx(p1, p2, 1.5*avgScale, rl.Color{255, 240, 180, alpha})
 	}
