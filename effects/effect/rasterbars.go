@@ -6,6 +6,8 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+const BounceSpeed = 0.8
+
 type RasterBars struct {
 	palette []rl.Color
 	timer   float32
@@ -31,7 +33,7 @@ func (r *RasterBars) Draw() {
 	gap := float32(5.0)        // 5 pixel gap as requested
 
 	for i := 0; i < numBars; i++ {
-		bounce := float64(r.timer * 0.8)
+		bounce := float64(r.timer * BounceSpeed)
 		offset := float32(math.Sin(bounce)) * (screenHeight * 0.3)
 
 		// Base Y calculation including the gap
@@ -74,9 +76,9 @@ func (r *RasterBars) Draw() {
 }
 
 func (r *RasterBars) IsMovingUp() bool {
-	// The derivative of sin(r.timer * 0.8) is 0.8 * cos(r.timer * 0.8)
+	// The derivative of sin(r.timer * BounceSpeed) is BounceSpeed * cos(r.timer * BounceSpeed)
 	// If cos is negative, it's moving UP (Y value is decreasing)
-	return math.Cos(float64(r.timer*0.8)) < 0
+	return math.Cos(float64(r.timer*BounceSpeed)) < 0
 }
 
 var _ BaseEffect = (*RasterBars)(nil)
