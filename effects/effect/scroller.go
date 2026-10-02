@@ -51,13 +51,22 @@ func NewScroller(txt string, pal []rl.Color, fontPath string, fontSize float32, 
 	}
 }
 
-func (s *Scroller) Process() {
+func (s *Scroller) Process() bool {
 	s.x -= s.speed
 	s.frames++
 	// Reset when the entire string has scrolled off
 	if s.x < -s.totalWidth {
 		s.x = float32(rl.GetScreenWidth())
+		return true
 	}
+	return false
+}
+
+func (s *Scroller) GetCharX(index int) float32 {
+	if index < 0 || index >= len(s.charOffsets) {
+		return -1000
+	}
+	return s.x + s.charOffsets[index]
 }
 
 func (s *Scroller) Draw() {

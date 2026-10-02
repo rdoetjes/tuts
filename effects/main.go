@@ -2,6 +2,7 @@ package main
 
 import (
 	"effects/effect"
+	"strings"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -34,6 +35,9 @@ func main() {
 
 	scroll2 := effect.NewScroller(lyrics2, candyPalette, "assets/fonts/Impact.ttf", 60, float32(rl.GetScreenHeight())-80, 5, 15, 3, false)
 
+	phrase := "KEEP THE FUCKING SCENE ALIVE!!!"
+	phraseIdx := strings.Index(lyrics2, phrase)
+
 	// Load CRT shader
 	shader := rl.LoadShader("", "assets/shaders/crt.fs")
 	resolutionLoc := rl.GetShaderLocation(shader, "resolution")
@@ -55,7 +59,18 @@ func main() {
 		stars.Process()
 		moon.Process()
 		scroll.Process()
-		scroll2.Process()
+
+		if scroll2.Process() {
+			// Scroller reset: Turn fire back ON if it was OFF
+			if !fire.IsBurning() {
+				fire.Toggle()
+			}
+		}
+
+		// Turn fire OFF when specific phrase reaches the center of the screen
+		if phraseIdx != -1 && fire.IsBurning() && scroll2.GetCharX(phraseIdx) < 512 {
+			fire.Toggle()
+		}
 
 		// Draw to render texture
 		rl.BeginTextureMode(target)
