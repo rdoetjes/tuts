@@ -25,8 +25,8 @@ func main() {
 		}
 
 		fire.Process()
-		pentagram.Process()
 		scroll.Process()
+		pentagram.Process()
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)

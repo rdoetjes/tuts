@@ -132,34 +132,92 @@ func (p *Pentagram) Draw() {
 	}
 
 	palette := []rl.Color{
-		{0, 50, 150, 255},    // Deep Blue
-		{50, 0, 150, 255},    // Indigo
-		{100, 0, 100, 255},   // Purple
-		{200, 0, 50, 255},    // Dark Red
-		{255, 50, 0, 255},    // Bright Red
-		{255, 200, 100, 255}, // Hot highlight
+		{20, 0, 0, 255},      // Charred / Deep Shadow
+		{60, 5, 0, 255},      // Ember Base
+		{120, 10, 0, 255},    // Dark Glowing Red
+		{180, 20, 0, 255},    // Glowing Red
+		{220, 40, 0, 255},    // Hot Red
+		{255, 80, 0, 255},    // Red-Orange
+		{255, 120, 0, 255},   // Orange
+		{255, 160, 20, 255},  // Amber
+		{255, 200, 40, 255},  // Hot Amber
+		{255, 220, 80, 255},  // Incandescent Orange
+		{255, 240, 150, 255}, // Yellow-White Heat
+		{255, 255, 200, 255}, // White Heat Peak
 	}
 
-	// Helper to draw beveled lines
-	drawBeveledLine := func(p1, p2 rl.Vector2, avgScale float32) {
-		// Base thickness adjusted for the new normalised scale
-		baseThickness := 10.0 * avgScale
-		if baseThickness < 3.0 {
-			baseThickness = 3.0
+	// Pulse factor for "glowing ember" look
+	pulse := float32(math.Sin(rl.GetTime()*4.0)*0.2 + 0.8)
+
+	// Helper to draw beveled lines with lighting and depth shading
+	drawBeveledLine := func(p1, p2 rl.Vector2, avgScale float32, depth float32) {
+		baseThickness := 12.0 * avgScale
+		if baseThickness < 4.0 {
+			baseThickness = 4.0
 		}
 
-		for step := 0; step < 10; step++ {
-			// Thickness tapers from baseThickness down to a highlight
-			t := 1.0 - (float32(step) / 10.0)
+		dx := p2.X - p1.X
+		dy := p2.Y - p1.Y
+		angle := float32(math.Atan2(float64(dy), float64(dx)))
+
+		depthShade := depth * 0.8
+		if depthShade > 1.2 {
+			depthShade = 1.2
+		}
+
+		numSteps := 24
+		for step := 0; step < numSteps; step++ {
+			t := 1.0 - (float32(step) / float32(numSteps))
 			thickness := baseThickness * t
-			if thickness < 1.0 {
-				thickness = 1.0
-			}
-			colorIdx := step * len(palette) / 10
+
+			colorIdx := step * len(palette) / numSteps
 			if colorIdx >= len(palette) {
 				colorIdx = len(palette) - 1
 			}
-			rl.DrawLineEx(p1, p2, thickness, palette[colorIdx])
+			baseColor := palette[colorIdx]
+
+			// Apply depth shading and pulsing ember effect
+			// Fade out as it moves away from the camera
+			// avgScale decreases as it moves away
+			fade := avgScale * 4.0
+			if fade > 1.0 {
+				fade = 1.0
+			}
+			if fade < 0.0 {
+				fade = 0.0
+			}
+
+			r := float32(baseColor.R) * depthShade * pulse * fade
+			g := float32(baseColor.G) * depthShade * pulse * fade
+			b := float32(baseColor.B) * depthShade * pulse * fade
+			alpha := uint8(255.0 * fade)
+
+			// Add directional lighting (specular) - Keep it warm (red/yellow), avoid blue/green
+			if step > 16 {
+				spec := float32(math.Sin(float64(angle)*2.0+float64(p.angle))) * 0.2
+				if spec > 0 {
+					r += spec * 255 * fade
+					g += spec * 150 * fade // Less green for a warmer highlight
+				}
+			}
+
+			rl.DrawLineEx(p1, p2, thickness, rl.Color{
+				uint8(math.Min(255, float64(r))),
+				uint8(math.Min(255, float64(g))),
+				uint8(math.Min(255, float64(b))),
+				alpha,
+			})
+		}
+
+		// Hot glint on the ridge
+		glintFactor := float32(math.Cos(float64(angle) - float64(p.angle*0.5)))
+		if glintFactor > 0.8 {
+			fade := avgScale * 4.0
+			if fade > 1.0 {
+				fade = 1.0
+			}
+			alpha := uint8((glintFactor - 0.8) * 5.0 * 200 * pulse * fade)
+			rl.DrawLineEx(p1, p2, 1.5*avgScale, rl.Color{255, 230, 150, alpha})
 		}
 	}
 
@@ -169,7 +227,9 @@ func (p *Pentagram) Draw() {
 		p1 := projected[indices[i]]
 		p2 := projected[indices[i+1]]
 		avgScale := (scales[indices[i]] + scales[indices[i+1]]) / 2.0
-		drawBeveledLine(p1, p2, avgScale)
+		// Depth factor for shading
+		depth := avgScale * 5.0
+		drawBeveledLine(p1, p2, avgScale, depth)
 	}
 
 	// Draw Circle Frame
@@ -177,15 +237,8 @@ func (p *Pentagram) Draw() {
 		p1 := projectedCircle[i]
 		p2 := projectedCircle[(i+1)%len(projectedCircle)]
 		avgScale := (scalesCircle[i] + scalesCircle[(i+1)%len(projectedCircle)]) / 2.0
-		drawBeveledLine(p1, p2, avgScale)
-	}
-
-	// Draw dots at pentagram vertices (rivets)
-	for i := 0; i < 5; i++ {
-		radius := 12.0 * scales[i]
-		rl.DrawCircleV(projected[i], radius, rl.Color{0, 0, 100, 255})
-		rl.DrawCircleV(projected[i], radius*0.8, rl.Color{255, 0, 0, 255})
-		rl.DrawCircleV(projected[i], radius*0.3, rl.Color{255, 255, 255, 200})
+		depth := avgScale * 5.0
+		drawBeveledLine(p1, p2, avgScale, depth)
 	}
 }
 
