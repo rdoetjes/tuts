@@ -80,7 +80,7 @@ func (s *Flames) Process() {
 	}
 }
 
-func (s *Flames) spreadFire(x, y int) {
+func (s *Flames) spreadFire(x int, y int) {
 	pixel := s.heatmap[y][x]
 	if pixel == 0 {
 		s.heatmap[y-1][x] = 0
