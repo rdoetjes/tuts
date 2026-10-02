@@ -12,8 +12,7 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
-	const cols, rows = 400, 150
-	var fire *effects.Flames = effects.NewFlames(cols, rows)
+	var fire *effects.Flames = effects.NewFlames(400, 150)
 
 	for !rl.WindowShouldClose() {
 		if rl.GetKeyPressed() > 0 {
