@@ -28,7 +28,7 @@ func main() {
 		{110, 50, 20, 255}, // Rich Chocolate Brown
 	}
 
-	lyrics2 := "PHONAX AND CRU JONES, FUCKING DONE IT AGAIN! WE CRACKED THIS BITCH, WE SURE AS HELL ARE GOING TO HELL... BUT HEY... HELL AIN'T A BAD PLACE TO BE! YOU'LL FIND US EATING PUSSY AND DRINKING VODKA NEAR SATAN, ADOLF, MAO AND STALIN'S TABLE!.... HELL YEAH!!!!"
+	lyrics2 := "-------------------------PHONAX AND CRU JONES, FUCKING DID IT AGAIN! WE CRACKED THIS BITCH, WE SURE AS HELL ARE GOING TO HELL... BUT HEY... HELL AIN'T A BAD PLACE TO BE! YOU'LL FIND US EATING PUSSY AND DRINKING VODKA NEAR SATAN, ADOLF, MAO AND STALIN'S TABLE!.... HELL YEAH!!!!----------------------------------------"
 	scroll2 := effect.NewScroller(lyrics2, candyPalette, "assets/fonts/Impact.ttf", 60, float32(rl.GetScreenHeight())-80, 5, 45, 15, 3, false)
 
 	for !rl.WindowShouldClose() {
