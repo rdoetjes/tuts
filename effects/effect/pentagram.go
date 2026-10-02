@@ -14,6 +14,7 @@ type Pentagram struct {
 	vertices       []Vec4
 	circleVertices []Vec4
 	angle          float32
+	palette        []rl.Color
 }
 
 func NewPentagram() *Pentagram {
@@ -41,10 +42,19 @@ func NewPentagram() *Pentagram {
 		}
 	}
 
+	palette := []rl.Color{
+		{40, 10, 0, 255},     // Dark Patina / Oxidation
+		{70, 30, 5, 255},     // Weathered Bronze
+		{110, 50, 10, 255},   // Antique Copper
+		{150, 80, 20, 255},   // Burnished Bronze
+		{255, 230, 120, 255}, // Warm Metallic Glint
+	}
+
 	return &Pentagram{
 		vertices:       vertices,
 		circleVertices: circleVertices,
 		angle:          0,
+		palette:        palette,
 	}
 }
 
@@ -114,6 +124,78 @@ func (p *Pentagram) project(v Vec4) (rl.Vector2, float32) {
 	}, scale4 * scale3 * 25.0 // Normalised scale for thickness
 }
 
+func (p *Pentagram) drawBeveledLine(p1, p2 rl.Vector2, avgScale float32, depth float32, heatPulse float32) {
+	baseThickness := 12.0 * avgScale
+	if baseThickness < 4.0 {
+		baseThickness = 4.0
+	}
+
+	dx := p2.X - p1.X
+	dy := p2.Y - p1.Y
+	angle := float32(math.Atan2(float64(dy), float64(dx)))
+
+	depthShade := depth * 0.8
+	if depthShade > 1.2 {
+		depthShade = 1.2
+	}
+
+	numSteps := 2
+	for step := 0; step < numSteps; step++ {
+		t := 1.0 - (float32(step) / float32(numSteps))
+		thickness := baseThickness * t
+
+		colorIdx := step * len(p.palette) / numSteps
+		if colorIdx >= len(p.palette) {
+			colorIdx = len(p.palette) - 1
+		}
+		baseColor := p.palette[colorIdx]
+
+		// Apply depth shading and pulsing ember effect
+		// Fade out as it moves away from the camera
+		// avgScale decreases as it moves away
+		fade := avgScale * 4.0
+		if fade > 1.0 {
+			fade = 1.0
+		}
+		if fade < 0.0 {
+			fade = 0.0
+		}
+
+		r := float32(baseColor.R) * depthShade * fade * heatPulse
+		g := float32(baseColor.G) * depthShade * fade * heatPulse
+		b := float32(baseColor.B) * depthShade * fade * heatPulse
+		alpha := uint8(255.0 * fade)
+
+		// Add directional lighting (specular) - Warm Metallic
+		if step > 16 {
+			spec := float32(math.Sin(float64(angle)*2.0+float64(p.angle))) * 0.25
+			if spec > 0 {
+				r += spec * 255 * fade
+				g += spec * 200 * fade
+				b += spec * 100 * fade
+			}
+		}
+
+		rl.DrawLineEx(p1, p2, thickness, rl.Color{
+			uint8(math.Min(255, float64(r))),
+			uint8(math.Min(255, float64(g))),
+			uint8(math.Min(255, float64(b))),
+			alpha,
+		})
+	}
+
+	// Warm metallic glint on the ridge
+	glintFactor := float32(math.Cos(float64(angle) - float64(p.angle*0.5)))
+	if glintFactor > 0.2 {
+		fade := avgScale * 4.0
+		if fade > 1.0 {
+			fade = 1.0
+		}
+		alpha := uint8((glintFactor - 0.8) * 5.0 * 200 * fade)
+		rl.DrawLineEx(p1, p2, 1.5*avgScale, rl.Color{255, 240, 180, alpha})
+	}
+}
+
 func (p *Pentagram) Draw() {
 	// Project pentagram vertices
 	projected := make([]rl.Vector2, len(p.vertices))
@@ -131,90 +213,8 @@ func (p *Pentagram) Draw() {
 		projectedCircle[i], scalesCircle[i] = p.project(rotated)
 	}
 
-	palette := []rl.Color{
-		{40, 10, 0, 255},   // Dark Patina / Oxidation
-		{70, 30, 5, 255},   // Weathered Bronze
-		{110, 50, 10, 255}, // Antique Copper
-		{150, 80, 20, 255}, // Burnished Bronze
-
-		{255, 230, 120, 255}, // Warm Metallic Glint
-	}
-
 	// Subtle "heat soak" pulse - looks like it's warm from the fire
 	heatPulse := float32(math.Sin(rl.GetTime()*2.0)*0.1 + 0.9)
-
-	// Helper to draw beveled lines with lighting and depth shading
-	drawBeveledLine := func(p1, p2 rl.Vector2, avgScale float32, depth float32) {
-		baseThickness := 12.0 * avgScale
-		if baseThickness < 4.0 {
-			baseThickness = 4.0
-		}
-
-		dx := p2.X - p1.X
-		dy := p2.Y - p1.Y
-		angle := float32(math.Atan2(float64(dy), float64(dx)))
-
-		depthShade := depth * 0.8
-		if depthShade > 1.2 {
-			depthShade = 1.2
-		}
-
-		numSteps := 2
-		for step := 0; step < numSteps; step++ {
-			t := 1.0 - (float32(step) / float32(numSteps))
-			thickness := baseThickness * t
-
-			colorIdx := step * len(palette) / numSteps
-			if colorIdx >= len(palette) {
-				colorIdx = len(palette) - 1
-			}
-			baseColor := palette[colorIdx]
-
-			// Apply depth shading and pulsing ember effect
-			// Fade out as it moves away from the camera
-			// avgScale decreases as it moves away
-			fade := avgScale * 4.0
-			if fade > 1.0 {
-				fade = 1.0
-			}
-			if fade < 0.0 {
-				fade = 0.0
-			}
-
-			r := float32(baseColor.R) * depthShade * fade * heatPulse
-			g := float32(baseColor.G) * depthShade * fade * heatPulse
-			b := float32(baseColor.B) * depthShade * fade * heatPulse
-			alpha := uint8(255.0 * fade)
-
-			// Add directional lighting (specular) - Warm Metallic
-			if step > 16 {
-				spec := float32(math.Sin(float64(angle)*2.0+float64(p.angle))) * 0.25
-				if spec > 0 {
-					r += spec * 255 * fade
-					g += spec * 200 * fade
-					b += spec * 100 * fade
-				}
-			}
-
-			rl.DrawLineEx(p1, p2, thickness, rl.Color{
-				uint8(math.Min(255, float64(r))),
-				uint8(math.Min(255, float64(g))),
-				uint8(math.Min(255, float64(b))),
-				alpha,
-			})
-		}
-
-		// Warm metallic glint on the ridge
-		glintFactor := float32(math.Cos(float64(angle) - float64(p.angle*0.5)))
-		if glintFactor > 0.2 {
-			fade := avgScale * 4.0
-			if fade > 1.0 {
-				fade = 1.0
-			}
-			alpha := uint8((glintFactor - 0.8) * 5.0 * 200 * fade)
-			rl.DrawLineEx(p1, p2, 1.5*avgScale, rl.Color{255, 240, 180, alpha})
-		}
-	}
 
 	// Draw Pentagram
 	indices := []int{0, 2, 4, 1, 3, 0}
@@ -224,7 +224,7 @@ func (p *Pentagram) Draw() {
 		avgScale := (scales[indices[i]] + scales[indices[i+1]]) / 2.0
 		// Depth factor for shading
 		depth := avgScale * 5.0
-		drawBeveledLine(p1, p2, avgScale, depth)
+		p.drawBeveledLine(p1, p2, avgScale, depth, heatPulse)
 	}
 
 	// Draw Circle Frame
@@ -233,7 +233,7 @@ func (p *Pentagram) Draw() {
 		p2 := projectedCircle[(i+1)%len(projectedCircle)]
 		avgScale := (scalesCircle[i] + scalesCircle[(i+1)%len(projectedCircle)]) / 2.0
 		depth := avgScale * 5.0
-		drawBeveledLine(p1, p2, avgScale, depth)
+		p.drawBeveledLine(p1, p2, avgScale, depth, heatPulse)
 	}
 }
 
