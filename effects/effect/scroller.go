@@ -27,12 +27,12 @@ func (s *Scroller) Process() {
 
 func (s *Scroller) Draw() {
 	t := rl.GetTime()
-	charStep := float32(280) // Fixed width for every character
+	charStep := float32(150) // Fixed width for every character
 	for i, char := range s.text {
 		y := float32(rl.GetScreenHeight())/2 - 240 + float32(math.Sin(t*3+float64(i)*0.3))*150
 
 		// Calculate fixed position
-		posX := s.x + float32(i)*charStep
+		posX := (s.x + float32(i)*charStep) - 90
 
 		// Only draw if visible
 		if posX+charStep < 0 || posX > float32(rl.GetScreenWidth()) {
