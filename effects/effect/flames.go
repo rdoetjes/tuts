@@ -137,7 +137,7 @@ func (s *Flames) Draw() {
 	rl.DrawTexturePro(s.texture, srcRect, destRectFloor, origin, 0, rl.White)
 
 	// Draw ceiling flames (top 320 pixels, flipped vertically and horizontally)
-	destRectCeiling := rl.Rectangle{X: 0, Y: 0, Width: screenWidth, Height: 320}
+	destRectCeiling := rl.Rectangle{X: 0, Y: 0, Width: -screenWidth, Height: -320}
 	srcRectFlipped := rl.Rectangle{X: 0, Y: 0, Width: -float32(s.nCols), Height: -float32(s.nRows)}
 	rl.DrawTexturePro(s.texture, srcRectFlipped, destRectCeiling, origin, 0, rl.White)
 }
