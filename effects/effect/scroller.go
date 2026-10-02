@@ -42,7 +42,7 @@ func (s *Scroller) Draw() {
 		pos := rl.Vector2{X: posX, Y: y}
 
 		// Draw 3D extrude
-		layers := 12
+		layers := 10
 		for l := layers; l > 0; l-- {
 			offset := float32(l) * 4.0
 			layerColor := rl.Color{R: 40 + uint8(16*l), G: 0, B: 0, A: 255}
@@ -50,7 +50,12 @@ func (s *Scroller) Draw() {
 		}
 
 		// Draw main face
-		color := s.pal[int(t*15+float64(i))%len(s.pal)]
+		c := (int(t*15+float64(i)) % len(s.pal))
+		if c > 30 {
+			c = 0
+		}
+
+		color := s.pal[c]
 		rl.DrawTextEx(s.font, string(char), pos, 480, 2, color)
 
 		// Draw highlight
