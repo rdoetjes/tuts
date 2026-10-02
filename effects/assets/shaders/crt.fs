@@ -26,7 +26,7 @@ vec2 curve(vec2 uv) {
 
 void main() {
     vec2 uv = curve(fragTexCoord);
-    
+
     // Check if we're out of bounds after curvature
     if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
         finalColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -49,9 +49,6 @@ void main() {
     float vignette = uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y);
     vignette = pow(vignette * 15.0, vignetteIntensity);
     color.rgb *= vignette;
-
-    // Faint flicker
-    // color.rgb *= 0.98 + 0.02 * sin(110.0 * uv.y);
 
     finalColor = color * colDiffuse;
 }
