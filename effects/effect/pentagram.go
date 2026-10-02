@@ -132,18 +132,18 @@ func (p *Pentagram) Draw() {
 	}
 
 	palette := []rl.Color{
-		{20, 0, 0, 255},      // Charred / Deep Shadow
-		{60, 5, 0, 255},      // Ember Base
-		{120, 10, 0, 255},    // Dark Glowing Red
-		{180, 20, 0, 255},    // Glowing Red
-		{220, 40, 0, 255},    // Hot Red
-		{255, 80, 0, 255},    // Red-Orange
-		{255, 120, 0, 255},   // Orange
-		{255, 160, 20, 255},  // Amber
-		{255, 200, 40, 255},  // Hot Amber
-		{255, 220, 80, 255},  // Incandescent Orange
-		{255, 240, 150, 255}, // Yellow-White Heat
-		{255, 255, 200, 255}, // White Heat Peak
+		{20, 0, 0, 255},     // Charred
+		{60, 2, 0, 255},     // Deep Red
+		{120, 5, 0, 255},    // Red
+		{180, 15, 0, 255},   // Bright Red
+		{220, 40, 0, 255},   // Orange-Red
+		{255, 80, 0, 255},   // Orange
+		{255, 120, 0, 255},  // Bright Orange
+		{255, 160, 0, 255},  // Gold
+		{255, 190, 0, 255},  // Yellow-Gold
+		{255, 210, 0, 255},  // Yellow
+		{255, 230, 20, 255}, // Incandescent Yellow
+		{255, 250, 80, 255}, // Hot White-Yellow
 	}
 
 	// Pulse factor for "glowing ember" look
