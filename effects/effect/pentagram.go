@@ -28,7 +28,7 @@ func NewPentagram() *Pentagram {
 		}
 	}
 
-	numCirclePoints := 64
+	numCirclePoints := 80
 	circleVertices := make([]Vec4, numCirclePoints)
 	radius := float32(1.15) // Slightly larger than the pentagram
 	for i := 0; i < numCirclePoints; i++ {
