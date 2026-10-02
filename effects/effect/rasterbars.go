@@ -26,6 +26,9 @@ func NewRasterBars(pal []rl.Color) *RasterBars {
 		{220, 0, 0, 255},   // Red
 		{255, 120, 0, 255}, // Orange
 		{255, 220, 0, 255}, // Yellow
+		{255, 120, 0, 255}, // Orange
+		{220, 0, 0, 255},   // Red
+		{110, 50, 20, 255}, // 80s brown
 	}
 
 	for i := 0; i < numBars; i++ {
@@ -87,7 +90,7 @@ func (r *RasterBars) Draw() {
 	screenWidth := float32(rl.GetScreenWidth())
 	screenHeight := float32(rl.GetScreenHeight())
 
-	numBars := 8
+	numBars := 7
 	barHeight := float32(28.0) * r.currentScale
 	gap := float32(5.0)
 
