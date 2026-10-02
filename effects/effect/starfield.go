@@ -30,7 +30,7 @@ func NewStarfield(count int) *Starfield {
 		stars[i] = Star{
 			x:     float32(rl.GetRandomValue(0, screenWidth)),
 			y:     float32(rl.GetRandomValue(0, screenHeight)),
-			speed: depth * 0.5,
+			speed: depth * 3.5,
 			size:  depth * 0.8,
 			color: FirePalette[colorIdx],
 		}

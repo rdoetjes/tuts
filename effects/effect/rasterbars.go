@@ -39,7 +39,7 @@ func (r *RasterBars) Draw() {
 		y := screenHeight/2 + offset - (float32(numBars) * totalBarStep / 2) + (float32(i) * totalBarStep)
 
 		shift := int(r.timer * 5)
-		colorIdx := (i + shift) % len(r.palette)
+		colorIdx := (i + shift) % len(r.palette) / 2
 		baseColor := r.palette[colorIdx]
 
 		// Draw rounded shading for each bar
