@@ -98,7 +98,7 @@ func (s *Flames) spreadFire(x int, y int) {
 		dstX = s.nCols - 1
 	}
 
-	decay := uint8(rnd & 1)
+	decay := uint8(rnd & 1) // 0 or 1
 	if pixel > decay {
 		s.heatmap[y-1][dstX] = pixel - decay
 	} else {
