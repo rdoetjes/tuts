@@ -132,13 +132,11 @@ func (p *Pentagram) Draw() {
 	}
 
 	palette := []rl.Color{
-		{40, 10, 0, 255},     // Dark Patina / Oxidation
-		{70, 30, 5, 255},     // Weathered Bronze
-		{110, 50, 10, 255},   // Antique Copper
-		{150, 80, 20, 255},   // Burnished Bronze
-		{190, 110, 30, 255},  // Rose Gold
-		{220, 150, 40, 255},  // Polished Gold
-		{255, 190, 60, 255},  // Bright Brass
+		{40, 10, 0, 255},   // Dark Patina / Oxidation
+		{70, 30, 5, 255},   // Weathered Bronze
+		{110, 50, 10, 255}, // Antique Copper
+		{150, 80, 20, 255}, // Burnished Bronze
+
 		{255, 230, 120, 255}, // Warm Metallic Glint
 	}
 
@@ -161,7 +159,7 @@ func (p *Pentagram) Draw() {
 			depthShade = 1.2
 		}
 
-		numSteps := 24
+		numSteps := 2
 		for step := 0; step < numSteps; step++ {
 			t := 1.0 - (float32(step) / float32(numSteps))
 			thickness := baseThickness * t
@@ -208,7 +206,7 @@ func (p *Pentagram) Draw() {
 
 		// Warm metallic glint on the ridge
 		glintFactor := float32(math.Cos(float64(angle) - float64(p.angle*0.5)))
-		if glintFactor > 0.8 {
+		if glintFactor > 0.2 {
 			fade := avgScale * 4.0
 			if fade > 1.0 {
 				fade = 1.0
