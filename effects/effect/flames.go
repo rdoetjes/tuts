@@ -78,6 +78,9 @@ func (s *Flames) Process() {
 			s.spreadFire(x, y)
 		}
 	}
+
+	//update pixels to image structe
+	s.updatePixels()
 }
 
 func (s *Flames) spreadFire(x int, y int) {
@@ -121,9 +124,6 @@ func (s *Flames) updatePixels() {
 }
 
 func (s *Flames) Draw() {
-	//update pixels to image structe
-	s.updatePixels()
-
 	// Upload the updated image to the GPU texture
 	rl.UpdateTexture(s.texture, rl.LoadImageColors(s.image))
 
