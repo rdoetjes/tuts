@@ -33,6 +33,16 @@ func main() {
 
 	scroll2 := effect.NewScroller(lyrics2, candyPalette, "assets/fonts/Impact.ttf", 60, float32(rl.GetScreenHeight())-80, 5, 15, 3, false)
 
+	// Load CRT shader
+	shader := rl.LoadShader("", "assets/shaders/crt.fs")
+	resolutionLoc := rl.GetShaderLocation(shader, "resolution")
+	rl.SetShaderValue(shader, resolutionLoc, []float32{float32(rl.GetScreenWidth()), float32(rl.GetScreenHeight())}, rl.ShaderUniformVec2)
+
+	// Create render texture for post-processing
+	target := rl.LoadRenderTexture(1024, 768)
+	defer rl.UnloadRenderTexture(target)
+	defer rl.UnloadShader(shader)
+
 	for !rl.WindowShouldClose() {
 		if rl.GetKeyPressed() > 0 {
 			fire.Toggle()
@@ -46,7 +56,8 @@ func main() {
 		scroll.Process()
 		scroll2.Process()
 
-		rl.BeginDrawing()
+		// Draw to render texture
+		rl.BeginTextureMode(target)
 		rl.ClearBackground(rl.Black)
 
 		moon.Draw()
@@ -63,6 +74,16 @@ func main() {
 		scroll.Draw()
 		fire.Draw()
 		scroll2.Draw()
+		rl.EndTextureMode()
+
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.Black)
+
+		// Draw render texture with CRT shader
+		rl.BeginShaderMode(shader)
+		// NOTE: Render texture must be Y-flipped because of OpenGL coordinates
+		rl.DrawTextureRec(target.Texture, rl.Rectangle{X: 0, Y: 0, Width: float32(target.Texture.Width), Height: -float32(target.Texture.Height)}, rl.Vector2{X: 0, Y: 0}, rl.White)
+		rl.EndShaderMode()
 
 		rl.DrawFPS(10, 10)
 		rl.EndDrawing()
