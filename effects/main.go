@@ -28,7 +28,7 @@ func NewEngine() *Engine {
 	e.rasterBars = effect.NewRasterBars(effect.FirePalette)
 	e.embers = effect.NewStarfield(400)
 
-	lyrics1 := "                  I GUESS, D'ELITE TEAM IS GOING TO HELL... AND LET us TELL YOU... IN THE IMMORTAL WORDS OF BON SCOTT..... HELL AIN'T A BAD PLACE TO BE!!!...          "
+	lyrics1 := "                                I GUESS, D'ELITE TEAM IS GOING TO HELL... AND LET US TELL YOU... IN THE IMMORTAL WORDS OF BON SCOTT..... HELL AIN'T A BAD PLACE TO BE!!!...          "
 	e.scroll1 = effect.NewScroller(lyrics1, effect.FirePalette, "assets/fonts/Menlo.ttf", 400, float32(rl.GetScreenHeight())/2-250, 8, 100, 12, true)
 
 	candyPalette := []rl.Color{
