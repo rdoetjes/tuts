@@ -12,13 +12,14 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
-	cols, rows := 400, 150
+	const cols, rows = 400, 150
 	var fire *effects.Flames = effects.NewFlames(cols, rows)
 
 	for !rl.WindowShouldClose() {
 		if rl.GetKeyPressed() > 0 {
 			fire.Toggle()
 		}
+
 		fire.Process()
 
 		rl.BeginDrawing()
