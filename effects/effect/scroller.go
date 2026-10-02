@@ -27,12 +27,12 @@ func (s *Scroller) Process() {
 
 func (s *Scroller) Draw() {
 	t := rl.GetTime()
-	charStep := float32(150) // Fixed width for every character
+	charStep := float32(175) // Fixed width for every character
 	for i, char := range s.text {
 		y := float32(rl.GetScreenHeight())/2 - 240 + float32(math.Sin(t*3+float64(i)*0.3))*150
 
 		// Calculate fixed position
-		posX := (s.x + float32(i)*charStep) - 90
+		posX := (s.x + float32(i)*charStep)
 
 		// Only draw if visible
 		if posX+charStep < 0 || posX > float32(rl.GetScreenWidth()) {
@@ -44,8 +44,8 @@ func (s *Scroller) Draw() {
 		// Draw 3D extrude
 		layers := 12
 		for l := layers; l > 0; l-- {
-			offset := float32(l) * 2.0
-			layerColor := rl.Color{R: 40, G: 0, B: 0, A: 255}
+			offset := float32(l) * 4.0
+			layerColor := rl.Color{R: 40 + uint8(16*l), G: 0, B: 0, A: 255}
 			rl.DrawTextEx(s.font, string(char), rl.Vector2{X: pos.X + offset, Y: pos.Y + offset}, 480, 2, layerColor)
 		}
 
