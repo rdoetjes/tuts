@@ -21,7 +21,7 @@ type Flames struct {
 	heatmap [][]uint8
 	nRows   int
 	nCols   int
-	isOff   bool
+	isOn    bool
 	image   *rl.Image
 	texture rl.Texture2D
 }
@@ -40,7 +40,7 @@ func NewFlames(nCols int, nRows int) *Flames {
 		heatmap: heatmap,
 		nRows:   nRows,
 		nCols:   nCols,
-		isOff:   false,
+		isOn:    true,
 		image:   img,
 		texture: tex,
 	}
@@ -49,15 +49,15 @@ func NewFlames(nCols int, nRows int) *Flames {
 }
 
 func (s *Flames) IsBurning() bool {
-	return !s.isOff
+	return s.isOn
 }
 
 func (s *Flames) Toggle() {
-	s.isOff = !s.isOff
+	s.isOn = !s.isOn
 }
 
 func (s *Flames) Process() {
-	if s.isOff {
+	if !s.isOn {
 		for i := 0; i < s.nCols; i++ {
 			// extinquish bottom row
 			if s.heatmap[s.nRows-1][i] > 0 {
