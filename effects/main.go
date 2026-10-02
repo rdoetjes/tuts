@@ -1,7 +1,7 @@
 package main
 
 import (
-	"effects/effects"
+	effects "effects/effect"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
