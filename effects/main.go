@@ -17,6 +17,7 @@ type Engine struct {
 	shader     rl.Shader
 	target     rl.RenderTexture2D
 	phraseIdx  int
+	timer      float32
 }
 
 func NewEngine() *Engine {
@@ -58,6 +59,7 @@ func (e *Engine) Unload() {
 }
 
 func (e *Engine) Process() {
+	e.timer += rl.GetFrameTime()
 	if rl.GetKeyPressed() > 0 {
 		e.fire.Toggle()
 	}
@@ -95,6 +97,7 @@ func (e *Engine) Draw() {
 
 	e.scroll1.Draw()
 	e.fire.Draw()
+
 	e.scroll2.Draw()
 	rl.EndTextureMode()
 
