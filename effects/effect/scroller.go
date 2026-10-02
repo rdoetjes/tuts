@@ -13,35 +13,49 @@ type Scroller struct {
 	x            float32
 	yPos         float32
 	speed        float32
-	spacing      float32
 	yAmplitude   float32
 	pal          []rl.Color
 	flashSpeed   int
 	perCharColor bool
 	frames       int
+	charOffsets  []float32
+	totalWidth   float32
 }
 
-func NewScroller(txt string, pal []rl.Color, fontPath string, fontSize float32, yPos float32, speed float32, spacing float32, yAmp float32, flashSpeed int, perCharColor bool) *Scroller {
+func NewScroller(txt string, pal []rl.Color, fontPath string, fontSize float32, yPos float32, speed float32, yAmp float32, flashSpeed int, perCharColor bool) *Scroller {
+	font := rl.LoadFontEx(fontPath, int32(fontSize), nil, 0)
+
+	// Pre-calculate character offsets for proportional spacing
+	charOffsets := make([]float32, len(txt))
+	var currentX float32 = 0
+	for i, char := range txt {
+		charOffsets[i] = currentX
+		// Measure each character to find its width
+		charSize := rl.MeasureTextEx(font, string(char), fontSize, 2)
+		currentX += charSize.X
+	}
+
 	return &Scroller{
 		text:         txt,
-		font:         rl.LoadFontEx(fontPath, int32(fontSize), nil, 0),
+		font:         font,
 		fontSize:     fontSize,
 		x:            float32(rl.GetScreenWidth()),
 		yPos:         yPos,
 		speed:        speed,
-		spacing:      spacing,
 		yAmplitude:   yAmp,
 		pal:          pal,
 		flashSpeed:   flashSpeed,
 		perCharColor: perCharColor,
+		charOffsets:  charOffsets,
+		totalWidth:   currentX,
 	}
 }
 
 func (s *Scroller) Process() {
 	s.x -= s.speed
 	s.frames++
-	// Use spacing for reset logic
-	if s.x < -float32(len(s.text))*s.spacing*1.5 {
+	// Reset when the entire string has scrolled off
+	if s.x < -s.totalWidth {
 		s.x = float32(rl.GetScreenWidth())
 	}
 }
@@ -51,11 +65,14 @@ func (s *Scroller) Draw() {
 	for i, char := range s.text {
 		y := s.yPos + float32(math.Sin(t*3+float64(i)*0.3))*s.yAmplitude
 
-		// Calculate position
-		posX := (s.x + float32(i)*s.spacing)
+		// Calculate position using pre-calculated proportional offsets
+		posX := s.x + s.charOffsets[i]
+
+		// Get character width for visibility check
+		charWidth := rl.MeasureTextEx(s.font, string(char), s.fontSize, 2).X
 
 		// Only draw if visible
-		if posX+s.spacing < 0 || posX > float32(rl.GetScreenWidth()) {
+		if posX+charWidth < 0 || posX > float32(rl.GetScreenWidth()) {
 			continue
 		}
 
