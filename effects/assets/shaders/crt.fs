@@ -42,7 +42,11 @@ void main() {
     color.a = 1.0;
 
     // Scanlines
+    // uv.y * resolution.y normalizes it back to 0,0 left upper corner
+    // the * 1.5 is the spacing between the lines (lower is bigger gap)
+    // the value scanline osicliates between -1 and 1
     float scanline = sin(uv.y * resolution.y * 1.5) * scanlineAlpha;
+    // subtracting a positive makes it darker, subtracting a negative brightens the line
     color.rgb -= scanline;
 
     // Vignette
