@@ -9,19 +9,41 @@ import (
 const BounceSpeed = 0.8
 
 type RasterBars struct {
-	palette []rl.Color
-	timer   float32
+	palette      []rl.Color
+	timer        float32
+	currentScale float32
 }
 
 func NewRasterBars(pal []rl.Color) *RasterBars {
 	return &RasterBars{
-		palette: pal,
-		timer:   0,
+		palette:      pal,
+		timer:        0,
+		currentScale: 1.0,
 	}
 }
 
 func (r *RasterBars) Process() {
 	r.timer += 0.06
+
+	// Target scale: 1.0 when moving up, 0.8 when moving down
+	targetScale := float32(1.0)
+	if !r.IsMovingUp() {
+		targetScale = 0.8
+	}
+
+	// Smoothly transition scale over 5 frames (step = 0.2 / 5 = 0.04)
+	step := float32(0.08)
+	if r.currentScale < targetScale {
+		r.currentScale += step
+		if r.currentScale > targetScale {
+			r.currentScale = targetScale
+		}
+	} else if r.currentScale > targetScale {
+		r.currentScale -= step
+		if r.currentScale < targetScale {
+			r.currentScale = targetScale
+		}
+	}
 }
 
 func (r *RasterBars) Draw() {
@@ -29,8 +51,8 @@ func (r *RasterBars) Draw() {
 	screenHeight := float32(rl.GetScreenHeight())
 
 	numBars := 8
-	barHeight := float32(28.0) // Slightly taller to accommodate internal shading
-	gap := float32(5.0)        // 5 pixel gap as requested
+	barHeight := float32(28.0) * r.currentScale
+	gap := float32(5.0)
 
 	for i := 0; i < numBars; i++ {
 		bounce := float64(r.timer * BounceSpeed)
