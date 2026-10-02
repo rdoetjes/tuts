@@ -29,8 +29,8 @@ func main() {
 		{120, 40, 0, 255},  // Deep Burnt Sienna (Brown replacement)
 	}
 
-	lyrics2 := "-------------------------PHONAX AND CRU JONES, FUCKING DID IT AGAIN! WE CRACKED THIS BITCH, WE SURE AS HELL ARE GOING TO HELL... BUT HEY... HELL AIN'T A BAD PLACE TO BE! YOU'LL FIND US EATING PUSSY AND DRINKING VODKA NEAR SATAN, ADOLF, MAO AND STALIN'S TABLE!.... HELL YEAH!!!!----------------------------------------"
-	scroll2 := effect.NewScroller(lyrics2, candyPalette, "assets/fonts/Impact.ttf", 60, float32(rl.GetScreenHeight())-80, 5, 45, 15, 3, false)
+	lyrics2 := "-------------------------PHONAX AND CRU JONES, FUCKING DID IT AGAIN! WE CRACKED THIS BITCH, WE SURE AS HELL ARE GOING TO HELL... BUT HEY........... HELL AIN'T A BAD PLACE TO BE!!!!...... SO,    YOU'LL FIND US EATING PUSSY AND DRINKING VODKA NEAR SATAN, ADOLF, MAO AND STALIN'S TABLE!.... HELL YEAH!!!!----------------------------------------"
+	scroll2 := effect.NewScroller(lyrics2, candyPalette, "assets/fonts/Impact.ttf", 90, float32(rl.GetScreenHeight())-100, 5, 45, 15, 3, false)
 
 	for !rl.WindowShouldClose() {
 		if rl.GetKeyPressed() > 0 {
