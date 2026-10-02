@@ -11,6 +11,7 @@ func main() {
 	defer rl.CloseWindow()
 
 	rl.SetTargetFPS(60)
+	rl.DisableCursor()
 
 	fire := effect.NewFlames(400, 150)
 	pentagram := effect.NewPentagram()
