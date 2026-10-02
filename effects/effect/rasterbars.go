@@ -19,7 +19,7 @@ func NewRasterBars(pal []rl.Color) *RasterBars {
 }
 
 func (r *RasterBars) Process() {
-	r.timer += 0.02
+	r.timer += 0.06
 }
 
 func (r *RasterBars) Draw() {
@@ -71,6 +71,12 @@ func (r *RasterBars) Draw() {
 			rl.DrawRectangle(0, int32(sliceY), int32(screenWidth), int32(sliceHeight)+1, sliceColor)
 		}
 	}
+}
+
+func (r *RasterBars) IsMovingUp() bool {
+	// The derivative of sin(r.timer * 0.8) is 0.8 * cos(r.timer * 0.8)
+	// If cos is negative, it's moving UP (Y value is decreasing)
+	return math.Cos(float64(r.timer*0.8)) < 0
 }
 
 var _ BaseEffect = (*RasterBars)(nil)

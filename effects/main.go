@@ -36,8 +36,15 @@ func main() {
 		rl.ClearBackground(rl.Black)
 
 		stars.Draw()
-		rasterBars.Draw()
-		pentagram.Draw()
+
+		if rasterBars.IsMovingUp() {
+			pentagram.Draw()
+			rasterBars.Draw()
+		} else {
+			rasterBars.Draw()
+			pentagram.Draw()
+		}
+
 		scroll.Draw()
 		fire.Draw()
 		rl.DrawFPS(10, 10)
