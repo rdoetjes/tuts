@@ -132,22 +132,18 @@ func (p *Pentagram) Draw() {
 	}
 
 	palette := []rl.Color{
-		{20, 0, 0, 255},     // Charred
-		{60, 2, 0, 255},     // Deep Red
-		{120, 5, 0, 255},    // Red
-		{180, 15, 0, 255},   // Bright Red
-		{220, 40, 0, 255},   // Orange-Red
-		{255, 80, 0, 255},   // Orange
-		{255, 120, 0, 255},  // Bright Orange
-		{255, 160, 0, 255},  // Gold
-		{255, 190, 0, 255},  // Yellow-Gold
-		{255, 210, 0, 255},  // Yellow
-		{255, 230, 20, 255}, // Incandescent Yellow
-		{255, 250, 80, 255}, // Hot White-Yellow
+		{40, 10, 0, 255},     // Dark Patina / Oxidation
+		{70, 30, 5, 255},     // Weathered Bronze
+		{110, 50, 10, 255},   // Antique Copper
+		{150, 80, 20, 255},   // Burnished Bronze
+		{190, 110, 30, 255},  // Rose Gold
+		{220, 150, 40, 255},  // Polished Gold
+		{255, 190, 60, 255},  // Bright Brass
+		{255, 230, 120, 255}, // Warm Metallic Glint
 	}
 
-	// Pulse factor for "glowing ember" look
-	pulse := float32(math.Sin(rl.GetTime()*4.0)*0.2 + 0.8)
+	// Subtle "heat soak" pulse - looks like it's warm from the fire
+	heatPulse := float32(math.Sin(rl.GetTime()*2.0)*0.1 + 0.9)
 
 	// Helper to draw beveled lines with lighting and depth shading
 	drawBeveledLine := func(p1, p2 rl.Vector2, avgScale float32, depth float32) {
@@ -187,17 +183,18 @@ func (p *Pentagram) Draw() {
 				fade = 0.0
 			}
 
-			r := float32(baseColor.R) * depthShade * pulse * fade
-			g := float32(baseColor.G) * depthShade * pulse * fade
-			b := float32(baseColor.B) * depthShade * pulse * fade
+			r := float32(baseColor.R) * depthShade * fade * heatPulse
+			g := float32(baseColor.G) * depthShade * fade * heatPulse
+			b := float32(baseColor.B) * depthShade * fade * heatPulse
 			alpha := uint8(255.0 * fade)
 
-			// Add directional lighting (specular) - Keep it warm (red/yellow), avoid blue/green
+			// Add directional lighting (specular) - Warm Metallic
 			if step > 16 {
-				spec := float32(math.Sin(float64(angle)*2.0+float64(p.angle))) * 0.2
+				spec := float32(math.Sin(float64(angle)*2.0+float64(p.angle))) * 0.25
 				if spec > 0 {
 					r += spec * 255 * fade
-					g += spec * 150 * fade // Less green for a warmer highlight
+					g += spec * 200 * fade
+					b += spec * 100 * fade
 				}
 			}
 
@@ -209,15 +206,15 @@ func (p *Pentagram) Draw() {
 			})
 		}
 
-		// Hot glint on the ridge
+		// Warm metallic glint on the ridge
 		glintFactor := float32(math.Cos(float64(angle) - float64(p.angle*0.5)))
 		if glintFactor > 0.8 {
 			fade := avgScale * 4.0
 			if fade > 1.0 {
 				fade = 1.0
 			}
-			alpha := uint8((glintFactor - 0.8) * 5.0 * 200 * pulse * fade)
-			rl.DrawLineEx(p1, p2, 1.5*avgScale, rl.Color{255, 230, 150, alpha})
+			alpha := uint8((glintFactor - 0.8) * 5.0 * 200 * fade)
+			rl.DrawLineEx(p1, p2, 1.5*avgScale, rl.Color{255, 240, 180, alpha})
 		}
 	}
 

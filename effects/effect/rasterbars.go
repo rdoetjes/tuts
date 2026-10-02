@@ -92,7 +92,7 @@ func (r *RasterBars) Draw() {
 
 	numBars := 7
 	barHeight := float32(28.0) * r.currentScale
-	gap := float32(5.0)
+	gap := float32(3.0)
 
 	for i := 0; i < numBars; i++ {
 		bounce := float64(r.timer * BounceSpeed)
