@@ -29,7 +29,7 @@ func main() {
 		{120, 40, 0, 255},  // Deep Burnt Sienna (Brown replacement)
 	}
 
-	lyrics2 := "PHONAX AND CRU JONES, FUCKING DONE IT AGAIN! WE CRACKED THIS BITCH, WE SURE AS HELL ARE GOING TO HELL... BUT HEY... HELL AIN'T A BAD PLACE TO BE! YOU'LL FIND US EATING PUSSY AND DRINKING NEAR SATAN'S TABLE!.... HELL YEAH!!!!"
+	lyrics2 := "PHONAX AND CRU JONES, FROM D'ELITE.....   FUCKING DONE IT AGAIN. YOU HOPELESS WHORES!!!!!!                            YUP!!!                 BITCHES!!!                      WE CRACKED THIS SHIT BUCKET RIGHT OPEN..... I GUESS, WE ARE GOING TO HELL... BUT HEY... HELL AIN'T A BAD PLACE TO BE! YOU'LL FIND US EATING PUSSY AND DRINKING NEAR SATAN'S TABLE!.... HELL YEAH!!!!"
 	scroll2 := effect.NewScroller(lyrics2, candyPalette, "assets/fonts/Impact.ttf", 60, float32(rl.GetScreenHeight())-80, 5, 15, 3, false)
 
 	for !rl.WindowShouldClose() {
