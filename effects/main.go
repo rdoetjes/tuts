@@ -16,11 +16,7 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 		if rl.GetKeyPressed() > 0 {
-			if fire.IsBurning() {
-				fire.TurnOff()
-			} else {
-				fire.TurnOn()
-			}
+			fire.Toggle()
 		}
 		fire.Process()
 

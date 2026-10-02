@@ -52,12 +52,8 @@ func (s *Flames) IsBurning() bool {
 	return !s.isOff
 }
 
-func (s *Flames) TurnOff() {
-	s.isOff = true
-}
-
-func (s *Flames) TurnOn() {
-	s.isOff = false
+func (s *Flames) Toggle() {
+	s.isOff = !s.isOff
 }
 
 func (s *Flames) Process() {
