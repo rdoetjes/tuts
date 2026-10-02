@@ -50,13 +50,18 @@ func (s *Scroller) Draw() {
 		}
 
 		// Draw main face
-		c := (int(t*15+float64(i)) % len(s.pal))
-		if c > 30 {
-			c = 0
+		// Cycle colors up and down the palette (ping-pong effect)
+		numColors := len(s.pal)
+		if numColors > 1 {
+			cycleLength := 2 * (numColors - 1)
+			idx := (int(t*20) + i) % cycleLength
+			c := idx
+			if idx >= numColors {
+				c = cycleLength - idx
+			}
+			color := s.pal[c]
+			rl.DrawTextEx(s.font, string(char), pos, 480, 2, color)
 		}
-
-		color := s.pal[c]
-		rl.DrawTextEx(s.font, string(char), pos, 480, 2, color)
 
 		// Draw highlight
 		rl.DrawTextEx(s.font, string(char), rl.Vector2{X: pos.X - 3, Y: pos.Y - 3}, 480, 2, rl.Color{255, 255, 255, 80})
