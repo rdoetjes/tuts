@@ -18,7 +18,7 @@ func main() {
 	stars := effect.NewStarfield(400)
 	moon := effect.NewMoon(200)
 
-	lyrics := "                  I GUESS, D'ELITE TEAM IS GOING TO HELL... AND LET ME TELL YOU... IN THE IMMORTAL WORDS OF BON SCOTT..... HELL AIN'T A BAD PLACE TO BE!!!...          "
+	lyrics := "                  I GUESS, D'ELITE TEAM IS GOING TO HELL... AND LET US TELL YOU... IN THE IMMORTAL WORDS OF BON SCOTT..... HELL AIN'T A BAD PLACE TO BE!!!...          "
 
 	scroll := effect.NewScroller(lyrics, effect.FirePalette, "assets/fonts/Menlo.ttf", 400, float32(rl.GetScreenHeight())/2-250, 8, 100, 12, true)
 
