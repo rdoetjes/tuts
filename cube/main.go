@@ -30,8 +30,8 @@ func main() {
 	// A cube has 8 vertices (corners). We define them in a 3D coordinate system
 	// where (0,0,0) is the center of the cube.
 	vertices := []Vector3{
-		{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}, // Front face (Z=1)
-		{-1, -1, -1}, {1, -1, -1}, {1, 1, -1}, {-1, 1, -1}, // Back face (Z=-1)
+		{-1, -1, 2}, {1, -1, 2}, {1, 1, 2}, {-1, 1, 2}, // Front face (Z=1)
+		{-1, -1, -2}, {1, -1, -2}, {1, 1, -2}, {-1, 1, -2}, // Back face (Z=-1)
 	}
 
 	// 2. Define Edges
@@ -67,7 +67,7 @@ func main() {
 			// 'offset' moves the object away from the camera so it doesn't clip.
 			// 'scale' acts as a field of view/zoom factor.
 
-			distance := 4.0 // Distance from "camera"
+			distance := 5.0 // Distance from "camera"
 			fov := 400.0    // Scaling factor to map to screen pixels
 
 			// We add the distance to Z to prevent division by zero and move the cube forward.
