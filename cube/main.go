@@ -88,7 +88,8 @@ func main() {
 			rl.DrawLine(int32(p1.X), int32(p1.Y), int32(p2.X), int32(p2.Y), rl.RayWhite)
 		}
 
-		rl.DrawText("Spinning Cube - Custom 3D Logic", 10, 10, 20, rl.Gray)
+		rl.DrawFPS(10, 10)
+
 		rl.EndDrawing()
 	}
 }
